@@ -1,21 +1,6 @@
 {
-  "name": "birdhouse",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "auth:generate": "npx @better-auth/cli@latest generate --config ./src/server/auth/index.ts --yes",
-    "build": "next build",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
-    "dev": "next dev",
-    "format": "biome format --write .",
-    "lint": "biome check .",
-    "lint:unsafe": "biome check --write --unsafe .",
-    "lint:write": "biome check --write .",
-    "start": "next start"
+  "clx2aMetadata": {
+    "initVersion": "0.11.3"
   },
   "dependencies": {
     "@t3-oss/env-nextjs": "^0.13.8",
@@ -39,7 +24,22 @@
     "tailwindcss": "^4.0.17",
     "typescript": "^5.9.3"
   },
-  "clx2aMetadata": {
-    "initVersion": "0.11.3"
-  }
+  "name": "birdhouse",
+  "private": true,
+  "scripts": {
+    "auth:generate": "npx @better-auth/cli@latest generate --config ./src/server/auth/index.ts --yes",
+    "build": "next build",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "dev": "next dev",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "lint:unsafe": "biome check --write --unsafe .",
+    "lint:write": "biome check --write .",
+    "start": "next start"
+  },
+  "type": "module",
+  "version": "0.1.0"
 }

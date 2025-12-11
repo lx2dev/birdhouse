@@ -1,7 +1,8 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "assist": {
     "actions": {
+      "recommended": true,
       "source": {
         "organizeImports": {
           "level": "on",
@@ -11,21 +12,48 @@
               ":BLANK_LINE:",
               ":ALIAS:",
               ":BLANK_LINE:",
-              ":PATH:",
+              ":PATH:"
             ],
-            "identifierOrder": "natural",
-          },
+            "identifierOrder": "natural"
+          }
         },
+        "recommended": true,
         "useSortedAttributes": "on",
         "useSortedKeys": "on",
-        "useSortedProperties": "on",
-      },
+        "useSortedProperties": "on"
+      }
     },
-    "enabled": true,
+    "enabled": true
+  },
+  "css": {
+    "assist": {
+      "enabled": true
+    },
+    "formatter": {
+      "enabled": true
+    },
+    "linter": {
+      "enabled": true
+    },
+    "parser": {
+      "cssModules": true,
+      "tailwindDirectives": true
+    }
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!node_modules", "!.next", "!dist", "!build"],
+    "includes": [
+      "**",
+      "!node_modules",
+      "!.next",
+      "!dist",
+      "!build",
+      "!out",
+      "!package-lock.json",
+      "!pnpm-lock.yaml",
+      "!bun.lock",
+      "!yarn.lock"
+    ]
   },
   "formatter": {
     "bracketSpacing": true,
@@ -34,39 +62,45 @@
     "indentStyle": "space",
     "indentWidth": 2,
     "lineWidth": 80,
-    "useEditorconfig": true,
+    "useEditorconfig": true
+  },
+  "html": {
+    "formatter": {
+      "enabled": true
+    }
   },
   "javascript": {
+    "assist": {
+      "enabled": true
+    },
     "formatter": {
       "arrowParentheses": "always",
       "enabled": true,
       "jsxQuoteStyle": "double",
       "quoteStyle": "double",
       "semicolons": "asNeeded",
-      "trailingCommas": "all",
+      "trailingCommas": "all"
     },
+    "linter": {
+      "enabled": true
+    }
   },
   "linter": {
-    "domains": {
-      "next": "recommended",
-      "react": "recommended",
-    },
     "enabled": true,
     "rules": {
       "complexity": {
         "noExtraBooleanCast": "warn",
         "noUselessFragments": "warn",
-        "noUselessTernary": "warn",
+        "noUselessTernary": "warn"
       },
       "nursery": {
         "useSortedClasses": {
           "fix": "safe",
           "level": "warn",
           "options": {
-            "attributes": ["className", "class"],
-            "functions": ["cn", "clsx", "classnames"],
-          },
-        },
+            "functions": ["clsx", "cva", "cn"]
+          }
+        }
       },
       "recommended": true,
       "style": {
@@ -76,19 +110,19 @@
         "useImportType": {
           "level": "warn",
           "options": {
-            "style": "separatedType",
-          },
+            "style": "separatedType"
+          }
         },
-        "useShorthandAssign": "error",
+        "useShorthandAssign": "error"
       },
       "suspicious": {
-        "noUnknownAtRules": "off",
-      },
-    },
+        "noUnknownAtRules": "off"
+      }
+    }
   },
   "vcs": {
     "clientKind": "git",
     "enabled": true,
-    "useIgnoreFile": true,
-  },
+    "useIgnoreFile": true
+  }
 }
