@@ -6,33 +6,39 @@ import { waitForTask } from "@/lib/proxmox/wait-for-task"
 const DEFAULT_NODE = "pve01"
 
 export async function createVmAction() {
-  const upid = await proxmox.nodes.$(DEFAULT_NODE).qemu.$(9000).clone.$post({
-    full: false, // If true, vm won't start due to lock error
-    name: "test-vm",
-    newid: 5000,
-  })
-
-  console.log("Clone started, UPID:", upid)
-
-  // Must wait for clone to finish before configuring
-  await waitForTask(proxmox, DEFAULT_NODE, upid)
-
-  console.log("Clone finished, configuring VM...")
-  await proxmox.nodes
+  const cloneUpid = await proxmox.nodes
     .$(DEFAULT_NODE)
-    .qemu.$(5000)
-    .config.$post({
-      cores: 2,
-      description: `Created at ${new Date().toISOString()}`,
-      memory: "2048",
-      net0: "virtio,bridge=vmbr0",
+    .qemu.$(9000)
+    .clone.$post({
+      full: false,
+      name: "test-vm",
+      newid: 5000,
     })
 
-  console.log("VM configured, setting up Cloud-Init...")
+  for await (const update of waitForTask(proxmox, DEFAULT_NODE, cloneUpid)) {
+    if (update.logs) {
+      console.log(update.logs.join("\n"))
+    }
+  }
+
+  console.log("Configuring VM...")
+
+  await proxmox.nodes.$(DEFAULT_NODE).qemu.$(5000).config.$post({
+    cipassword: "cloudpassword",
+    ciuser: "clouduser",
+    cores: 2,
+    memory: "2048",
+  })
   await proxmox.nodes.$(DEFAULT_NODE).qemu.$(5000).cloudinit.$put()
 
-  console.log("Cloud-Init configured, starting VM...")
-  await proxmox.nodes.$(DEFAULT_NODE).qemu.$(5000).status.start.$post()
+  console.log("Starting VM...")
 
-  console.log("VM created and started: 5000")
+  const startUpid = await proxmox.nodes
+    .$(DEFAULT_NODE)
+    .qemu.$(5000)
+    .status.start.$post()
+
+  await waitForTask(proxmox, DEFAULT_NODE, startUpid).next()
+
+  console.log("VM started!")
 }
