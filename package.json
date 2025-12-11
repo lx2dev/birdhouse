@@ -13,6 +13,7 @@
     "drizzle-orm": "^0.44.7",
     "next": "^16.0.8",
     "postgres": "^3.4.7",
+    "proxmox-api": "^1.1.1",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "server-only": "^0.0.1",
