@@ -10,7 +10,7 @@ export async function createVmAction() {
     .$(DEFAULT_NODE)
     .qemu.$(9000)
     .clone.$post({
-      full: false,
+      full: true,
       name: "test-vm",
       newid: 5000,
     })
@@ -39,6 +39,4 @@ export async function createVmAction() {
     .status.start.$post()
 
   await waitForTask(proxmox, DEFAULT_NODE, startUpid).next()
-
-  console.log("VM started!")
 }
