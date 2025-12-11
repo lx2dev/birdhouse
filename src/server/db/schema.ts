@@ -3,20 +3,6 @@ import { index, pgTableCreator } from "drizzle-orm/pg-core"
 
 export const createTable = pgTableCreator((name) => `birdhouse_${name}`)
 
-export const post = createTable(
-  "post",
-  (d) => ({
-    createdAt: d
-      .timestamp({ withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    name: d.varchar({ length: 255 }).notNull(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
-  }),
-  (t) => [index("post_name_idx").on(t.name)],
-)
-
 export const user = createTable(
   "user",
   (d) => ({
