@@ -13,6 +13,9 @@ export const env = createEnv({
     DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     NODE_ENV: process.env.NODE_ENV,
+    PM_HOST: process.env.PM_HOST,
+    PM_SECRET: process.env.PM_SECRET,
+    PM_TOKEN_ID: process.env.PM_TOKEN_ID,
   },
   server: {
     BETTER_AUTH_SECRET: z.string(),
@@ -22,6 +25,9 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    PM_HOST: z.string(),
+    PM_SECRET: z.string(),
+    PM_TOKEN_ID: z.string(),
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 })
