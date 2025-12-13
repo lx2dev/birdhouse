@@ -8,9 +8,11 @@ import {
   IconPointFilled,
   IconRotateClockwise,
   IconServer2,
+  IconTerminal,
   IconTrash,
 } from "@tabler/icons-react"
 import { formatDistanceToNow } from "date-fns"
+import Link from "next/link"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -62,11 +64,13 @@ export function ComputeCard({ vm }: ComputeCardProps) {
             <Badge className={getStatusColor(vm.status)}>{vm.status}</Badge>
           </div>
           <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button className="size-8" size="icon" variant="ghost">
-                <IconDotsVertical />
-              </Button>
-            </DropdownMenuTrigger>
+            <DropdownMenuTrigger
+              render={
+                <Button className="size-8" size="icon" variant="ghost">
+                  <IconDotsVertical />
+                </Button>
+              }
+            />
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 // disabled={vm.status === "running" || startMutation.isPending}
@@ -141,6 +145,17 @@ export function ComputeCard({ vm }: ComputeCardProps) {
             </span>
           </div>
         </div>
+
+        <Link href={`/dashboard/vm/${vm.id}`}>
+          <Button
+            className="w-full gap-2 bg-transparent"
+            size="sm"
+            variant="outline"
+          >
+            <IconTerminal className="size-4" />
+            Manage
+          </Button>
+        </Link>
       </CardContent>
     </Card>
   )
