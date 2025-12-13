@@ -15,6 +15,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     PM_HOST: process.env.PM_HOST,
     PM_SECRET: process.env.PM_SECRET,
+    PM_TLS_SKIP_VERIFY: process.env.PM_TLS_SKIP_VERIFY,
     PM_TOKEN_ID: process.env.PM_TOKEN_ID,
   },
   server: {
@@ -27,6 +28,7 @@ export const env = createEnv({
       .default("development"),
     PM_HOST: z.string(),
     PM_SECRET: z.string(),
+    PM_TLS_SKIP_VERIFY: z.enum(["true", "false"]).default("false"),
     PM_TOKEN_ID: z.string(),
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
