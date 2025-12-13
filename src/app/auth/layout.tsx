@@ -13,7 +13,7 @@ export default function AuthLayout({ children }: LayoutProps<"/auth">) {
           <Icons.logo className="size-16" />
           Birdhouse
         </Link>
-        {children}
+        <main>{children}</main>
       </div>
     </div>
   )
