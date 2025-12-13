@@ -48,7 +48,6 @@ export function AppHeader({ user }: AppHeaderProps) {
             const isActive = pathname === href
 
             return (
-              // @ts-expect-error - typedRoutes
               <Link href={href} key={href}>
                 <Button
                   className="gap-2"
