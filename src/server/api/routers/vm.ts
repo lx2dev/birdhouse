@@ -1,26 +1,60 @@
 import { TRPCError } from "@trpc/server"
-import { desc, eq } from "drizzle-orm"
+import { and, desc, eq, lt, or } from "drizzle-orm"
+import z, { nullish } from "zod"
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import { vm as vmTable } from "@/server/db/schema"
 
 export const vmRouter = createTRPCRouter({
-  list: protectedProcedure.query(async ({ ctx }) => {
-    const { user } = ctx.session
+  list: protectedProcedure
+    .input(
+      z.object({
+        cursor: z
+          .object({
+            createdAt: z.date(),
+            id: z.cuid(),
+          })
+          .nullish(),
+        limit: z.number().min(1).max(100),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { user } = ctx.session
+      const { cursor, limit } = input
 
-    const vms = await ctx.db
-      .select()
-      .from(vmTable)
-      .where(eq(vmTable.userId, user.id))
-      .orderBy(desc(vmTable.createdAt))
+      const vms = await ctx.db
+        .select()
+        .from(vmTable)
+        .where(
+          and(
+            eq(vmTable.userId, user.id),
+            cursor
+              ? or(
+                  lt(vmTable.createdAt, cursor.createdAt),
+                  and(
+                    eq(vmTable.id, cursor.id),
+                    eq(vmTable.createdAt, cursor.createdAt),
+                  ),
+                )
+              : undefined,
+          ),
+        )
+        .orderBy(desc(vmTable.createdAt))
+        .limit(limit + 1)
 
-    if (!vms) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "No VMs found for the user.",
-      })
-    }
+      const hasMore = vms.length > limit
+      const items = hasMore ? vms.slice(0, -1) : vms
+      const lastItem = items[items.length - 1]
+      const nextCursor = hasMore
+        ? {
+            createdAt: lastItem.createdAt,
+            id: lastItem.id,
+          }
+        : null
 
-    return vms
-  }),
+      return {
+        items,
+        nextCursor,
+      }
+    }),
 })
