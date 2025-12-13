@@ -12,22 +12,22 @@ export const vmTemplateStatusEnum = pgEnum("vm_template_status", [
 export const vmTemplate = createTable(
   "vm_template",
   (d) => ({
-    cpuCores: d.integer().notNull(),
+    cpuCores: d.integer("cpu_cores").notNull(),
     createdAt: d
-      .timestamp({ withTimezone: true })
+      .timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    description: d.text(),
-    diskGb: d.integer().notNull(),
-    displayName: d.text().notNull(),
-    id: d.text().primaryKey(),
-    memoryMb: d.integer().notNull(),
-    name: d.text().notNull().unique(),
-    osType: d.text().notNull(),
-    proxmoxTemplateId: d.text().notNull(),
+    description: d.text("description"),
+    diskGb: d.integer("disk_gb").notNull(),
+    displayName: d.text("display_name").notNull(),
+    id: d.text("id").primaryKey(),
+    memoryMb: d.integer("memory_mb").notNull(),
+    name: d.text("name").notNull().unique(),
+    osType: d.text("os_type").notNull(),
+    proxmoxTemplateId: d.text("proxmox_template_id").notNull(),
     status: vmTemplateStatusEnum().default("testing").notNull(),
     updatedAt: d
-      .timestamp({ withTimezone: true })
+      .timestamp("updated_at", { withTimezone: true })
       .$onUpdate(() => /* @__PURE__ */ new Date()),
   }),
   (t) => [
@@ -47,34 +47,35 @@ export const vmStatusEnum = pgEnum("vm_status", [
 export const vm = createTable(
   "vm",
   (d) => ({
-    cpuCores: d.integer().notNull(),
+    cpuCores: d.integer("cpu_cores").notNull(),
     createdAt: d
-      .timestamp({ withTimezone: true })
+      .timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    diskGb: d.integer().notNull(),
-    hostname: d.text().notNull(),
-    id: d.text().primaryKey(),
-    ipv4Address: d.text().notNull(),
-    ipv6Address: d.text().notNull(),
-    proxmoxNode: d.text().notNull(),
-    proxmoxPool: d.text().default("").notNull(),
-    ramMb: d.integer().notNull(),
-    rootPassword: d.text().notNull(),
-    sshPublicKey: d.text().notNull(),
-    status: vmStatusEnum().default("provisioning").notNull(),
+    diskGb: d.integer("disk_gb").notNull(),
+    hostname: d.text("hostname").notNull(),
+    id: d.text("id").primaryKey(),
+    ipv4Address: d.text("ipv4_address").notNull(),
+    ipv6Address: d.text("ipv6_address").notNull(),
+    name: d.text("name").notNull(),
+    proxmoxNode: d.text("proxmox_node").notNull(),
+    proxmoxPool: d.text("proxmox_pool").default("").notNull(),
+    ramMb: d.integer("ram_mb").notNull(),
+    rootPassword: d.text("root_password").notNull(),
+    sshPublicKey: d.text("ssh_public_key").notNull(),
+    status: vmStatusEnum("status").default("provisioning").notNull(),
     templateId: d
-      .text()
+      .text("template_id")
       .notNull()
       .references(() => vmTemplate.id),
     updatedAt: d
-      .timestamp({ withTimezone: true })
+      .timestamp("updated_at", { withTimezone: true })
       .$onUpdate(() => /* @__PURE__ */ new Date()),
     userId: d
-      .text()
+      .text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    vmid: d.text().notNull(),
+    vmid: d.text("vmid").notNull(),
   }),
   (t) => [
     index("vm_vmid_idx").on(t.vmid),
@@ -87,15 +88,15 @@ export const sshKey = createTable(
   "ssh_key",
   (d) => ({
     createdAt: d
-      .timestamp({ withTimezone: true })
+      .timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    fingerprint: d.text().notNull(),
-    id: d.text().primaryKey(),
-    name: d.text().notNull(),
-    publicKey: d.text().notNull(),
+    fingerprint: d.text("fingerprint").notNull(),
+    id: d.text("id").primaryKey(),
+    name: d.text("name").notNull(),
+    publicKey: d.text("public_key").notNull(),
     userId: d
-      .text()
+      .text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
   }),
@@ -105,18 +106,18 @@ export const sshKey = createTable(
 export const auditLog = createTable(
   "audit_log",
   (d) => ({
-    action: d.text().notNull(),
+    action: d.text("action").notNull(),
     createdAt: d
-      .timestamp({ withTimezone: true })
+      .timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    details: d.jsonb().notNull(),
-    id: d.text().primaryKey(),
-    ipAddress: d.text(),
-    resourceId: d.text().notNull(),
-    resourceType: d.text().notNull(),
+    details: d.jsonb("details").notNull(),
+    id: d.text("id").primaryKey(),
+    ipAddress: d.text("ip_address"),
+    resourceId: d.text("resource_id").notNull(),
+    resourceType: d.text("resource_type").notNull(),
     userId: d
-      .text()
+      .text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
   }),
