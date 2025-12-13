@@ -53,7 +53,7 @@ export default function DemoPage() {
   }, [])
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-4">
+    <div className="flex min-h-svh flex-col items-center justify-center p-4">
       <Link className="self-start" href="/">
         <Button variant="link">
           <IconArrowLeft /> Home
