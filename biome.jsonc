@@ -119,6 +119,7 @@
         "useShorthandAssign": "error"
       },
       "suspicious": {
+        "noArrayIndexKey": "info",
         "noUnknownAtRules": "off"
       }
     }
