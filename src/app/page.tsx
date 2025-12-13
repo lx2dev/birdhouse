@@ -1,5 +1,7 @@
 "use client"
 
+import { IconArrowRight } from "@tabler/icons-react"
+import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -52,6 +54,12 @@ export default function HomePage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
+      <Link className="self-end" href="/dashboard">
+        <Button variant="link">
+          Dashboard <IconArrowRight />
+        </Button>
+      </Link>
+
       <h1 className="font-semibold text-lg">Birdhouse</h1>
 
       <Button disabled={isRunning} onClick={startVmCreation} size="lg">
