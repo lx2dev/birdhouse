@@ -88,6 +88,9 @@
   "linter": {
     "enabled": true,
     "rules": {
+      "a11y": {
+        "noLabelWithoutControl": "off"
+      },
       "complexity": {
         "noExtraBooleanCast": "warn",
         "noUselessFragments": "warn",
