@@ -84,6 +84,8 @@ export const vm = createTable(
   ],
 )
 
+export type VM = typeof vm.$inferSelect
+
 export const sshKey = createTable(
   "ssh_key",
   (d) => ({
