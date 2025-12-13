@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm"
+import { relations, sql } from "drizzle-orm"
 import { index, pgEnum, pgTableCreator } from "drizzle-orm/pg-core"
 
 export const createTable = pgTableCreator((name) => `birdhouse_${name}`)
@@ -26,7 +26,9 @@ export const vmTemplate = createTable(
     osType: d.text().notNull(),
     proxmoxTemplateId: d.text().notNull(),
     status: vmTemplateStatusEnum().default("testing").notNull(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+    updatedAt: d
+      .timestamp({ withTimezone: true })
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
   }),
   (t) => [
     index("vm_template_name_idx").on(t.name),
@@ -65,7 +67,9 @@ export const vm = createTable(
       .text()
       .notNull()
       .references(() => vmTemplate.id),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+    updatedAt: d
+      .timestamp({ withTimezone: true })
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
     userId: d
       .text()
       .notNull()
@@ -126,22 +130,28 @@ export const user = createTable(
   "user",
   (d) => ({
     approved: d
-      .boolean()
+      .boolean("approved")
       .$defaultFn(() => false)
       .notNull(),
+    banExpires: d.timestamp("ban_expires"),
+    banned: d.boolean("banned").default(false),
+    banReason: d.text("ban_reason"),
     createdAt: d
-      .timestamp({ withTimezone: true })
+      .timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    email: d.text().notNull().unique(),
+    email: d.text("email").notNull().unique(),
     emailVerified: d
-      .boolean()
+      .boolean("email_verified")
       .$defaultFn(() => false)
       .notNull(),
     id: d.text().primaryKey(),
     image: d.text(),
     name: d.text().notNull(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+    role: d.text("role"),
+    updatedAt: d
+      .timestamp("updated_at", { withTimezone: true })
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
   }),
   (t) => [
     index("user_name_idx").on(t.name),
@@ -154,17 +164,20 @@ export const session = createTable(
   "session",
   (d) => ({
     createdAt: d
-      .timestamp({ withTimezone: true })
+      .timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    expiresAt: d.timestamp().notNull(),
-    id: d.text().primaryKey(),
-    ipAddress: d.text(),
-    token: d.text().notNull().unique(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
-    userAgent: d.text(),
+    expiresAt: d.timestamp("expires_at").notNull(),
+    id: d.text("id").primaryKey(),
+    impersonatedBy: d.text("impersonated_by"),
+    ipAddress: d.text("ip_address"),
+    token: d.text("token").notNull().unique(),
+    updatedAt: d
+      .timestamp("updated_at", { withTimezone: true })
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
+    userAgent: d.text("user_agent"),
     userId: d
-      .text()
+      .text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
   }),
@@ -174,23 +187,25 @@ export const session = createTable(
 export const account = createTable(
   "account",
   (d) => ({
-    accessToken: d.text(),
-    accessTokenExpiresAt: d.timestamp(),
-    accountId: d.text().notNull(),
+    accessToken: d.text("access_token"),
+    accessTokenExpiresAt: d.timestamp("access_token_expires_at"),
+    accountId: d.text("account_id").notNull(),
     createdAt: d
-      .timestamp({ withTimezone: true })
+      .timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    id: d.text().primaryKey(),
-    idToken: d.text(),
-    password: d.text(),
-    providerId: d.text().notNull(),
-    refreshToken: d.text(),
-    refreshTokenExpiresAt: d.timestamp(),
-    scope: d.text(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+    id: d.text("id").primaryKey(),
+    idToken: d.text("id_token"),
+    password: d.text("password"),
+    providerId: d.text("provider_id").notNull(),
+    refreshToken: d.text("refresh_token"),
+    refreshTokenExpiresAt: d.timestamp("refresh_token_expires_at"),
+    scope: d.text("scope"),
+    updatedAt: d
+      .timestamp("updated_at", { withTimezone: true })
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
     userId: d
-      .text()
+      .text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
   }),
@@ -201,14 +216,35 @@ export const verification = createTable(
   "verification",
   (d) => ({
     createdAt: d
-      .timestamp({ withTimezone: true })
+      .timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    expiresAt: d.timestamp().notNull(),
-    id: d.text().primaryKey(),
-    identifier: d.text().notNull(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
-    value: d.text().notNull(),
+    expiresAt: d.timestamp("expires_at").notNull(),
+    id: d.text("id").primaryKey(),
+    identifier: d.text("identifier").notNull(),
+    updatedAt: d
+      .timestamp("updated_at", { withTimezone: true })
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
+    value: d.text("value").notNull(),
   }),
   (t) => [index("verification_identifier_idx").on(t.identifier)],
 )
+
+export const userRelations = relations(user, ({ many }) => ({
+  accounts: many(account),
+  sessions: many(session),
+}))
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id],
+  }),
+}))
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id],
+  }),
+}))
