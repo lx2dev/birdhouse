@@ -9,6 +9,8 @@ export const vmTemplateStatusEnum = pgEnum("vm_template_status", [
   "testing",
 ])
 
+export type VMTemplateStatus = (typeof vmTemplateStatusEnum.enumValues)[number]
+
 export const vmTemplate = createTable(
   "vm_template",
   (d) => ({
@@ -44,6 +46,8 @@ export const vmStatusEnum = pgEnum("vm_status", [
   "error",
 ])
 
+export type VMStatus = (typeof vmStatusEnum.enumValues)[number]
+
 export const vm = createTable(
   "vm",
   (d) => ({
@@ -56,10 +60,9 @@ export const vm = createTable(
     hostname: d.text("hostname").notNull(),
     id: d.text("id").primaryKey(),
     ipv4Address: d.text("ipv4_address").notNull(),
-    ipv6Address: d.text("ipv6_address").notNull(),
     name: d.text("name").notNull(),
     proxmoxNode: d.text("proxmox_node").notNull(),
-    proxmoxPool: d.text("proxmox_pool").default("").notNull(),
+    proxmoxPool: d.text("proxmox_pool").default("UserPool").notNull(),
     ramMb: d.integer("ram_mb").notNull(),
     rootPassword: d.text("root_password").notNull(),
     sshPublicKey: d.text("ssh_public_key").notNull(),
