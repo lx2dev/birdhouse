@@ -22,6 +22,7 @@ export const auth = betterAuth({
             await db.update(userTable).set({
               approved: true,
               emailVerified: true,
+              role: "admin",
             })
           }
         },
