@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 
+import { Button } from "@/components/ui/button"
+
 type LogEntry = {
   id: string
   text: string
@@ -52,26 +54,21 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
       <h1 className="font-semibold text-lg">Birdhouse</h1>
 
-      <button
-        className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-blue-300"
-        disabled={isRunning}
-        onClick={startVmCreation}
-        type="button"
-      >
+      <Button disabled={isRunning} onClick={startVmCreation} size="lg">
         {isRunning ? "Creating VM..." : "Create VM"}
-      </button>
+      </Button>
 
       {error && (
-        <div className="mt-4 max-w-xl rounded bg-red-100 px-4 py-2 text-red-700 text-sm">
+        <div className="mt-4 max-w-xl rounded-(--radius) bg-destructive/10 px-4 py-2 text-destructive text-sm dark:bg-destructive/20">
           {error}
         </div>
       )}
 
       <div className="mt-6 flex w-full max-w-xl flex-col">
         <span className="mb-2 font-medium text-sm">Logs</span>
-        <div className="h-64 overflow-y-auto rounded border border-gray-200 bg-black px-3 py-2 text-gray-100 text-xs">
+        <div className="h-64 overflow-y-auto rounded border bg-black px-3 py-2 text-xs text-zinc-100">
           {logs.length === 0 ? (
-            <span className="text-gray-500">
+            <span className="font-mono text-muted-foreground">
               No logs yet. Click "Create VM" to start.
             </span>
           ) : (
