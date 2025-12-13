@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Noto_Sans, Noto_Sans_Mono } from "next/font/google"
 
 import { ThemeProvider } from "@/components/providers/theme"
+import { Toaster } from "@/components/ui/sonner"
 import { cn } from "@/lib/utils"
 
 import "@/styles/globals.css"
@@ -27,7 +28,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn("antialiased", notoSans.variable, notoMono.variable)}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   )
