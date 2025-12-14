@@ -82,7 +82,7 @@ DashboardSection.Skeleton = function SkeletonComp() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 3 }).map((_, idx) => (
-        <Skeleton className="h-48" key={idx} />
+        <Skeleton className="h-64" key={idx} />
       ))}
     </div>
   )
