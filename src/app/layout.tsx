@@ -19,6 +19,9 @@ const notoMono = Noto_Sans_Mono({
 export const metadata: Metadata = {
   description: "Birdhouse",
   title: "A Proxmox Virtual Compute Provisioning Platform By Lx2.dev",
+  icons: {
+    icon: "/favicon.svg",
+  },
 }
 
 export default function RootLayout({
