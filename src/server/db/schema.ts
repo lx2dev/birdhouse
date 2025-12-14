@@ -37,6 +37,7 @@ export const vmTemplate = createTable(
     index("vm_template_status_idx").on(t.status),
   ],
 )
+export type VMTemplateTable = typeof vmTemplate.$inferSelect
 
 export const vmStatusEnum = pgEnum("vm_status", [
   "running",
