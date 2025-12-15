@@ -7,12 +7,15 @@ import {
   IconPlus,
   IconPointFilled,
 } from "@tabler/icons-react"
+import * as React from "react"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 import { Controller, useForm } from "react-hook-form"
+import { toast } from "sonner"
 import type z from "zod"
 
 import { Button } from "@/components/ui/button"
+import { ButtonGroup } from "@/components/ui/button-group"
 import { Card, CardContent } from "@/components/ui/card"
 import {
   Empty,
@@ -33,11 +36,20 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { api } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
 import { createComputeSchema } from "@/modules/dashboard/schemas"
+import { CreateSSHKeyDialog } from "@/modules/dashboard/ui/create-ssh-key-dialog"
+
 export function NewComputeSection() {
   return (
     <Suspense fallback={<NewComputeSection.Skeleton />}>
@@ -49,19 +61,39 @@ export function NewComputeSection() {
 }
 
 function NewComputeSectionSuspense() {
+  const [credentials, setCredentials] = React.useState<{
+    username: string
+    password: string
+  } | null>(null)
+  const [showCredentials, setShowCredentials] = React.useState<boolean>(false)
+
   const form = useForm({
     defaultValues: {
       name: "",
+      sshKeyId: "",
       templateId: "",
     },
     resolver: zodResolver(createComputeSchema),
   })
 
-  const isSubmitting = form.formState.isSubmitting
+  const { isSubmitting } = form.formState
 
   const [templates] = api.template.list.useSuspenseQuery()
+  const [sshKeys] = api.sshKey.list.useSuspenseQuery()
+  const createCompute = api.compute.create.useMutation({
+    onError(error) {
+      toast.error("Failed to create compute instance:", {
+        description: error.message,
+      })
+    },
+    onSuccess(data) {
+      setCredentials(data.credentials)
+      setShowCredentials(true)
+      toast.success("Compute instance created successfully!")
+    },
+  })
 
-  async function onSubmit(data: z.infer<typeof createComputeSchema>) {
+  function onSubmit(data: z.infer<typeof createComputeSchema>) {
     console.log(data)
   }
 
@@ -189,6 +221,50 @@ function NewComputeSectionSuspense() {
                     <FieldError errors={[fieldState.error]} />
                   )}
                 </FieldSet>
+              )}
+            />
+
+            <Controller
+              control={form.control}
+              name="sshKeyId"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-select-language">
+                      Select SSH Key
+                    </FieldLabel>
+                    <FieldDescription>
+                      Select an existing SSH key or create a new one
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                  <ButtonGroup className="w-full">
+                    <Select
+                      name={field.name}
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <SelectTrigger
+                        aria-invalid={fieldState.invalid}
+                        className="flex-1"
+                        disabled={isSubmitting || sshKeys.length === 0}
+                        id={field.name}
+                      >
+                        <SelectValue aria-placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sshKeys.map((key) => (
+                          <SelectItem key={key.id} value={key.id}>
+                            {key.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <CreateSSHKeyDialog />
+                  </ButtonGroup>
+                </Field>
               )}
             />
 
