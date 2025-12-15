@@ -1,7 +1,12 @@
+import { api, HydrateClient } from "@/lib/api/server"
+import { NewComputeView } from "@/modules/dashboard/views/new-compute"
+
 export default function NewComputePage() {
+  void api.template.list.prefetch()
+
   return (
-    <div>
-      <h1>NewComputePage</h1>
-    </div>
+    <HydrateClient>
+      <NewComputeView />
+    </HydrateClient>
   )
 }
