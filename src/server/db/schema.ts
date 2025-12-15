@@ -118,6 +118,8 @@ export const sshKey = createTable(
   (t) => [index("ssh_key_userId_idx").on(t.userId)],
 )
 
+export type SSHKeyTable = typeof sshKey.$inferSelect
+
 export const auditLog = createTable(
   "audit_log",
   (d) => ({
