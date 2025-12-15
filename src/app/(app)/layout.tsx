@@ -1,3 +1,4 @@
+import type { UserWithRole } from "better-auth/plugins"
 import { redirect } from "next/navigation"
 
 import { AppHeader } from "@/components/layout/app-header"
@@ -10,7 +11,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 
   return (
     <div className="min-h-svh">
-      <AppHeader user={session.user} />
+      <AppHeader user={session.user as UserWithRole} />
       <main className="p-4 lg:p-8">{children}</main>
       <SiteFooter />
     </div>

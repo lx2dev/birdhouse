@@ -1,7 +1,13 @@
 "use client"
 
-import { IconKey, IconLogout, IconPlus, IconServer2 } from "@tabler/icons-react"
-import type { User } from "better-auth"
+import {
+  IconArrowUpRight,
+  IconKey,
+  IconLogout,
+  IconPlus,
+  IconServer2,
+} from "@tabler/icons-react"
+import type { UserWithRole } from "better-auth/plugins"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 
@@ -16,7 +22,7 @@ const NAV_ITEMS = [
 ]
 
 interface AppHeaderProps {
-  user: User
+  user: UserWithRole
 }
 
 export function AppHeader({ user }: AppHeaderProps) {
@@ -63,6 +69,14 @@ export function AppHeader({ user }: AppHeaderProps) {
         </nav>
 
         <div className="ml-auto flex items-center gap-3">
+          {user.role === "admin" && (
+            <Link
+              className="hidden items-center text-muted-foreground text-sm transition-colors hover:text-foreground sm:flex"
+              href="/admin"
+            >
+              Admin <IconArrowUpRight className="size-3" />
+            </Link>
+          )}
           <div className="hidden text-muted-foreground text-sm sm:block">
             {user.email}
           </div>
