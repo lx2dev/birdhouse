@@ -1,6 +1,8 @@
 import { db } from "@/server/db"
 import * as schema from "@/server/db/schema"
 
+const vmTemplateId = crypto.randomUUID()
+
 async function seedVMTemplates() {
   try {
     console.log("Seeding VM templates...")
@@ -11,6 +13,7 @@ async function seedVMTemplates() {
         description: "Official Ubuntu 22.04 LTS server image.",
         diskGb: 20,
         displayName: "Ubuntu 22.04 LTS",
+        id: vmTemplateId,
         memoryMb: 2048,
         name: "Ubuntu 22.04 LTS",
         osType: "linux",
@@ -41,7 +44,7 @@ async function seedVM() {
         rootPassword: "securepassword",
         sshPublicKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC...",
         status: "running",
-        templateId: "template-ubuntu-2204",
+        templateId: vmTemplateId,
         userId: "13EKN93ccV5sDwqAZWE05tjc0aaiZjZM",
         vmid: 100,
       })
