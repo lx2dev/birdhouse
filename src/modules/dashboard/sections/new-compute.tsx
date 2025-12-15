@@ -227,43 +227,61 @@ function NewComputeSectionSuspense() {
             <Controller
               control={form.control}
               name="sshKeyId"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldContent>
-                    <FieldLabel htmlFor={field.name}>Select SSH Key</FieldLabel>
-                    <FieldDescription>
-                      Select an existing SSH key or create a new one
-                    </FieldDescription>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </FieldContent>
-                  <ButtonGroup className="w-full">
-                    <Select
-                      name={field.name}
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
-                      <SelectTrigger
-                        aria-invalid={fieldState.invalid}
-                        className="flex-1"
-                        disabled={isSubmitting || sshKeys.length === 0}
-                        id={field.name}
+              render={({ field, fieldState }) => {
+                const selectedKey = sshKeys.find((k) => k.id === field.value)
+
+                return (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldContent>
+                      <FieldLabel htmlFor={field.name}>
+                        Select SSH Key
+                      </FieldLabel>
+                      <FieldDescription>
+                        Select an existing SSH key or create a new one
+                      </FieldDescription>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </FieldContent>
+                    <ButtonGroup className="w-full">
+                      <Select
+                        name={field.name}
+                        onValueChange={field.onChange}
+                        value={field.value}
                       >
-                        <SelectValue aria-placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {sshKeys.map((key) => (
-                          <SelectItem key={key.id} value={key.id}>
-                            {key.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <CreateSSHKeyDialog />
-                  </ButtonGroup>
-                </Field>
-              )}
+                        <SelectTrigger
+                          aria-invalid={fieldState.invalid}
+                          className="flex-1"
+                          disabled={isSubmitting || sshKeys.length === 0}
+                          id={field.name}
+                        >
+                          <SelectValue>
+                            {selectedKey ? (
+                              <>
+                                <span className="font-semibold">
+                                  {selectedKey.name}
+                                </span>{" "}
+                                ({selectedKey.fingerprint})
+                              </>
+                            ) : (
+                              "Select an SSH key"
+                            )}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {sshKeys.map((key) => (
+                            <SelectItem key={key.id} value={key.id}>
+                              <span className="font-semibold">{key.name}</span>{" "}
+                              ({key.fingerprint})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <CreateSSHKeyDialog />
+                    </ButtonGroup>
+                  </Field>
+                )
+              }}
             />
 
             <Field orientation="horizontal">
