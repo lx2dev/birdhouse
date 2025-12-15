@@ -61,11 +61,11 @@ export function NewComputeSection() {
 }
 
 function NewComputeSectionSuspense() {
-  const [credentials, setCredentials] = React.useState<{
+  const [_credentials, setCredentials] = React.useState<{
     username: string
     password: string
   } | null>(null)
-  const [showCredentials, setShowCredentials] = React.useState<boolean>(false)
+  const [_showCredentials, setShowCredentials] = React.useState<boolean>(false)
 
   const form = useForm({
     defaultValues: {
@@ -80,7 +80,7 @@ function NewComputeSectionSuspense() {
 
   const [templates] = api.template.list.useSuspenseQuery()
   const [sshKeys] = api.sshKey.list.useSuspenseQuery()
-  const createCompute = api.compute.create.useMutation({
+  const _createCompute = api.compute.create.useMutation({
     onError(error) {
       toast.error("Failed to create compute instance:", {
         description: error.message,
