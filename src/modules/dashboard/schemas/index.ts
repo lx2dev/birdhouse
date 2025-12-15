@@ -21,6 +21,8 @@ export const createComputeSchema = z.object({
 })
 
 export const createSSHKeySchema = z.object({
+  bits: z.number().int().min(2048).max(4096).default(2048).optional(),
+  keyType: z.enum(["rsa", "ed25519"]).default("rsa"),
   name: z
     .string()
     .min(3)
