@@ -1,7 +1,7 @@
 import { IconArrowUpRight } from "@tabler/icons-react"
 import Link from "next/link"
 
-export function AppFooter() {
+export function SiteFooter() {
   return (
     <footer className="fixed bottom-4 left-4 hidden text-muted-foreground text-xs lg:block">
       by{" "}
