@@ -230,9 +230,7 @@ function NewComputeSectionSuspense() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldContent>
-                    <FieldLabel htmlFor="form-rhf-select-language">
-                      Select SSH Key
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Select SSH Key</FieldLabel>
                     <FieldDescription>
                       Select an existing SSH key or create a new one
                     </FieldDescription>
