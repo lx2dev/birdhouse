@@ -8,11 +8,10 @@ import {
   IconUsers,
 } from "@tabler/icons-react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 
 import { Icons } from "@/components/icons"
 import { Button } from "@/components/ui/button"
-import { authClient } from "@/lib/auth/client"
 
 const NAV_ITEMS = [
   { href: "/admin", icon: IconLayoutDashboard, label: "Admin" },
@@ -22,18 +21,7 @@ const NAV_ITEMS = [
 ]
 
 export function AdminHeader() {
-  const router = useRouter()
   const pathname = usePathname()
-
-  async function handleSignOut() {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess() {
-          router.push("/auth/signin")
-        },
-      },
-    })
-  }
 
   return (
     <header className="sticky top-0 z-50 border-border border-b bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/60">
@@ -65,10 +53,12 @@ export function AdminHeader() {
         </nav>
 
         <div className="ml-auto">
-          <Button onClick={handleSignOut} size="sm" variant="outline">
-            <IconLogout />
-            <span className="hidden sm:inline">Sign Out</span>
-          </Button>
+          <Link href="/">
+            <Button size="sm" variant="outline">
+              <IconLogout />
+              <span className="hidden sm:inline">Exit Admin</span>
+            </Button>
+          </Link>
         </div>
       </div>
     </header>
