@@ -85,7 +85,7 @@ export const vm = createTable(
       .text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    vmid: d.text("vmid").notNull(),
+    vmid: d.integer("vmid").notNull(),
   }),
   (t) => [
     index("vm_vmid_idx").on(t.vmid),
