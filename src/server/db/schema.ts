@@ -29,7 +29,7 @@ export const vmTemplate = createTable(
     memoryMb: d.integer("memory_mb").notNull(),
     name: d.text("name").notNull().unique(),
     osType: d.text("os_type").notNull(),
-    proxmoxTemplateId: d.text("proxmox_template_id").notNull(),
+    proxmoxTemplateId: d.integer("proxmox_template_id").notNull(),
     status: vmTemplateStatusEnum().default("testing").notNull(),
     updatedAt: d
       .timestamp("updated_at", { withTimezone: true })
@@ -40,6 +40,7 @@ export const vmTemplate = createTable(
     index("vm_template_status_idx").on(t.status),
   ],
 )
+
 export type VMTemplateTable = typeof vmTemplate.$inferSelect
 
 export const vmStatusEnum = pgEnum("vm_status", [
