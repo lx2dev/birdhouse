@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
+import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
 import { createComputeSchema } from "@/modules/dashboard/schemas"
@@ -78,7 +79,14 @@ function NewComputeSectionSuspense() {
 
   const { isSubmitting } = form.formState
 
-  const [templates] = api.template.list.useSuspenseQuery()
+  const [templates, query] = api.template.list.useSuspenseInfiniteQuery(
+    {
+      limit: DEFAULT_FETCH_LIMIT,
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    },
+  )
   const [sshKeys] = api.sshKey.list.useSuspenseQuery()
   const _createCompute = api.compute.create.useMutation({
     onError(error) {
@@ -94,6 +102,7 @@ function NewComputeSectionSuspense() {
   })
 
   function onSubmit(data: z.infer<typeof createComputeSchema>) {
+    // TODO: Implement create compute instance
     console.log(data)
   }
 
@@ -138,7 +147,8 @@ function NewComputeSectionSuspense() {
                   <FieldDescription>
                     Select compute resources for your instance
                   </FieldDescription>
-                  {templates.length === 0 ? (
+                  {templates.pages.flatMap((page) => page.items).length ===
+                  0 ? (
                     <Empty>
                       <EmptyHeader>
                         <EmptyTitle>No templates available</EmptyTitle>
@@ -152,68 +162,70 @@ function NewComputeSectionSuspense() {
                     </Empty>
                   ) : (
                     <div className="grid gap-4 md:grid-cols-2">
-                      {templates.map((template) => (
-                        <RadioGroup
-                          aria-invalid={fieldState.invalid}
-                          disabled={isSubmitting}
-                          key={template.id}
-                          name={field.name}
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <FieldLabel
-                            className={cn(
-                              "border-2 transition-colors",
-                              field.value === template.id
-                                ? "border-primary bg-primary/5"
-                                : "border-border hover:border-primary/50",
-                              isSubmitting && "cursor-not-allowed opacity-50",
-                            )}
-                            htmlFor={template.id}
+                      {templates.pages
+                        .flatMap((page) => page.items)
+                        .map((template) => (
+                          <RadioGroup
+                            aria-invalid={fieldState.invalid}
+                            disabled={isSubmitting}
+                            key={template.id}
+                            name={field.name}
+                            onValueChange={field.onChange}
+                            value={field.value}
                           >
-                            <Field orientation="horizontal">
-                              <FieldContent className="space-y-3">
-                                <div>
-                                  <FieldLabel>
-                                    {template.displayName}
-                                  </FieldLabel>
-                                  {template.description && (
-                                    <FieldDescription>
-                                      {template.description}
-                                    </FieldDescription>
-                                  )}
-                                </div>
+                            <FieldLabel
+                              className={cn(
+                                "border-2 transition-colors",
+                                field.value === template.id
+                                  ? "border-primary bg-primary/5"
+                                  : "border-border hover:border-primary/50",
+                                isSubmitting && "cursor-not-allowed opacity-50",
+                              )}
+                              htmlFor={template.id}
+                            >
+                              <Field orientation="horizontal">
+                                <FieldContent className="space-y-3">
+                                  <div>
+                                    <FieldLabel>
+                                      {template.displayName}
+                                    </FieldLabel>
+                                    {template.description && (
+                                      <FieldDescription>
+                                        {template.description}
+                                      </FieldDescription>
+                                    )}
+                                  </div>
 
-                                <div className="space-y-2 text-sm">
-                                  <div className="flex items-center gap-2 text-muted-foreground">
-                                    <IconCpu className="size-4" />
-                                    <span>
-                                      {template.cpuCores}{" "}
-                                      {template.cpuCores === 1
-                                        ? "Core"
-                                        : "Cores"}
-                                    </span>
-                                    <IconPointFilled className="size-2.5" />
-                                    <span>
-                                      {(template.memoryMb / 1024).toFixed(1)} GB
-                                      RAM
-                                    </span>
+                                  <div className="space-y-2 text-sm">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                      <IconCpu className="size-4" />
+                                      <span>
+                                        {template.cpuCores}{" "}
+                                        {template.cpuCores === 1
+                                          ? "Core"
+                                          : "Cores"}
+                                      </span>
+                                      <IconPointFilled className="size-2.5" />
+                                      <span>
+                                        {(template.memoryMb / 1024).toFixed(1)}{" "}
+                                        GB RAM
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                      <IconDatabase className="size-4" />
+                                      <span>{template.diskGb} GB Storage</span>
+                                    </div>
                                   </div>
-                                  <div className="flex items-center gap-2 text-muted-foreground">
-                                    <IconDatabase className="size-4" />
-                                    <span>{template.diskGb} GB Storage</span>
-                                  </div>
-                                </div>
-                              </FieldContent>
-                              <RadioGroupItem
-                                disabled={isSubmitting}
-                                id={template.id}
-                                value={template.id}
-                              />
-                            </Field>
-                          </FieldLabel>
-                        </RadioGroup>
-                      ))}
+                                </FieldContent>
+                                <RadioGroupItem
+                                  disabled={isSubmitting}
+                                  id={template.id}
+                                  value={template.id}
+                                />
+                              </Field>
+                            </FieldLabel>
+                          </RadioGroup>
+                        ))}
                     </div>
                   )}
 
