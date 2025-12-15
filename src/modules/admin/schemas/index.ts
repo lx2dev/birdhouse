@@ -9,6 +9,6 @@ export const insertVMTemplateSchema = z.object({
   displayName: z.string(),
   memoryMb: z.number(),
   osType: z.string(),
-  proxmoxTemplateId: z.number(),
+  proxmoxTemplateId: z.string(),
   status: z.enum(vmTemplateStatusEnum.enumValues).default("testing"),
 })
