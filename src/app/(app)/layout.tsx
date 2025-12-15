@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 
-import { AppFooter } from "@/components/layout/app-footer"
 import { AppHeader } from "@/components/layout/app-header"
+import { AppFooter } from "@/components/layout/site-footer"
 import { getSession } from "@/lib/auth/utils"
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
