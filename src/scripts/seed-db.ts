@@ -18,6 +18,7 @@ async function seedVMTemplates() {
         proxmoxTemplateId: "9000",
         status: "available",
       })
+      .onConflictDoNothing()
       .execute()
   } catch (error) {
     console.error("Error seeding VM templates:", error)
@@ -44,8 +45,9 @@ async function seedVM() {
         status: "running",
         templateId: "template-ubuntu-2204",
         userId: "13EKN93ccV5sDwqAZWE05tjc0aaiZjZM",
-        vmid: "100",
+        vmid: 100,
       })
+      .onConflictDoNothing()
       .execute()
   } catch (error) {
     console.error("Error seeding VMs:", error)
