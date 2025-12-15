@@ -8,6 +8,11 @@ export const createComputeSchema = z.object({
     .regex(/^[a-z0-9-]+$/, {
       message: "Name can only contain lowercase letters, numbers, and hyphens",
     }),
+  sshKeyId: z
+    .uuid({
+      error: "Please select a valid SSH key",
+    })
+    .nonempty("SSH key is required"),
   templateId: z
     .uuid({
       error: "Please select a valid template",
