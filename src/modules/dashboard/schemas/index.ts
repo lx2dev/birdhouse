@@ -19,3 +19,14 @@ export const createComputeSchema = z.object({
     })
     .nonempty("Please select a template"),
 })
+
+export const createSSHKeySchema = z.object({
+  name: z
+    .string()
+    .min(3)
+    .max(50)
+    .regex(/^[a-zA-Z0-9-_ ]+$/, {
+      message:
+        "Name can only contain letters, numbers, spaces, hyphens, and underscores",
+    }),
+})
