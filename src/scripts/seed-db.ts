@@ -10,7 +10,7 @@ const SEED_TEMPLATES = [
     memoryMb: 2048,
     name: "Ubuntu 22.04 LTS",
     osType: "linux",
-    proxmoxTemplateId: "9000",
+    proxmoxTemplateId: 9000,
     status: "available",
   },
   {
@@ -21,7 +21,7 @@ const SEED_TEMPLATES = [
     memoryMb: 4096,
     name: "CentOS 8",
     osType: "linux",
-    proxmoxTemplateId: "9001",
+    proxmoxTemplateId: 9001,
     status: "available",
   },
   {
@@ -32,7 +32,7 @@ const SEED_TEMPLATES = [
     memoryMb: 8192,
     name: "Windows Server 2019",
     osType: "windows",
-    proxmoxTemplateId: "9002",
+    proxmoxTemplateId: 9002,
     status: "available",
   },
   {
@@ -43,7 +43,7 @@ const SEED_TEMPLATES = [
     memoryMb: 1024,
     name: "Alpine Linux",
     osType: "linux",
-    proxmoxTemplateId: "9003",
+    proxmoxTemplateId: 9003,
     status: "available",
   },
 ] as const
