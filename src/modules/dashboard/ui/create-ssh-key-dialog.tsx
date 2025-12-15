@@ -204,7 +204,7 @@ export function CreateSSHKeyDialog() {
                   type="button"
                 />
                 <Link
-                  download
+                  download={`${sshKey.name}_private_key.pem`}
                   href={`data:text/plain;base64,${btoa(sshKey.privateKey)}`}
                 >
                   <Button>
