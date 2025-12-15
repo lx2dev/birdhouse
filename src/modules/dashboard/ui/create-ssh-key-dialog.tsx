@@ -114,6 +114,23 @@ export function CreateSSHKeyDialog() {
     )
   }
 
+  function handleDownloadPrivateKey(
+    privateKeyContent: string,
+    keyName: string,
+  ) {
+    const blob = new Blob([privateKeyContent], {
+      type: "text/plain;charset=utf-8",
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `id_${keyName.toLowerCase().replace(/\s/g, "-")}`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   function onClose() {
     setSSHKey(null)
     form.reset()
@@ -203,15 +220,15 @@ export function CreateSSHKeyDialog() {
                   }
                   type="button"
                 />
-                <Link
-                  download={`${sshKey.name}_private_key.pem`}
-                  href={`data:text/plain;base64,${btoa(sshKey.privateKey)}`}
+                <Button
+                  onClick={() => {
+                    handleDownloadPrivateKey(sshKey.privateKey, sshKey.name)
+                  }}
+                  type="button"
                 >
-                  <Button>
-                    <IconDownload />
-                    Download Private Key
-                  </Button>
-                </Link>
+                  <IconDownload />
+                  Download Private Key
+                </Button>
               </AlertDialogFooter>
             </div>
           </>
@@ -239,6 +256,7 @@ export function CreateSSHKeyDialog() {
                       <Input
                         {...field}
                         aria-invalid={fieldState.invalid}
+                        disabled={isSubmitting}
                         id={field.name}
                         placeholder="My SSH Key"
                       />
