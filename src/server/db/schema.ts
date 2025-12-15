@@ -22,7 +22,10 @@ export const vmTemplate = createTable(
     description: d.text("description"),
     diskGb: d.integer("disk_gb").notNull(),
     displayName: d.text("display_name").notNull(),
-    id: d.text("id").primaryKey(),
+    id: d
+      .text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     memoryMb: d.integer("memory_mb").notNull(),
     name: d.text("name").notNull().unique(),
     osType: d.text("os_type").notNull(),
@@ -59,7 +62,10 @@ export const vm = createTable(
       .notNull(),
     diskGb: d.integer("disk_gb").notNull(),
     hostname: d.text("hostname").notNull(),
-    id: d.text("id").primaryKey(),
+    id: d
+      .text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     ipv4Address: d.text("ipv4_address").notNull(),
     memoryMb: d.integer("memory_mb").notNull(),
     name: d.text("name").notNull(),
@@ -98,7 +104,10 @@ export const sshKey = createTable(
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
     fingerprint: d.text("fingerprint").notNull(),
-    id: d.text("id").primaryKey(),
+    id: d
+      .text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     name: d.text("name").notNull(),
     publicKey: d.text("public_key").notNull(),
     userId: d
@@ -118,7 +127,10 @@ export const auditLog = createTable(
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
     details: d.jsonb("details").notNull(),
-    id: d.text("id").primaryKey(),
+    id: d
+      .text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     ipAddress: d.text("ip_address"),
     resourceId: d.text("resource_id").notNull(),
     resourceType: d.text("resource_type").notNull(),
