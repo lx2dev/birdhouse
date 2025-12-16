@@ -78,10 +78,7 @@ export const vm = createTable(
       .references(() => sshKey.id, { onDelete: "restrict" }),
     sshPublicKey: d.text("ssh_public_key").notNull(),
     status: vmStatusEnum("status").default("provisioning").notNull(),
-    templateId: d
-      .text("template_id")
-      .notNull()
-      .references(() => vmTemplate.id),
+    templateId: d.text("template_id"),
     updatedAt: d
       .timestamp("updated_at", { withTimezone: true })
       .$onUpdate(() => /* @__PURE__ */ new Date()),
@@ -283,10 +280,6 @@ export const vmRelations = relations(vm, ({ one }) => ({
   sshKey: one(sshKey, {
     fields: [vm.sshKeyId],
     references: [sshKey.id],
-  }),
-  template: one(vmTemplate, {
-    fields: [vm.templateId],
-    references: [vmTemplate.id],
   }),
   user: one(user, {
     fields: [vm.userId],
