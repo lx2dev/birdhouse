@@ -1,8 +1,9 @@
 import { exec } from "node:child_process"
 import { promisify } from "node:util"
 import { TRPCError } from "@trpc/server"
-import { and, desc, eq } from "drizzle-orm"
+import { and, desc, eq, lt, or } from "drizzle-orm"
 import * as forge from "node-forge"
+import z from "zod"
 
 import { createSSHKeySchema } from "@/modules/dashboard/schemas"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
@@ -105,15 +106,55 @@ export const sshKeyRouter = createTRPCRouter({
       }
     }),
 
-  list: protectedProcedure.query(async ({ ctx }) => {
-    const { user } = ctx.session
+  list: protectedProcedure
+    .input(
+      z.object({
+        cursor: z
+          .object({
+            createdAt: z.date(),
+            id: z.cuid(),
+          })
+          .nullish(),
+        limit: z.number().min(1).max(100),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { user } = ctx.session
+      const { cursor, limit } = input
 
-    const sshKeys = await ctx.db
-      .select()
-      .from(sshKeyTable)
-      .where(eq(sshKeyTable.userId, user.id))
-      .orderBy(desc(sshKeyTable.createdAt))
+      const sshKeys = await ctx.db
+        .select()
+        .from(sshKeyTable)
+        .where(
+          and(
+            eq(sshKeyTable.userId, user.id),
+            cursor
+              ? or(
+                  lt(sshKeyTable.createdAt, cursor.createdAt),
+                  and(
+                    eq(sshKeyTable.id, cursor.id),
+                    eq(sshKeyTable.createdAt, cursor.createdAt),
+                  ),
+                )
+              : undefined,
+          ),
+        )
+        .orderBy(desc(sshKeyTable.createdAt))
+        .limit(limit + 1)
 
-    return sshKeys
-  }),
+      const hasMore = sshKeys.length > limit
+      const items = hasMore ? sshKeys.slice(0, -1) : sshKeys
+      const lastItem = items[items.length - 1]
+      const nextCursor = hasMore
+        ? {
+            createdAt: lastItem.createdAt,
+            id: lastItem.id,
+          }
+        : null
+
+      return {
+        items,
+        nextCursor,
+      }
+    }),
 })
