@@ -58,7 +58,7 @@ export function AdminHeader() {
           <Link href="/">
             <Button size={mobile ? "icon" : "sm"} variant="outline">
               <IconLogout />
-              <span className="hidden sm:inline">Exit Admin</span>
+              <span className="hidden md:inline">Exit Admin</span>
             </Button>
           </Link>
         </div>

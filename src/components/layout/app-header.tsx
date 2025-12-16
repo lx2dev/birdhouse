@@ -89,7 +89,7 @@ export function AppHeader({ user }: AppHeaderProps) {
             variant="outline"
           >
             <IconLogout />
-            <span className="hidden sm:inline">Sign Out</span>
+            <span className="hidden md:inline">Sign Out</span>
           </Button>
         </div>
       </div>
