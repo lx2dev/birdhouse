@@ -25,7 +25,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { ButtonGroup } from "@/components/ui/button-group"
 import { DialogClose, DialogFooter } from "@/components/ui/dialog"
 import { Field, FieldError, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -55,13 +54,7 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
   const [sshKey, setSSHKey] = React.useState<
     (SSHKeyTable & { privateKey: string }) | null
   >(null)
-  const [copied, setCopied] = React.useState<{
-    privateKey: boolean
-    fingerprint: boolean
-  }>({
-    fingerprint: false,
-    privateKey: false,
-  })
+  const [copied, setCopied] = React.useState<boolean>(false)
 
   const form = useForm({
     defaultValues: {
@@ -91,34 +84,8 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
 
   function handleCopyPrivateKey() {
     navigator.clipboard.writeText(sshKey?.privateKey || "")
-    setCopied({
-      ...copied,
-      privateKey: true,
-    })
-    setTimeout(
-      () =>
-        setCopied({
-          ...copied,
-          privateKey: false,
-        }),
-      2000,
-    )
-  }
-
-  function handleCopyFingerprint() {
-    navigator.clipboard.writeText(sshKey?.fingerprint || "")
-    setCopied({
-      ...copied,
-      fingerprint: true,
-    })
-    setTimeout(
-      () =>
-        setCopied({
-          ...copied,
-          fingerprint: false,
-        }),
-      2000,
-    )
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   function handleDownloadPrivateKey(
@@ -181,7 +148,7 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
                       size="icon-xs"
                       type="button"
                     >
-                      {copied.privateKey ? (
+                      {copied ? (
                         <IconCheck className="text-green-500" />
                       ) : (
                         <IconCopy />
@@ -189,28 +156,6 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
                     </InputGroupButton>
                   </InputGroupAddon>
                 </InputGroup>
-              </div>
-              <div>
-                <Label className="mb-2 block font-medium">Fingerprint:</Label>
-                <ButtonGroup className="w-full">
-                  <Input
-                    className="w-full"
-                    readOnly
-                    value={sshKey.fingerprint}
-                  />
-
-                  <Button
-                    onClick={handleCopyFingerprint}
-                    type="button"
-                    variant="outline"
-                  >
-                    {copied.fingerprint ? (
-                      <IconCheck className="text-green-500" />
-                    ) : (
-                      <IconCopy />
-                    )}
-                  </Button>
-                </ButtonGroup>
               </div>
               <AlertDialogFooter className="border-0 bg-transparent dark:bg-transparent">
                 <AlertDialogCancel
