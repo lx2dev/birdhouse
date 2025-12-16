@@ -11,7 +11,7 @@ export const vmRouter = createTRPCRouter({
         cursor: z
           .object({
             createdAt: z.date(),
-            id: z.cuid(),
+            id: z.uuid(),
           })
           .nullish(),
         limit: z.number().min(1).max(100),
