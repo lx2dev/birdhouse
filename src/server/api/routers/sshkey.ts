@@ -106,6 +106,33 @@ export const sshKeyRouter = createTRPCRouter({
       }
     }),
 
+  delete: protectedProcedure
+    .input(
+      z.object({
+        id: z.uuid(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { user } = ctx.session
+      const { id } = input
+
+      const [key] = await ctx.db
+        .delete(sshKeyTable)
+        .where(and(eq(sshKeyTable.id, id), eq(sshKeyTable.userId, user.id)))
+        .returning()
+
+      if (!key) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "SSH key not found.",
+        })
+      }
+
+      return {
+        keyId: key.id,
+      }
+    }),
+
   list: protectedProcedure
     .input(
       z.object({

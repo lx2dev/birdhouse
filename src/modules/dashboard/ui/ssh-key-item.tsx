@@ -1,10 +1,37 @@
 "use client"
 
-import { IconCheck, IconCopy } from "@tabler/icons-react"
+import {
+  IconCheck,
+  IconCopy,
+  IconDotsVertical,
+  IconDownload,
+  IconTrash,
+} from "@tabler/icons-react"
 import { formatDistanceToNow } from "date-fns"
 import * as React from "react"
+import { toast } from "sonner"
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Item,
   ItemActions,
@@ -13,6 +40,8 @@ import {
   ItemFooter,
   ItemTitle,
 } from "@/components/ui/item"
+import { Spinner } from "@/components/ui/spinner"
+import { api } from "@/lib/api/client"
 import type { SSHKeyTable } from "@/server/db/schema"
 
 interface SSHKeyItemProps {
@@ -88,14 +117,134 @@ export function SSHKeyItem({ item: key }: SSHKeyItemProps) {
         </ItemDescription>
       </ItemContent>
       <ItemActions>
-        <Button size="sm" variant="outline">
-          Open
-        </Button>
+        <KeyItemActions item={key} />
       </ItemActions>
       <ItemFooter className="text-muted-foreground text-sm">
         Added{" "}
         {formatDistanceToNow(new Date(key.createdAt), { addSuffix: true })}
       </ItemFooter>
     </Item>
+  )
+}
+
+function KeyItemActions({ item: key }: SSHKeyItemProps) {
+  const utils = api.useUtils()
+
+  const [dialog, setDialog] = React.useState<"delete" | null>(null)
+  const [isDownloading, setIsDownloading] = React.useState<boolean>(false)
+
+  const deleteKey = api.sshKey.delete.useMutation({
+    onError(error) {
+      toast.error("Failed to delete SSH key:", {
+        description: error.message,
+      })
+    },
+    onSuccess() {
+      toast.success("SSH key deleted successfully.")
+      utils.sshKey.list.invalidate()
+    },
+  })
+
+  function handleDownloadPublicKey() {
+    try {
+      setIsDownloading(true)
+      const blob = new Blob([key.publicKey], {
+        type: "text/plain;charset=utf-8",
+      })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `id_${key.name.toLowerCase().replace(/\s/g, "-")}.pub`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error("Failed to download public key:", error)
+      toast.error("Failed to download public key.", {
+        description: "Please try again later.",
+      })
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+
+  async function handleDeleteKey() {
+    await deleteKey.mutateAsync({
+      id: key.id,
+    })
+  }
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button size="icon" variant="ghost">
+              <IconDotsVertical />
+            </Button>
+          }
+        />
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem
+              disabled={isDownloading}
+              onClick={handleDownloadPublicKey}
+            >
+              {isDownloading ? <Spinner /> : <IconDownload />}
+              Download Public Key
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              disabled={deleteKey.isPending}
+              onClick={() => {
+                // allow dialog to open before closing menu
+                setTimeout(() => setDialog("delete"), 150)
+              }}
+              variant="destructive"
+            >
+              <IconTrash />
+              Delete Key
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog
+        onOpenChange={() => setDialog(null)}
+        open={dialog === "delete"}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to delete this SSH key?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="my-4 flex items-center space-x-2 rounded-lg bg-muted p-4">
+            <IconTrash className="text-destructive" />
+            <span className="font-medium font-mono text-muted-foreground text-sm">
+              {key.name}
+            </span>
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleteKey.isPending}
+              onClick={handleDeleteKey}
+              variant="destructive"
+            >
+              {deleteKey.isPending ? <Spinner /> : <IconTrash />}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }
