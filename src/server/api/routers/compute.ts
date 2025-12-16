@@ -36,7 +36,7 @@ export const computeRouter = createTRPCRouter({
         .randomBytes(16)
         .toString("base64")
         .slice(0, 24)
-      const hostname = `${name.toLowerCase().replaceAll(/[^a-z0-9-]/g, "-")}-${crypto.randomBytes(3).toString("hex")}`
+      const hostname = `${user.email}-${name.toLowerCase().replaceAll(/[^a-z0-9-]/g, "-")}-${crypto.randomBytes(3).toString("hex")}`
 
       const vmid = await getNextAvailableVmid()
 
