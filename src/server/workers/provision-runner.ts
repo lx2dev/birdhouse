@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm"
 
 import { PM_DEFAULT_NODE, PM_DEFAULT_POOL } from "@/constants"
 import { proxmox } from "@/lib/proxmox"
+import { waitForTask } from "@/lib/proxmox/wait-for-task"
 import { db } from "@/server/db"
 import type { VMTable } from "@/server/db/schema"
 import {
@@ -53,7 +54,7 @@ async function processOne(vm: VMTable) {
       throw new Error(`Template or operating system not found for VM ${id}`)
     }
 
-    await proxmox.nodes
+    const cloneUpid = await proxmox.nodes
       .$(PM_DEFAULT_NODE)
       .qemu.$(operatingSystem.proxmoxTemplateId)
       .clone.$post({
@@ -62,6 +63,23 @@ async function processOne(vm: VMTable) {
         newid: vmid,
         pool: PM_DEFAULT_POOL,
       })
+
+    try {
+      for await (const update of waitForTask(
+        proxmox,
+        PM_DEFAULT_NODE,
+        cloneUpid,
+        POLL_INTERVAL_MS,
+      )) {
+        if (update.logs) {
+          for (const line of update.logs)
+            console.log(`[proxmox:${cloneUpid}] ${line}`)
+        }
+      }
+    } catch (error) {
+      console.error(`Cloning VM failed for VM ${id}:`, error)
+      throw error
+    }
 
     await proxmox.nodes
       .$(PM_DEFAULT_NODE)
