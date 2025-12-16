@@ -320,6 +320,7 @@ function NewComputeSectionSuspense() {
                       <CreateSSHKeyDialog>
                         <Button
                           className="text-foreground"
+                          disabled={isSubmitting}
                           type="button"
                           variant="outline"
                         >
