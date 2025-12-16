@@ -121,7 +121,11 @@ export const sshKey = createTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
   }),
-  (t) => [index("ssh_key_userId_idx").on(t.userId)],
+  (t) => [
+    index("ssh_key_userId_idx").on(t.userId),
+    index("ssh_key_name_idx").on(t.name),
+    index("ssh_key_fingerprint_idx").on(t.fingerprint),
+  ],
 )
 
 export type SSHKeyTable = typeof sshKey.$inferSelect
