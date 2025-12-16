@@ -1,6 +1,9 @@
 import z from "zod"
 
-import { vmTemplateStatusEnum } from "@/server/db/schema"
+import {
+  operatingSystemStatusEnum,
+  vmTemplateStatusEnum,
+} from "@/server/db/schema"
 
 export const insertVMTemplateSchema = z.object({
   cpuCores: z.number(),
@@ -10,4 +13,13 @@ export const insertVMTemplateSchema = z.object({
   memoryMb: z.number(),
   operatingSystemId: z.uuid(),
   status: z.enum(vmTemplateStatusEnum.enumValues).default("testing"),
+})
+
+export const insertOperatingSystemSchema = z.object({
+  displayName: z.string(),
+  name: z.string(),
+  osType: z.enum(["linux", "windows"]),
+  osVersion: z.string(),
+  proxmoxTemplateId: z.number(),
+  status: z.enum(operatingSystemStatusEnum.enumValues).default("testing"),
 })
