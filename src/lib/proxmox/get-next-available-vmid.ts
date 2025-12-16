@@ -4,7 +4,7 @@ export async function getNextAvailableVmid(): Promise<number> {
   try {
     const resources = await proxmox.nodes.$get()
 
-    let maxVmid = 100
+    let maxVmid = 99
 
     for (const resource of resources) {
       if (resource.vmid && resource.vmid > maxVmid) {
