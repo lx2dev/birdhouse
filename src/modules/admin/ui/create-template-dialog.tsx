@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/dialog"
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -32,7 +31,6 @@ import { api } from "@/lib/api/client"
 import { insertVMTemplateSchema } from "@/modules/admin/schemas"
 
 // TODO: Add create multiple toggle
-
 export function CreateTemplateDialog() {
   const utils = api.useUtils()
 
@@ -43,7 +41,6 @@ export function CreateTemplateDialog() {
       cpuCores: 2,
       diskGb: 20,
       memoryMb: 2048,
-      proxmoxTemplateId: "9000",
     },
     resolver: zodResolver(insertVMTemplateSchema),
   })
@@ -194,32 +191,6 @@ export function CreateTemplateDialog() {
                   )}
                 />
               </div>
-
-              <Controller
-                control={form.control}
-                name="proxmoxTemplateId"
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Proxmox Template ID
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      aria-invalid={fieldState.invalid}
-                      disabled={isSubmitting}
-                      id={field.name}
-                      placeholder="9000"
-                      type="number"
-                    />
-                    <FieldDescription>
-                      The template ID as defined in Proxmox VE
-                    </FieldDescription>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
             </FieldGroup>
           </div>
 
