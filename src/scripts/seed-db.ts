@@ -43,26 +43,34 @@ const SEED_TEMPLATES: readonly (typeof schema.vmTemplate.$inferInsert)[] = [
 const OPERATING_SYSTEM: readonly (typeof schema.operatingSystem.$inferInsert)[] =
   [
     {
+      displayName: "Ubuntu 22.04 LTS",
       name: "Ubuntu 22.04 LTS",
       osType: "linux",
+      osVersion: "22.04 LTS",
       proxmoxTemplateId: 9000,
       status: "available",
     },
     {
+      displayName: "Debian 12",
       name: "Debian 12",
       osType: "linux",
+      osVersion: "12",
       proxmoxTemplateId: 9001,
       status: "unavailable",
     },
     {
+      displayName: "CentOS 8",
       name: "CentOS 8",
       osType: "linux",
+      osVersion: "8",
       proxmoxTemplateId: 9002,
       status: "unavailable",
     },
     {
+      displayName: "Windows Server 2022",
       name: "Windows Server 2022",
       osType: "windows",
+      osVersion: "2022",
       proxmoxTemplateId: 9100,
       status: "unavailable",
     },
