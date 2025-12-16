@@ -40,6 +40,34 @@ const SEED_TEMPLATES: readonly (typeof schema.vmTemplate.$inferInsert)[] = [
   },
 ] as const
 
+const OPERATING_SYSTEM: readonly (typeof schema.operatingSystem.$inferInsert)[] =
+  [
+    {
+      name: "Ubuntu 22.04 LTS",
+      osType: "linux",
+      proxmoxTemplateId: 9000,
+      status: "available",
+    },
+    {
+      name: "Debian 12",
+      osType: "linux",
+      proxmoxTemplateId: 9001,
+      status: "unavailable",
+    },
+    {
+      name: "CentOS 8",
+      osType: "linux",
+      proxmoxTemplateId: 9002,
+      status: "unavailable",
+    },
+    {
+      name: "Windows Server 2022",
+      osType: "windows",
+      proxmoxTemplateId: 9100,
+      status: "unavailable",
+    },
+  ]
+
 async function seedVMTemplates() {
   try {
     console.log("Seeding VM templates...")
@@ -52,6 +80,22 @@ async function seedVMTemplates() {
     }
   } catch (error) {
     console.error("Error seeding VM templates:", error)
+    process.exit(1)
+  }
+}
+
+async function seedOperatingSystems() {
+  try {
+    console.log("Seeding Operating Systems...")
+    for (const os of OPERATING_SYSTEM) {
+      await db
+        .insert(schema.operatingSystem)
+        .values(os)
+        .onConflictDoNothing()
+        .execute()
+    }
+  } catch (error) {
+    console.error("Error seeding Operating Systems:", error)
     process.exit(1)
   }
 }
@@ -86,6 +130,7 @@ async function seedVMTemplates() {
 
 async function main() {
   await seedVMTemplates()
+  await seedOperatingSystems()
   // await seedVM()
 }
 
