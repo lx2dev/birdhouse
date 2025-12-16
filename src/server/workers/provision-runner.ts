@@ -30,7 +30,12 @@ async function processOne(vm: VMTable) {
     console.error(
       `VM ${id} has no templateId or operatingSystemId, cannot provision`,
     )
-    await db.update(vmTable).set({ status: "error" }).where(eq(vmTable.id, id))
+    await db
+      .update(vmTable)
+      .set({
+        status: "error",
+      })
+      .where(eq(vmTable.id, id))
     return
   }
 
@@ -99,7 +104,12 @@ async function processOne(vm: VMTable) {
     console.log(`Provisioned VM ${id} (vmid=${vmid})`)
   } catch (err) {
     console.error(`Failed to provision VM ${id}:`, err)
-    await db.update(vmTable).set({ status: "error" }).where(eq(vmTable.id, id))
+    await db
+      .update(vmTable)
+      .set({
+        status: "error",
+      })
+      .where(eq(vmTable.id, id))
   }
 }
 

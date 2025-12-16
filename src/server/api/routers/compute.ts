@@ -8,6 +8,7 @@ import { createComputeSchema } from "@/modules/dashboard/schemas"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import {
   auditLog as auditLogTable,
+  operatingSystem as osTable,
   sshKey as sshKeyTable,
   vm as vmTable,
   vmTemplate as vmTemplateTable,
@@ -19,7 +20,7 @@ export const computeRouter = createTRPCRouter({
     .input(createComputeSchema)
     .mutation(async ({ ctx, input }) => {
       const { user } = ctx.session
-      const { name, sshKeyId, templateId } = input
+      const { name, sshKeyId, templateId, operatingSystemId } = input
 
       const [template] = await ctx.db
         .select()
@@ -29,6 +30,17 @@ export const computeRouter = createTRPCRouter({
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Template not found",
+        })
+      }
+
+      const [operatingSystem] = await ctx.db
+        .select()
+        .from(osTable)
+        .where(eq(osTable.id, operatingSystemId))
+      if (!operatingSystem) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Operating System not found",
         })
       }
 
@@ -75,6 +87,7 @@ export const computeRouter = createTRPCRouter({
           ipv4Address: "",
           memoryMb: template.memoryMb,
           name,
+          operatingSystemId: operatingSystem.id,
           proxmoxNode: PM_DEFAULT_NODE,
           proxmoxPool: PM_DEFAULT_POOL,
           rootPassword,
