@@ -9,7 +9,6 @@ export function NewComputeView() {
           Choose a template and configure your virtual machine
         </p>
       </div>
-
       <NewComputeSection />
     </div>
   )
