@@ -48,17 +48,20 @@ export const templateRouter = createTRPCRouter({
           })
           .nullish(),
         limit: z.number().min(1).max(100),
+        withUnavailable: z.boolean().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
-      const { cursor, limit } = input
+      const { cursor, limit, withUnavailable = false } = input
 
       const templates = await ctx.db
         .select()
         .from(vmTemplateTable)
         .where(
           and(
-            eq(vmTemplateTable.status, "available"),
+            withUnavailable
+              ? undefined
+              : eq(vmTemplateTable.status, "available"),
             cursor
               ? or(
                   lt(vmTemplateTable.createdAt, cursor.createdAt),
