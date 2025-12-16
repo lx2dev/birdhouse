@@ -74,16 +74,21 @@ export function SSHKeyItem({ item: key }: SSHKeyItemProps) {
         <ItemTitle>{key.name}</ItemTitle>
         <ItemDescription className="space-y-2">
           <span className="flex items-center justify-between rounded-(--radius) bg-muted p-2.5 text-sm">
-            <span className="flex min-w-0 items-center gap-1.5">
+            <span className="flex min-w-0 items-center gap-2">
               <span className="shrink-0 font-medium">Public Key:</span>
-              <code className="truncate font-mono text-xs">
+              <code
+                className="max-w-[48ch] truncate font-mono text-xs"
+                title={key.publicKey}
+              >
                 {key.publicKey}
               </code>
             </span>
             <Button
-              className="ml-auto h-auto"
+              aria-label="Copy public key"
+              className="ml-2 h-auto"
               onClick={() => handleCopy("publicKey")}
               size="icon"
+              title="Copy public key"
               variant="ghost"
             >
               {copy.field === "publicKey" ? (
@@ -93,17 +98,23 @@ export function SSHKeyItem({ item: key }: SSHKeyItemProps) {
               )}
             </Button>
           </span>
-          <span className="flex items-center justify-between rounded-(--radius) bg-muted p-2.5 text-sm">
-            <span className="flex min-w-0 items-center gap-1.5">
+
+          <span className="flex items-center justify-between rounded-md bg-muted p-2.5 text-sm">
+            <span className="flex min-w-0 items-center gap-2">
               <span className="shrink-0 font-medium">Fingerprint:</span>
-              <code className="truncate font-mono text-xs">
+              <code
+                className="max-w-[28ch] truncate font-mono text-xs"
+                title={key.fingerprint}
+              >
                 {key.fingerprint}
               </code>
             </span>
             <Button
-              className="ml-auto h-auto"
+              aria-label="Copy fingerprint"
+              className="ml-2 h-auto"
               onClick={() => handleCopy("fingerprint")}
               size="icon"
+              title="Copy fingerprint"
               variant="ghost"
             >
               {copy.field === "fingerprint" ? (
