@@ -12,6 +12,7 @@ import { usePathname } from "next/navigation"
 
 import { Icons } from "@/components/icons"
 import { Button } from "@/components/ui/button"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 const NAV_ITEMS = [
   { href: "/admin", icon: IconLayoutDashboard, label: "Admin" },
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
 
 export function AdminHeader() {
   const pathname = usePathname()
+  const mobile = useIsMobile()
 
   return (
     <header className="sticky top-0 z-50 border-border border-b bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/60">
@@ -54,7 +56,7 @@ export function AdminHeader() {
 
         <div className="ml-auto">
           <Link href="/">
-            <Button size="sm" variant="outline">
+            <Button size={mobile ? "icon" : "sm"} variant="outline">
               <IconLogout />
               <span className="hidden sm:inline">Exit Admin</span>
             </Button>

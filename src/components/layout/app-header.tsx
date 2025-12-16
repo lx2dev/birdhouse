@@ -13,6 +13,7 @@ import { usePathname, useRouter } from "next/navigation"
 
 import { Icons } from "@/components/icons"
 import { Button } from "@/components/ui/button"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { authClient } from "@/lib/auth/client"
 
 const NAV_ITEMS = [
@@ -28,6 +29,7 @@ interface AppHeaderProps {
 export function AppHeader({ user }: AppHeaderProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const mobile = useIsMobile()
 
   async function handleSignOut() {
     await authClient.signOut({
@@ -81,7 +83,11 @@ export function AppHeader({ user }: AppHeaderProps) {
             {user.email}
           </div>
 
-          <Button onClick={handleSignOut} size="sm" variant="outline">
+          <Button
+            onClick={handleSignOut}
+            size={mobile ? "icon" : "sm"}
+            variant="outline"
+          >
             <IconLogout />
             <span className="hidden sm:inline">Sign Out</span>
           </Button>
