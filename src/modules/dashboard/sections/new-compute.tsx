@@ -73,6 +73,7 @@ function NewComputeSectionSuspense() {
   const form = useForm({
     defaultValues: {
       name: "",
+      operatingSystemId: "",
       sshKeyId: "",
       templateId: "",
     },
@@ -97,6 +98,15 @@ function NewComputeSectionSuspense() {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
     },
   )
+  const [operatingSystems] = api.os.list.useSuspenseInfiniteQuery(
+    {
+      limit: DEFAULT_FETCH_LIMIT,
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    },
+  )
+
   const createCompute = api.compute.create.useMutation({
     onError(error) {
       toast.error("Failed to create compute instance:", {
@@ -256,6 +266,83 @@ function NewComputeSectionSuspense() {
           <CardContent>
             <Controller
               control={form.control}
+              name="operatingSystemId"
+              render={({ field, fieldState }) => (
+                <FieldSet data-invalid={fieldState.invalid}>
+                  <FieldLegend variant="label">Choose Template</FieldLegend>
+                  <FieldDescription>
+                    Select compute resources for your instance
+                  </FieldDescription>
+                  {operatingSystems.pages.flatMap((page) => page.items)
+                    .length === 0 ? (
+                    <Empty>
+                      <EmptyHeader>
+                        <EmptyTitle>No templates available</EmptyTitle>
+                      </EmptyHeader>
+                      <EmptyContent>
+                        <p className="text-center text-muted-foreground text-sm">
+                          There are no instance templates available. Please
+                          contact support for assistance.
+                        </p>
+                      </EmptyContent>
+                    </Empty>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {operatingSystems.pages
+                        .flatMap((page) => page.items)
+                        .map((os) => (
+                          <RadioGroup
+                            aria-invalid={fieldState.invalid}
+                            disabled={isSubmitting}
+                            key={os.id}
+                            name={field.name}
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <FieldLabel
+                              className={cn(
+                                "border-2 transition-colors",
+                                field.value === os.id
+                                  ? "border-primary bg-primary/5"
+                                  : "border-border hover:border-primary/50",
+                                isSubmitting && "cursor-not-allowed opacity-50",
+                              )}
+                              htmlFor={os.id}
+                            >
+                              <Field orientation="horizontal">
+                                <FieldContent className="space-y-3">
+                                  <div>
+                                    <FieldLabel>{os.displayName}</FieldLabel>
+                                    <FieldDescription>
+                                      {os.osType} {os.osVersion}
+                                    </FieldDescription>
+                                  </div>
+                                </FieldContent>
+                                <RadioGroupItem
+                                  disabled={isSubmitting}
+                                  id={os.id}
+                                  value={os.id}
+                                />
+                              </Field>
+                            </FieldLabel>
+                          </RadioGroup>
+                        ))}
+                    </div>
+                  )}
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </FieldSet>
+              )}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent>
+            <Controller
+              control={form.control}
               name="sshKeyId"
               render={({ field, fieldState }) => {
                 const selectedKey = sshKeys.pages
@@ -360,6 +447,7 @@ NewComputeSection.Skeleton = function NewComputeSectionSkeleton() {
     <div className="space-y-4">
       <Skeleton className="h-46 w-full rounded-(--radius)" />
       <Skeleton className="h-90 w-full rounded-(--radius)" />
+      <Skeleton className="h-35 w-full rounded-(--radius)" />
       <Skeleton className="h-29 w-full rounded-(--radius)" />
       <Skeleton className="h-9 w-35 rounded-(--radius)" />
     </div>
