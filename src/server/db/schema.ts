@@ -28,7 +28,6 @@ export const vmTemplate = createTable(
       .$defaultFn(() => crypto.randomUUID()),
     memoryMb: d.integer("memory_mb").notNull(),
     name: d.text("name").notNull().unique(),
-    osType: d.text("os_type").notNull(),
     proxmoxTemplateId: d.integer("proxmox_template_id").notNull(),
     status: vmTemplateStatusEnum().default("testing").notNull(),
     updatedAt: d

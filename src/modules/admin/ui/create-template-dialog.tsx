@@ -20,23 +20,14 @@ import {
 } from "@/components/ui/dialog"
 import {
   Field,
-  FieldContent,
   FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
-import { OS_TYPE_OPTIONS } from "@/constants"
 import { api } from "@/lib/api/client"
 import { insertVMTemplateSchema } from "@/modules/admin/schemas"
 
@@ -87,7 +78,7 @@ export function CreateTemplateDialog() {
           </Button>
         }
       />
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="w-full max-w-3xl">
         <DialogHeader>
           <DialogTitle>Create Template</DialogTitle>
           <DialogDescription>
@@ -109,7 +100,7 @@ export function CreateTemplateDialog() {
                       aria-invalid={fieldState.invalid}
                       disabled={isSubmitting}
                       id={field.name}
-                      placeholder="Ubuntu 22.04 LTS"
+                      placeholder="Standard Small"
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -139,7 +130,7 @@ export function CreateTemplateDialog() {
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <Controller
                   control={form.control}
                   name="cpuCores"
@@ -180,9 +171,6 @@ export function CreateTemplateDialog() {
                     </Field>
                   )}
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
                 <Controller
                   control={form.control}
                   name="diskGb"
@@ -204,54 +192,6 @@ export function CreateTemplateDialog() {
                       )}
                     </Field>
                   )}
-                />
-                <Controller
-                  control={form.control}
-                  name="osType"
-                  render={({ field, fieldState }) => {
-                    const selectedOption = OS_TYPE_OPTIONS.find(
-                      (option) => option.value === field.value,
-                    )
-
-                    return (
-                      <Field
-                        data-invalid={fieldState.invalid}
-                        orientation="responsive"
-                      >
-                        <FieldContent>
-                          <FieldLabel htmlFor={field.name}>OS Type</FieldLabel>
-                          {fieldState.invalid && (
-                            <FieldError errors={[fieldState.error]} />
-                          )}
-                        </FieldContent>
-                        <Select
-                          name={field.name}
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <SelectTrigger
-                            aria-invalid={fieldState.invalid}
-                            disabled={isSubmitting}
-                            id={field.name}
-                          >
-                            <SelectValue>
-                              {selectedOption?.label ?? "Select OS Type"}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {OS_TYPE_OPTIONS.map((option) => (
-                              <SelectItem
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </Field>
-                    )
-                  }}
                 />
               </div>
 

@@ -25,7 +25,6 @@ export const templateRouter = createTRPCRouter({
           displayName: input.displayName,
           memoryMb: input.memoryMb,
           name,
-          osType: input.osType,
           proxmoxTemplateId: Number(input.proxmoxTemplateId),
           status: input.status,
         })
