@@ -1,3 +1,4 @@
+import { TemplateSection } from "@/modules/admin/sections/template"
 import { CreateTemplateDialog } from "@/modules/admin/ui/create-template-dialog"
 
 export function TemplateView() {
@@ -12,6 +13,7 @@ export function TemplateView() {
         </div>
         <CreateTemplateDialog />
       </div>
+      <TemplateSection />
     </div>
   )
 }
