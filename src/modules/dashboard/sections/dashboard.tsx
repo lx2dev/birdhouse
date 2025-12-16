@@ -73,6 +73,7 @@ function DashboardSectionSuspense() {
         fetchNextPage={query.fetchNextPage}
         hasNextPage={query.hasNextPage}
         isFetchingNextPage={query.isFetchingNextPage}
+        isManual
       />
     </>
   )
