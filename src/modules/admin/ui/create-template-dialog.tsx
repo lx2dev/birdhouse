@@ -30,8 +30,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { api } from "@/lib/api/client"
 import { insertVMTemplateSchema } from "@/modules/admin/schemas"
 
+type CreateTemplateDialogProps = React.ComponentProps<typeof Button>
+
 // TODO: Add create multiple toggle
-export function CreateTemplateDialog() {
+export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
   const utils = api.useUtils()
 
   const [open, setOpen] = React.useState<boolean>(false)
@@ -69,7 +71,7 @@ export function CreateTemplateDialog() {
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger
         render={
-          <Button>
+          <Button {...props}>
             <IconPlus />
             Create Template
           </Button>
