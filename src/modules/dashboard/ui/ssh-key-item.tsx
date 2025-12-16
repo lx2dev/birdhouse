@@ -5,6 +5,7 @@ import {
   IconCopy,
   IconDotsVertical,
   IconDownload,
+  IconForms,
   IconTrash,
 } from "@tabler/icons-react"
 import { formatDistanceToNow } from "date-fns"
@@ -31,6 +32,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Field } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
 import {
   Item,
   ItemActions,
@@ -141,6 +144,8 @@ function KeyItemActions({ item: key }: SSHKeyItemProps) {
   const utils = api.useUtils()
 
   const [dialog, setDialog] = React.useState<"delete" | null>(null)
+  const [editDialog, setEditDialog] = React.useState<boolean>(false)
+  const [nameValue, setNameValue] = React.useState<string>(key.name)
   const [isDownloading, setIsDownloading] = React.useState<boolean>(false)
 
   const deleteKey = api.sshKey.delete.useMutation({
@@ -151,6 +156,18 @@ function KeyItemActions({ item: key }: SSHKeyItemProps) {
     },
     onSuccess() {
       toast.success("SSH key deleted successfully.")
+      utils.sshKey.list.invalidate()
+    },
+  })
+
+  const updateKey = api.sshKey.update.useMutation({
+    onError(error) {
+      toast.error("Failed to rename SSH key:", {
+        description: error.message,
+      })
+    },
+    onSuccess() {
+      toast.success("SSH key renamed successfully.")
       utils.sshKey.list.invalidate()
     },
   })
@@ -198,6 +215,14 @@ function KeyItemActions({ item: key }: SSHKeyItemProps) {
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuGroup>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => {
+                setTimeout(() => setEditDialog(true), 150)
+              }}
+            >
+              <IconForms />
+              Rename
+            </DropdownMenuItem>
             <DropdownMenuItem
               disabled={isDownloading}
               onClick={handleDownloadPublicKey}
@@ -251,6 +276,42 @@ function KeyItemActions({ item: key }: SSHKeyItemProps) {
             >
               {deleteKey.isPending ? <Spinner /> : <IconTrash />}
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog onOpenChange={() => setEditDialog(false)} open={editDialog}>
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Rename SSH Key</AlertDialogTitle>
+            <AlertDialogDescription>
+              Change the display name for this SSH key.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="my-4">
+            <Field>
+              <Input
+                id="ssh-key-name"
+                onChange={(e) => setNameValue(e.target.value)}
+                placeholder="My SSH Key"
+                value={nameValue}
+              />
+            </Field>
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={updateKey.isPending}
+              onClick={async () => {
+                await updateKey.mutateAsync({ id: key.id, name: nameValue })
+                setEditDialog(false)
+              }}
+            >
+              {updateKey.isPending ? <Spinner /> : <IconCheck />}
+              Save
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

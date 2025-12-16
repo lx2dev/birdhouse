@@ -184,4 +184,43 @@ export const sshKeyRouter = createTRPCRouter({
         nextCursor,
       }
     }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().uuid(),
+        name: z.string().min(1).max(100),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { user } = ctx.session
+      const { id, name } = input
+
+      const [existing] = await ctx.db
+        .select()
+        .from(sshKeyTable)
+        .where(and(eq(sshKeyTable.name, name), eq(sshKeyTable.userId, user.id)))
+
+      if (existing && existing.id !== id) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "An SSH key with this name already exists for your account.",
+        })
+      }
+
+      const [updated] = await ctx.db
+        .update(sshKeyTable)
+        .set({ name })
+        .where(and(eq(sshKeyTable.id, id), eq(sshKeyTable.userId, user.id)))
+        .returning()
+
+      if (!updated) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "SSH key not found.",
+        })
+      }
+
+      return updated
+    }),
 })
