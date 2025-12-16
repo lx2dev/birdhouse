@@ -57,6 +57,8 @@ export const computeRouter = createTRPCRouter({
         sshPublicKey = sshKey.publicKey
       }
 
+      // const ipv4Address = await getIPv4Address(vmid)
+
       const [compute] = await ctx.db
         .insert(vmTable)
         .values({
@@ -87,7 +89,7 @@ export const computeRouter = createTRPCRouter({
       try {
         await proxmox.nodes
           .$(PM_DEFAULT_NODE)
-          .qemu.$(Number(template.proxmoxTemplateId))
+          .qemu.$(template.proxmoxTemplateId)
           .clone.$post({
             full: true,
             name: hostname,
