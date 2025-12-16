@@ -44,6 +44,7 @@ export type VMTemplateTable = typeof vmTemplate.$inferSelect
 export const operatingSystemStatusEnum = pgEnum("operating_system_status", [
   "available",
   "unavailable",
+  "testing",
 ])
 
 export type OperatingSystemStatus =
@@ -65,7 +66,7 @@ export const operatingSystem = createTable(
     osType: d.text("os_type").notNull(),
     osVersion: d.text("os_version").notNull(),
     proxmoxTemplateId: d.integer("proxmox_template_id").notNull(),
-    status: operatingSystemStatusEnum().default("available").notNull(),
+    status: operatingSystemStatusEnum().default("testing").notNull(),
     updatedAt: d
       .timestamp("updated_at", { withTimezone: true })
       .$onUpdate(() => /* @__PURE__ */ new Date()),
