@@ -9,7 +9,6 @@ const SEED_TEMPLATES: readonly (typeof schema.vmTemplate.$inferInsert)[] = [
     displayName: "Standard Micro",
     memoryMb: 1024,
     name: "Standard Micro",
-    proxmoxTemplateId: 9000,
     status: "available",
   },
   {
@@ -19,7 +18,6 @@ const SEED_TEMPLATES: readonly (typeof schema.vmTemplate.$inferInsert)[] = [
     displayName: "Standard Small",
     memoryMb: 2048,
     name: "Standard Small",
-    proxmoxTemplateId: 9000,
     status: "available",
   },
   {
@@ -29,7 +27,6 @@ const SEED_TEMPLATES: readonly (typeof schema.vmTemplate.$inferInsert)[] = [
     displayName: "Standard Medium",
     memoryMb: 4096,
     name: "Standard Medium",
-    proxmoxTemplateId: 9001,
     status: "available",
   },
   {
@@ -39,7 +36,6 @@ const SEED_TEMPLATES: readonly (typeof schema.vmTemplate.$inferInsert)[] = [
     displayName: "Standard Large",
     memoryMb: 8192,
     name: "Standard Large",
-    proxmoxTemplateId: 9002,
     status: "available",
   },
 ] as const
