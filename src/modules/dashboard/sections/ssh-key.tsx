@@ -39,12 +39,8 @@ function SSHKeySectionSuspense() {
   const [open, setOpen] = React.useState<boolean>(false)
 
   const [sshKeys, query] = api.sshKey.list.useSuspenseInfiniteQuery(
-    {
-      limit: DEFAULT_FETCH_LIMIT,
-    },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-    },
+    { limit: DEFAULT_FETCH_LIMIT },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
 
   const filteredSSHKeys = React.useMemo(() => {

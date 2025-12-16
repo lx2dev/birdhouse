@@ -36,12 +36,8 @@ export function DashboardSection() {
 
 function DashboardSectionSuspense() {
   const [vms, query] = api.vm.list.useSuspenseInfiniteQuery(
-    {
-      limit: DEFAULT_FETCH_LIMIT,
-    },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-    },
+    { limit: DEFAULT_FETCH_LIMIT },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
 
   return vms.pages.flatMap((page) => page.items).length === 0 ? (

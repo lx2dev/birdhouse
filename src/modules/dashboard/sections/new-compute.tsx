@@ -86,28 +86,16 @@ function NewComputeSectionSuspense() {
   const { isSubmitting } = form.formState
 
   const [templates] = api.template.list.useSuspenseInfiniteQuery(
-    {
-      limit: DEFAULT_FETCH_LIMIT,
-    },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-    },
+    { limit: DEFAULT_FETCH_LIMIT },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
   const [sshKeys] = api.sshKey.list.useSuspenseInfiniteQuery(
-    {
-      limit: DEFAULT_FETCH_LIMIT,
-    },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-    },
+    { limit: DEFAULT_FETCH_LIMIT },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
   const [operatingSystems] = api.os.list.useSuspenseInfiniteQuery(
-    {
-      limit: DEFAULT_FETCH_LIMIT,
-    },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-    },
+    { limit: DEFAULT_FETCH_LIMIT },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
 
   const createCompute = api.compute.create.useMutation({
