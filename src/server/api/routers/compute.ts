@@ -57,6 +57,7 @@ export const computeRouter = createTRPCRouter({
         sshPublicKey = sshKey.publicKey
       }
 
+      // TODO: below
       // const ipv4Address = await getIPv4Address(vmid)
 
       const [compute] = await ctx.db
