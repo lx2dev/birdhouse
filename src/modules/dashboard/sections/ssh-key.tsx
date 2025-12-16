@@ -5,6 +5,7 @@ import * as React from "react"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 
+import { InfiniteScroll } from "@/components/infinite-scroll"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -18,6 +19,7 @@ import {
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api } from "@/lib/api/client"
 import { CreateSSHKeyDialog } from "@/modules/dashboard/ui/create-ssh-key-dialog"
+import { SSHKeyItem } from "@/modules/dashboard/ui/ssh-key-item"
 
 export function SSHKeySection() {
   return (
@@ -42,7 +44,7 @@ function SSHKeySectionSuspense() {
   )
 
   return (
-    <>
+    <div>
       <CreateSSHKeyDialog onOpenChange={setOpen} open={open} />
       <Card>
         <CardContent>
@@ -67,18 +69,17 @@ function SSHKeySectionSuspense() {
           ) : (
             sshKeys.pages
               .flatMap((page) => page.items)
-              .map((key) => (
-                <div className="border-b py-2 last:border-0" key={key.id}>
-                  <div className="font-medium">{key.name}</div>
-                  <div className="text-muted-foreground text-sm">
-                    Added on {key.createdAt.toLocaleDateString()}
-                  </div>
-                </div>
-              ))
+              .map((key) => <SSHKeyItem item={key} key={key.id} />)
           )}
         </CardContent>
       </Card>
-    </>
+      <InfiniteScroll
+        fetchNextPage={query.fetchNextPage}
+        hasNextPage={query.hasNextPage}
+        isFetchingNextPage={query.isFetchingNextPage}
+        isManual
+      />
+    </div>
   )
 }
 
