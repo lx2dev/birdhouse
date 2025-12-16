@@ -8,7 +8,10 @@ import {
   createTRPCRouter,
   protectedProcedure,
 } from "@/server/api/init"
-import { vmTemplate as vmTemplateTable } from "@/server/db/schema"
+import {
+  vmTemplateStatusEnum,
+  vmTemplate as vmTemplateTable,
+} from "@/server/db/schema"
 
 export const templateRouter = createTRPCRouter({
   create: adminProcedure
@@ -48,20 +51,18 @@ export const templateRouter = createTRPCRouter({
           })
           .nullish(),
         limit: z.number().min(1).max(100),
-        withUnavailable: z.boolean().optional(),
+        status: z.enum(["any", ...vmTemplateStatusEnum.enumValues]).optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
-      const { cursor, limit, withUnavailable = false } = input
+      const { cursor, limit, status = "available" } = input
 
       const templates = await ctx.db
         .select()
         .from(vmTemplateTable)
         .where(
           and(
-            withUnavailable
-              ? undefined
-              : eq(vmTemplateTable.status, "available"),
+            status !== "any" ? eq(vmTemplateTable.status, status) : undefined,
             cursor
               ? or(
                   lt(vmTemplateTable.createdAt, cursor.createdAt),
