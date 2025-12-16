@@ -6,6 +6,7 @@ import { db } from "@/server/db"
 import type { VMTable } from "@/server/db/schema"
 import {
   auditLog as auditLogTable,
+  operatingSystem as operatingSystemTable,
   vm as vmTable,
   vmTemplate as vmTemplateTable,
 } from "@/server/db/schema"
@@ -20,25 +21,36 @@ async function processOne(vm: VMTable) {
     rootPassword,
     sshPublicKey,
     templateId,
+    operatingSystemId,
     name: vmName,
     userId,
   } = vm
 
-  if (!templateId) {
-    console.error(`VM ${id} has no templateId, cannot provision`)
+  if (!templateId || !operatingSystemId) {
+    console.error(
+      `VM ${id} has no templateId or operatingSystemId, cannot provision`,
+    )
     await db.update(vmTable).set({ status: "error" }).where(eq(vmTable.id, id))
     return
   }
 
   try {
+    const [operatingSystem] = await db
+      .select()
+      .from(operatingSystemTable)
+      .where(eq(operatingSystemTable.id, operatingSystemId))
     const [template] = await db
       .select()
       .from(vmTemplateTable)
       .where(eq(vmTemplateTable.id, templateId))
 
+    if (!template || !operatingSystem) {
+      throw new Error(`Template or operating system not found for VM ${id}`)
+    }
+
     await proxmox.nodes
       .$(PM_DEFAULT_NODE)
-      .qemu.$(template.proxmoxTemplateId)
+      .qemu.$(operatingSystem.proxmoxTemplateId)
       .clone.$post({
         full: true,
         name: hostname,
