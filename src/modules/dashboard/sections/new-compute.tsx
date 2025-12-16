@@ -269,9 +269,11 @@ function NewComputeSectionSuspense() {
               name="operatingSystemId"
               render={({ field, fieldState }) => (
                 <FieldSet data-invalid={fieldState.invalid}>
-                  <FieldLegend variant="label">Choose Template</FieldLegend>
+                  <FieldLegend variant="label">
+                    Choose Operating System
+                  </FieldLegend>
                   <FieldDescription>
-                    Select compute resources for your instance
+                    Select an operating system for your instance
                   </FieldDescription>
                   {operatingSystems.pages.flatMap((page) => page.items)
                     .length === 0 ? (
@@ -312,9 +314,11 @@ function NewComputeSectionSuspense() {
                               <Field orientation="horizontal">
                                 <FieldContent className="space-y-3">
                                   <div>
-                                    <FieldLabel>{os.displayName}</FieldLabel>
+                                    <FieldLabel className="capitalize">
+                                      {os.osType}
+                                    </FieldLabel>
                                     <FieldDescription>
-                                      {os.osType} {os.osVersion}
+                                      {os.displayName} {os.osVersion}
                                     </FieldDescription>
                                   </div>
                                 </FieldContent>

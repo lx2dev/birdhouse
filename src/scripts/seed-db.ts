@@ -8,7 +8,7 @@ const SEED_TEMPLATES: readonly (typeof schema.vmTemplate.$inferInsert)[] = [
     diskGb: 10,
     displayName: "Standard Micro",
     memoryMb: 1024,
-    name: "Standard Micro",
+    name: "standard-micro",
     status: "available",
   },
   {
@@ -17,7 +17,7 @@ const SEED_TEMPLATES: readonly (typeof schema.vmTemplate.$inferInsert)[] = [
     diskGb: 20,
     displayName: "Standard Small",
     memoryMb: 2048,
-    name: "Standard Small",
+    name: "standard-small",
     status: "available",
   },
   {
@@ -26,7 +26,7 @@ const SEED_TEMPLATES: readonly (typeof schema.vmTemplate.$inferInsert)[] = [
     diskGb: 40,
     displayName: "Standard Medium",
     memoryMb: 4096,
-    name: "Standard Medium",
+    name: "standard-medium",
     status: "available",
   },
   {
@@ -35,7 +35,7 @@ const SEED_TEMPLATES: readonly (typeof schema.vmTemplate.$inferInsert)[] = [
     diskGb: 80,
     displayName: "Standard Large",
     memoryMb: 8192,
-    name: "Standard Large",
+    name: "standard-large",
     status: "available",
   },
 ] as const
@@ -43,32 +43,32 @@ const SEED_TEMPLATES: readonly (typeof schema.vmTemplate.$inferInsert)[] = [
 const OPERATING_SYSTEM: readonly (typeof schema.operatingSystem.$inferInsert)[] =
   [
     {
-      displayName: "Ubuntu 22.04 LTS",
-      name: "Ubuntu 22.04 LTS",
+      displayName: "Ubuntu",
+      name: "ubuntu",
       osType: "linux",
       osVersion: "22.04 LTS",
       proxmoxTemplateId: 9000,
       status: "available",
     },
     {
-      displayName: "Debian 12",
-      name: "Debian 12",
+      displayName: "Debian",
+      name: "debian",
       osType: "linux",
       osVersion: "12",
       proxmoxTemplateId: 9001,
       status: "unavailable",
     },
     {
-      displayName: "CentOS 8",
-      name: "CentOS 8",
+      displayName: "CentOS",
+      name: "centos",
       osType: "linux",
       osVersion: "8",
       proxmoxTemplateId: 9002,
       status: "unavailable",
     },
     {
-      displayName: "Windows Server 2022",
-      name: "Windows Server 2022",
+      displayName: "Windows Server",
+      name: "windows-server",
       osType: "windows",
       osVersion: "2022",
       proxmoxTemplateId: 9100,
