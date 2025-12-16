@@ -50,7 +50,6 @@ interface SSHKeyItemProps {
   item: SSHKeyTable
 }
 
-// TODO: Fix overflow
 export function SSHKeyItem({ item: key }: SSHKeyItemProps) {
   const [copy, setCopy] = React.useState<{
     field: "publicKey" | "fingerprint" | null
