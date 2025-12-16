@@ -14,6 +14,22 @@ export const templateRouter = createTRPCRouter({
   create: adminProcedure
     .input(insertVMTemplateSchema)
     .mutation(async ({ ctx, input }) => {
+      const [existingTemplate] = await ctx.db
+        .select()
+        .from(vmTemplateTable)
+        .where(
+          eq(
+            vmTemplateTable.proxmoxTemplateId,
+            Number(input.proxmoxTemplateId),
+          ),
+        )
+      if (existingTemplate) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: `A VM template with Proxmox Template ID ${input.proxmoxTemplateId} already exists.`,
+        })
+      }
+
       const name = input.displayName.trim().toLowerCase().replace(/\s+/g, "-")
 
       const [template] = await ctx.db
@@ -29,7 +45,6 @@ export const templateRouter = createTRPCRouter({
           status: input.status,
         })
         .returning()
-
       if (!template) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
