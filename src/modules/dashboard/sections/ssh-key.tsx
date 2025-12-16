@@ -1,6 +1,7 @@
 "use client"
 
 import { IconKeyFilled, IconPlus } from "@tabler/icons-react"
+import { useSearchParams } from "next/navigation"
 import * as React from "react"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
@@ -32,6 +33,9 @@ export function SSHKeySection() {
 }
 
 function SSHKeySectionSuspense() {
+  const searchParams = useSearchParams()
+  const sshKeyQuery = searchParams.get("query")
+
   const [open, setOpen] = React.useState<boolean>(false)
 
   const [sshKeys, query] = api.sshKey.list.useSuspenseInfiniteQuery(
@@ -43,12 +47,27 @@ function SSHKeySectionSuspense() {
     },
   )
 
+  const filteredSSHKeys = React.useMemo(() => {
+    if (!sshKeyQuery) {
+      return sshKeys
+    }
+
+    const filteredPages = sshKeys.pages.map((page) => {
+      const filteredItems = page.items.filter((key) =>
+        key.name.toLowerCase().includes(sshKeyQuery.toLowerCase()),
+      )
+      return { ...page, items: filteredItems }
+    })
+
+    return { ...sshKeys, pages: filteredPages }
+  }, [sshKeys, sshKeyQuery])
+
   return (
     <div>
       <CreateSSHKeyDialog onOpenChange={setOpen} open={open} />
       <Card>
         <CardContent>
-          {sshKeys.pages.flatMap((page) => page.items).length === 0 ? (
+          {filteredSSHKeys.pages.flatMap((page) => page.items).length === 0 ? (
             <Empty>
               <EmptyHeader>
                 <EmptyMedia className="size-14" variant="icon">
@@ -67,7 +86,7 @@ function SSHKeySectionSuspense() {
               </EmptyContent>
             </Empty>
           ) : (
-            sshKeys.pages
+            filteredSSHKeys.pages
               .flatMap((page) => page.items)
               .map((key) => <SSHKeyItem item={key} key={key.id} />)
           )}
@@ -85,12 +104,26 @@ function SSHKeySectionSuspense() {
 
 SSHKeySection.Skeleton = () => (
   <Card>
-    <CardContent>Loading SSH Keys...</CardContent>
+    <CardContent>
+      <div className="space-y-4">
+        {[...Array(DEFAULT_FETCH_LIMIT)].map((_, idx) => (
+          <div
+            className="h-10 w-full animate-pulse rounded-md bg-muted"
+            key={idx}
+          />
+        ))}
+      </div>
+    </CardContent>
   </Card>
 )
 
 SSHKeySection.Error = () => (
-  <Card>
-    <CardContent>Failed to load SSH Keys.</CardContent>
-  </Card>
+  <Empty>
+    <EmptyHeader>
+      <EmptyTitle className="text-lg">Failed to load SSH keys</EmptyTitle>
+      <EmptyDescription>
+        There was an error loading your SSH keys. Please try again later.
+      </EmptyDescription>
+    </EmptyHeader>
+  </Empty>
 )
