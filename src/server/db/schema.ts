@@ -41,6 +41,27 @@ export const vmTemplate = createTable(
 
 export type VMTemplateTable = typeof vmTemplate.$inferSelect
 
+export const operatingSystem = createTable(
+  "operating_system",
+  (d) => ({
+    createdAt: d
+      .timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    id: d
+      .text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    name: d.text("name").notNull(),
+    osType: d.text("os_type").notNull(),
+    proxmoxTemplateId: d.integer("proxmox_template_id").notNull(),
+    updatedAt: d
+      .timestamp("updated_at", { withTimezone: true })
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
+  }),
+  (t) => [index("operating_system_name_idx").on(t.name)],
+)
+
 export const vmStatusEnum = pgEnum("vm_status", [
   "running",
   "stopped",
@@ -68,6 +89,7 @@ export const vm = createTable(
     ipv4Address: d.text("ipv4_address").notNull(),
     memoryMb: d.integer("memory_mb").notNull(),
     name: d.text("name").notNull(),
+    operatingSystemId: d.text("operating_system_id"),
     proxmoxNode: d.text("proxmox_node").notNull(),
     proxmoxPool: d.text("proxmox_pool").default("UserPool").notNull(),
     rootPassword: d.text("root_password").notNull(),
