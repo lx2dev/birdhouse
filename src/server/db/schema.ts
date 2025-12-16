@@ -89,7 +89,7 @@ export const vm = createTable(
     ipv4Address: d.text("ipv4_address").notNull(),
     memoryMb: d.integer("memory_mb").notNull(),
     name: d.text("name").notNull(),
-    operatingSystemId: d.text("operating_system_id"),
+    operatingSystemId: d.text("operating_system_id").unique(),
     proxmoxNode: d.text("proxmox_node").notNull(),
     proxmoxPool: d.text("proxmox_pool").default("UserPool").notNull(),
     rootPassword: d.text("root_password").notNull(),
@@ -298,6 +298,10 @@ export const accountRelations = relations(account, ({ one }) => ({
 }))
 
 export const vmRelations = relations(vm, ({ one }) => ({
+  operatingSystem: one(operatingSystem, {
+    fields: [vm.operatingSystemId],
+    references: [operatingSystem.id],
+  }),
   sshKey: one(sshKey, {
     fields: [vm.sshKeyId],
     references: [sshKey.id],
