@@ -306,7 +306,15 @@ function NewComputeSectionSuspense() {
                             ))}
                         </SelectContent>
                       </Select>
-                      <CreateSSHKeyDialog />
+                      <CreateSSHKeyDialog>
+                        <Button
+                          className="text-foreground"
+                          type="button"
+                          variant="outline"
+                        >
+                          <IconPlus />
+                        </Button>
+                      </CreateSSHKeyDialog>
                     </ButtonGroup>
                   </Field>
                 )

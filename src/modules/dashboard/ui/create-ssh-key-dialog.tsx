@@ -43,9 +43,13 @@ import type { SSHKeyTable } from "@/server/db/schema"
 
 interface CreateSSHKeyDialogProps {
   children?: React.ReactElement
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export function CreateSSHKeyDialog({ children }: CreateSSHKeyDialogProps) {
+export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
+  const { children, open, onOpenChange } = props
+
   const utils = api.useUtils()
 
   const [sshKey, setSSHKey] = React.useState<
@@ -140,16 +144,8 @@ export function CreateSSHKeyDialog({ children }: CreateSSHKeyDialogProps) {
   }
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger
-        render={
-          children ?? (
-            <Button className="text-foreground" type="button" variant="outline">
-              <IconPlus />
-            </Button>
-          )
-        }
-      />
+    <AlertDialog onOpenChange={onOpenChange} open={open}>
+      <AlertDialogTrigger render={children} />
       <AlertDialogContent className="sm:max-w-md">
         {sshKey ? (
           <>
