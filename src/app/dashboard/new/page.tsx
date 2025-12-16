@@ -6,7 +6,9 @@ export default function NewComputePage() {
   void api.template.list.prefetchInfinite({
     limit: DEFAULT_FETCH_LIMIT,
   })
-  void api.sshKey.list.prefetch()
+  void api.sshKey.list.prefetchInfinite({
+    limit: DEFAULT_FETCH_LIMIT,
+  })
 
   return (
     <HydrateClient>

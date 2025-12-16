@@ -79,7 +79,7 @@ function NewComputeSectionSuspense() {
 
   const { isSubmitting } = form.formState
 
-  const [templates, query] = api.template.list.useSuspenseInfiniteQuery(
+  const [templates] = api.template.list.useSuspenseInfiniteQuery(
     {
       limit: DEFAULT_FETCH_LIMIT,
     },
@@ -87,7 +87,14 @@ function NewComputeSectionSuspense() {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
     },
   )
-  const [sshKeys] = api.sshKey.list.useSuspenseQuery()
+  const [sshKeys] = api.sshKey.list.useSuspenseInfiniteQuery(
+    {
+      limit: DEFAULT_FETCH_LIMIT,
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    },
+  )
   const _createCompute = api.compute.create.useMutation({
     onError(error) {
       toast.error("Failed to create compute instance:", {
@@ -240,7 +247,9 @@ function NewComputeSectionSuspense() {
               control={form.control}
               name="sshKeyId"
               render={({ field, fieldState }) => {
-                const selectedKey = sshKeys.find((k) => k.id === field.value)
+                const selectedKey = sshKeys.pages
+                  .flatMap((page) => page.items)
+                  .find((k) => k.id === field.value)
 
                 return (
                   <Field data-invalid={fieldState.invalid}>
@@ -264,7 +273,11 @@ function NewComputeSectionSuspense() {
                         <SelectTrigger
                           aria-invalid={fieldState.invalid}
                           className="flex-1"
-                          disabled={isSubmitting || sshKeys.length === 0}
+                          disabled={
+                            isSubmitting ||
+                            sshKeys.pages.flatMap((page) => page.items)
+                              .length === 0
+                          }
                           id={field.name}
                         >
                           <SelectValue>
@@ -281,12 +294,16 @@ function NewComputeSectionSuspense() {
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
-                          {sshKeys.map((key) => (
-                            <SelectItem key={key.id} value={key.id}>
-                              <span className="font-semibold">{key.name}</span>{" "}
-                              ({key.fingerprint})
-                            </SelectItem>
-                          ))}
+                          {sshKeys.pages
+                            .flatMap((page) => page.items)
+                            .map((key) => (
+                              <SelectItem key={key.id} value={key.id}>
+                                <span className="font-semibold">
+                                  {key.name}
+                                </span>{" "}
+                                ({key.fingerprint})
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                       <CreateSSHKeyDialog />
