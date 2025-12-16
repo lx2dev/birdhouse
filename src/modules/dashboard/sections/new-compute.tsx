@@ -114,10 +114,10 @@ function NewComputeSectionSuspense() {
   }
 
   return (
-    <Card>
-      <CardContent>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <FieldGroup>
+        <Card>
+          <CardContent>
             <FieldSet>
               <FieldLegend>Instance Details</FieldLegend>
               <FieldDescription>Name your instance</FieldDescription>
@@ -144,7 +144,11 @@ function NewComputeSectionSuspense() {
                 )}
               />
             </FieldSet>
-            <FieldSeparator />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent>
             <Controller
               control={form.control}
               name="templateId"
@@ -242,7 +246,11 @@ function NewComputeSectionSuspense() {
                 </FieldSet>
               )}
             />
+          </CardContent>
+        </Card>
 
+        <Card>
+          <CardContent>
             <Controller
               control={form.control}
               name="sshKeyId"
@@ -320,46 +328,37 @@ function NewComputeSectionSuspense() {
                 )
               }}
             />
+          </CardContent>
+        </Card>
 
-            <Field orientation="horizontal">
-              <Button disabled={isSubmitting} type="submit">
-                {isSubmitting ? (
-                  <>
-                    <Spinner />
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    <IconPlus />
-                    Create Instance
-                  </>
-                )}
-              </Button>
-            </Field>
-          </FieldGroup>
-        </form>
-      </CardContent>
-    </Card>
+        <Field orientation="horizontal">
+          <Button disabled={isSubmitting} type="submit">
+            {isSubmitting ? (
+              <>
+                <Spinner />
+                Creating...
+              </>
+            ) : (
+              <>
+                <IconPlus />
+                Create Instance
+              </>
+            )}
+          </Button>
+        </Field>
+      </FieldGroup>
+    </form>
   )
 }
 
 NewComputeSection.Skeleton = function NewComputeSectionSkeleton() {
   return (
-    <Card>
-      <CardContent>
-        <div className="space-y-6">
-          <Skeleton className="h-10 w-1/4" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-1/3" />
-          <div className="grid gap-4 md:grid-cols-2">
-            {[...Array(4)].map((_, idx) => (
-              <Skeleton className="h-32" key={idx} />
-            ))}
-          </div>
-          <Skeleton className="h-10 w-1/6" />
-        </div>
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      <Skeleton className="h-46 w-full rounded-(--radius)" />
+      <Skeleton className="h-90 w-full rounded-(--radius)" />
+      <Skeleton className="h-29 w-full rounded-(--radius)" />
+      <Skeleton className="h-9 w-35 rounded-(--radius)" />
+    </div>
   )
 }
 
