@@ -73,6 +73,10 @@ export const vm = createTable(
     proxmoxNode: d.text("proxmox_node").notNull(),
     proxmoxPool: d.text("proxmox_pool").default("UserPool").notNull(),
     rootPassword: d.text("root_password").notNull(),
+    sshKeyId: d
+      .text("ssh_key_id")
+      .notNull()
+      .references(() => sshKey.id, { onDelete: "restrict" }),
     sshPublicKey: d.text("ssh_public_key").notNull(),
     status: vmStatusEnum("status").default("provisioning").notNull(),
     templateId: d
@@ -91,6 +95,7 @@ export const vm = createTable(
   (t) => [
     index("vm_vmid_idx").on(t.vmid),
     index("vm_userId_idx").on(t.userId),
+    index("vm_sshKeyId_idx").on(t.sshKeyId),
     index("vm_status_idx").on(t.status),
   ],
 )
@@ -269,4 +274,23 @@ export const accountRelations = relations(account, ({ one }) => ({
     fields: [account.userId],
     references: [user.id],
   }),
+}))
+
+export const vmRelations = relations(vm, ({ one }) => ({
+  sshKey: one(sshKey, {
+    fields: [vm.sshKeyId],
+    references: [sshKey.id],
+  }),
+  template: one(vmTemplate, {
+    fields: [vm.templateId],
+    references: [vmTemplate.id],
+  }),
+  user: one(user, {
+    fields: [vm.userId],
+    references: [user.id],
+  }),
+}))
+
+export const sshKeyRelations = relations(sshKey, ({ many }) => ({
+  vms: many(vm),
 }))
