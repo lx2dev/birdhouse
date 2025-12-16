@@ -146,7 +146,7 @@ export function ComputeCard({ vm }: ComputeCardProps) {
           </div>
         </div>
 
-        <Link href={`/dashboard/vm/${vm.id}`}>
+        <Link href={`/dashboard/compute/${vm.id}`}>
           <Button
             className="w-full gap-2 bg-transparent"
             size="sm"
