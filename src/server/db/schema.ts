@@ -56,12 +56,14 @@ export const operatingSystem = createTable(
       .timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
+    displayName: d.text("display_name").notNull(),
     id: d
       .text("id")
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
     name: d.text("name").notNull(),
     osType: d.text("os_type").notNull(),
+    osVersion: d.text("os_version").notNull(),
     proxmoxTemplateId: d.integer("proxmox_template_id").notNull(),
     status: operatingSystemStatusEnum().default("available").notNull(),
     updatedAt: d
