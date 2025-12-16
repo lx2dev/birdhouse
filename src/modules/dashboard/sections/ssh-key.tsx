@@ -59,7 +59,10 @@ function SSHKeySectionSuspense() {
       return { ...page, items: filteredItems }
     })
 
-    return { ...sshKeys, pages: filteredPages }
+    return {
+      ...sshKeys,
+      pages: filteredPages,
+    }
   }, [sshKeys, sshKeyQuery])
 
   return (
@@ -67,7 +70,7 @@ function SSHKeySectionSuspense() {
       <CreateSSHKeyDialog onOpenChange={setOpen} open={open} />
       <Card>
         <CardContent>
-          {filteredSSHKeys.pages.flatMap((page) => page.items).length === 0 ? (
+          {sshKeys.pages.flatMap((page) => page.items).length === 0 ? (
             <Empty>
               <EmptyHeader>
                 <EmptyMedia className="size-14" variant="icon">
@@ -84,6 +87,19 @@ function SSHKeySectionSuspense() {
                   Add SSH Key
                 </Button>
               </EmptyContent>
+            </Empty>
+          ) : filteredSSHKeys.pages.flatMap((page) => page.items).length ===
+            0 ? (
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia className="size-14" variant="icon">
+                  <IconKeyFilled className="size-8 text-muted-foreground" />
+                </EmptyMedia>
+                <EmptyTitle className="text-lg">No SSH keys found</EmptyTitle>
+                <EmptyDescription>
+                  We couldn&apos;t find any SSH keys matching your search.
+                </EmptyDescription>
+              </EmptyHeader>
             </Empty>
           ) : (
             filteredSSHKeys.pages
