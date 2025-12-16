@@ -1,7 +1,7 @@
 import { exec } from "node:child_process"
 import { promisify } from "node:util"
 import { TRPCError } from "@trpc/server"
-import { and, desc, eq, lt, or } from "drizzle-orm"
+import { and, desc, eq, ilike, lt, or } from "drizzle-orm"
 import * as forge from "node-forge"
 import z from "zod"
 
@@ -143,11 +143,12 @@ export const sshKeyRouter = createTRPCRouter({
           })
           .nullish(),
         limit: z.number().min(1).max(100),
+        query: z.string().min(1).max(200).nullish(),
       }),
     )
     .query(async ({ ctx, input }) => {
       const { user } = ctx.session
-      const { cursor, limit } = input
+      const { cursor, limit, query } = input
 
       const sshKeys = await ctx.db
         .select()
@@ -155,6 +156,12 @@ export const sshKeyRouter = createTRPCRouter({
         .where(
           and(
             eq(sshKeyTable.userId, user.id),
+            query
+              ? or(
+                  ilike(sshKeyTable.name, `%${query}%`),
+                  ilike(sshKeyTable.fingerprint, `%${query}%`),
+                )
+              : undefined,
             cursor
               ? or(
                   lt(sshKeyTable.createdAt, cursor.createdAt),
