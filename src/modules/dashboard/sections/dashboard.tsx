@@ -1,6 +1,10 @@
 "use client"
 
-import { IconPlus, IconServer2 } from "@tabler/icons-react"
+import {
+  IconExclamationCircleFilled,
+  IconPlus,
+  IconServer2,
+} from "@tabler/icons-react"
 import Link from "next/link"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
@@ -79,28 +83,25 @@ function DashboardSectionSuspense() {
   )
 }
 
-DashboardSection.Skeleton = function SkeletonComp() {
-  return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 3 }).map((_, idx) => (
-        <Skeleton className="h-64" key={idx} />
-      ))}
-    </div>
-  )
-}
+DashboardSection.Skeleton = () => (
+  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    {Array.from({ length: 3 }).map((_, idx) => (
+      <Skeleton className="h-64" key={idx} />
+    ))}
+  </div>
+)
 
-DashboardSection.Error = function ErrorComp() {
-  return (
-    <Empty>
-      <EmptyHeader>
-        <EmptyTitle>Failed to load instances</EmptyTitle>
-      </EmptyHeader>
-      <EmptyContent>
-        <p className="text-center text-muted-foreground text-sm">
-          There was an error while fetching your virtual compute instances.
-          Please try again later.
-        </p>
-      </EmptyContent>
-    </Empty>
-  )
-}
+DashboardSection.Error = () => (
+  <Empty>
+    <EmptyHeader>
+      <EmptyMedia>
+        <IconExclamationCircleFilled className="text-destructive" />
+      </EmptyMedia>
+      <EmptyTitle>Failed to load instances</EmptyTitle>
+      <EmptyDescription>
+        There was an error while fetching your virtual compute instances. Please
+        try again later.
+      </EmptyDescription>
+    </EmptyHeader>
+  </Empty>
+)

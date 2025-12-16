@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import {
   IconCpu,
   IconDatabase,
+  IconExclamationCircleFilled,
   IconPlus,
   IconPointFilled,
 } from "@tabler/icons-react"
@@ -21,7 +22,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import {
   Empty,
   EmptyContent,
+  EmptyDescription,
   EmptyHeader,
+  EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty"
 import {
@@ -446,30 +449,27 @@ function NewComputeSectionSuspense() {
   )
 }
 
-NewComputeSection.Skeleton = function NewComputeSectionSkeleton() {
-  return (
-    <div className="space-y-4">
-      <Skeleton className="h-46 w-full rounded-(--radius)" />
-      <Skeleton className="h-90 w-full rounded-(--radius)" />
-      <Skeleton className="h-35 w-full rounded-(--radius)" />
-      <Skeleton className="h-29 w-full rounded-(--radius)" />
-      <Skeleton className="h-9 w-35 rounded-(--radius)" />
-    </div>
-  )
-}
+NewComputeSection.Skeleton = () => (
+  <div className="space-y-4">
+    <Skeleton className="h-46 w-full rounded-(--radius)" />
+    <Skeleton className="h-90 w-full rounded-(--radius)" />
+    <Skeleton className="h-35 w-full rounded-(--radius)" />
+    <Skeleton className="h-29 w-full rounded-(--radius)" />
+    <Skeleton className="h-9 w-35 rounded-(--radius)" />
+  </div>
+)
 
-NewComputeSection.Error = function NewComputeSectionError() {
-  return (
-    <Empty>
-      <EmptyHeader>
-        <EmptyTitle>Unable to Load Compute Instance Templates</EmptyTitle>
-      </EmptyHeader>
-      <EmptyContent>
-        <p className="text-center text-muted-foreground text-sm">
-          There was an error loading compute instance templates. Please try
-          refreshing the page.
-        </p>
-      </EmptyContent>
-    </Empty>
-  )
-}
+NewComputeSection.Error = () => (
+  <Empty>
+    <EmptyHeader>
+      <EmptyMedia>
+        <IconExclamationCircleFilled className="text-destructive" />
+      </EmptyMedia>
+      <EmptyTitle>Unable to Load Compute Instance Templates</EmptyTitle>
+      <EmptyDescription>
+        There was an error loading compute instance templates. Please try
+        refreshing the page.
+      </EmptyDescription>
+    </EmptyHeader>
+  </Empty>
+)
