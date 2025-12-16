@@ -69,6 +69,7 @@ export const computeRouter = createTRPCRouter({
           proxmoxNode: PM_DEFAULT_NODE,
           proxmoxPool: PM_DEFAULT_POOL,
           rootPassword,
+          sshKeyId,
           sshPublicKey,
           status: "provisioning",
           templateId: template.id,
