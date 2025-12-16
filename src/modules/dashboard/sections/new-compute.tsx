@@ -7,6 +7,7 @@ import {
   IconPlus,
   IconPointFilled,
 } from "@tabler/icons-react"
+import { useRouter } from "next/navigation"
 import * as React from "react"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
@@ -61,6 +62,8 @@ export function NewComputeSection() {
 }
 
 function NewComputeSectionSuspense() {
+  const router = useRouter()
+
   const [_credentials, setCredentials] = React.useState<{
     username: string
     password: string
@@ -94,7 +97,7 @@ function NewComputeSectionSuspense() {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
     },
   )
-  const _createCompute = api.compute.create.useMutation({
+  const createCompute = api.compute.create.useMutation({
     onError(error) {
       toast.error("Failed to create compute instance:", {
         description: error.message,
@@ -104,12 +107,13 @@ function NewComputeSectionSuspense() {
       setCredentials(data.credentials)
       setShowCredentials(true)
       toast.success("Compute instance created successfully!")
+      form.reset()
+      router.push(`/dashboard/compute/${data.compute.id}`)
     },
   })
 
-  function onSubmit(data: z.infer<typeof createComputeSchema>) {
-    // TODO: Implement create compute instance
-    console.log(data)
+  async function onSubmit(data: z.infer<typeof createComputeSchema>) {
+    await createCompute.mutateAsync(data)
   }
 
   return (
