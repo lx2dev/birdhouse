@@ -1,6 +1,7 @@
 import { IconPlus } from "@tabler/icons-react"
 
 import { Button } from "@/components/ui/button"
+import { SearchSSHKeySection } from "@/modules/dashboard/sections/search-ssh-key"
 import { SSHKeySection } from "@/modules/dashboard/sections/ssh-key"
 import { CreateSSHKeyDialog } from "@/modules/dashboard/ui/create-ssh-key-dialog"
 
@@ -21,6 +22,7 @@ export function SSHKeyView() {
           </Button>
         </CreateSSHKeyDialog>
       </div>
+      <SearchSSHKeySection />
       <SSHKeySection />
     </div>
   )
