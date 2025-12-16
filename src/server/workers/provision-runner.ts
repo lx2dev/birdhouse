@@ -24,6 +24,12 @@ async function processOne(vm: VMTable) {
     userId,
   } = vm
 
+  if (!templateId) {
+    console.error(`VM ${id} has no templateId, cannot provision`)
+    await db.update(vmTable).set({ status: "error" }).where(eq(vmTable.id, id))
+    return
+  }
+
   try {
     const [template] = await db
       .select()
