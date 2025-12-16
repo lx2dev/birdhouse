@@ -9,6 +9,9 @@ export default function NewComputePage() {
   void api.sshKey.list.prefetchInfinite({
     limit: DEFAULT_FETCH_LIMIT,
   })
+  void api.os.list.prefetchInfinite({
+    limit: DEFAULT_FETCH_LIMIT,
+  })
 
   return (
     <HydrateClient>
