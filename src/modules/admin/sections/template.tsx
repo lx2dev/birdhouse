@@ -268,8 +268,8 @@ function TemplateSectionSuspense() {
 
 TemplateSection.Skeleton = () => (
   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-    {[...Array(3)].map((_, idx) => (
-      <Card className="animate-pulse" key={idx}>
+    {[...Array(9)].map((_, idx) => (
+      <Card key={idx}>
         <CardHeader className="space-y-2">
           <Skeleton className="h-5 w-2/3" />
           <Skeleton className="h-4 w-1/2" />
