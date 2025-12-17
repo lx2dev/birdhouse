@@ -49,7 +49,7 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
 
   const isSubmitting = form.formState.isSubmitting
 
-  const createTemplate = api.template.create.useMutation({
+  const createTemplate = api.admin.template.create.useMutation({
     onError(error) {
       toast.error("Failed to create VM Template:", {
         description: error.message,

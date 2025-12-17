@@ -72,7 +72,7 @@ export function EditTemplateDialog({
     }
   }, [open, template, form])
 
-  const updateTemplate = api.template.update.useMutation({
+  const updateTemplate = api.admin.template.update.useMutation({
     onError(error) {
       toast.error("Failed to update VM Template:", {
         description: error.message,

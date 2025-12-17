@@ -1,49 +1,13 @@
-import { TRPCError } from "@trpc/server"
 import { and, asc, desc, eq, lt, or } from "drizzle-orm"
 import z from "zod"
 
-import {
-  insertVMTemplateSchema,
-  updateVMTemplateSchema,
-} from "@/modules/admin/schemas"
-import {
-  adminProcedure,
-  createTRPCRouter,
-  protectedProcedure,
-} from "@/server/api/init"
+import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import {
   vmTemplateStatusEnum,
   vmTemplate as vmTemplateTable,
 } from "@/server/db/schema"
 
 export const templateRouter = createTRPCRouter({
-  create: adminProcedure
-    .input(insertVMTemplateSchema)
-    .mutation(async ({ ctx, input }) => {
-      const name = input.displayName.trim().toLowerCase().replace(/\s+/g, "-")
-
-      const [template] = await ctx.db
-        .insert(vmTemplateTable)
-        .values({
-          cpuCores: input.cpuCores,
-          description: input.description ?? null,
-          diskGb: input.diskGb,
-          displayName: input.displayName,
-          memoryMb: input.memoryMb,
-          name,
-          status: input.status,
-        })
-        .returning()
-      if (!template) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create VM template",
-        })
-      }
-
-      return template
-    }),
-
   list: protectedProcedure
     .input(
       z.object({
@@ -114,43 +78,5 @@ export const templateRouter = createTRPCRouter({
         items,
         nextCursor,
       }
-    }),
-
-  update: adminProcedure
-    .input(updateVMTemplateSchema)
-    .mutation(async ({ ctx, input }) => {
-      const [existingTemplate] = await ctx.db
-        .select()
-        .from(vmTemplateTable)
-        .where(eq(vmTemplateTable.id, input.id))
-      if (!existingTemplate) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `VM Template with ID ${input.id} not found`,
-        })
-      }
-
-      const updatedValues: Partial<typeof vmTemplateTable.$inferInsert> = {
-        cpuCores: input.cpuCores,
-        description: input.description,
-        diskGb: input.diskGb,
-        displayName: input.displayName,
-        memoryMb: input.memoryMb,
-        status: input.status,
-      }
-
-      const [updatedTemplate] = await ctx.db
-        .update(vmTemplateTable)
-        .set(updatedValues)
-        .where(eq(vmTemplateTable.id, input.id))
-        .returning()
-      if (!updatedTemplate) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to update VM Template",
-        })
-      }
-
-      return updatedTemplate
     }),
 })
