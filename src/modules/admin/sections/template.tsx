@@ -2,7 +2,6 @@
 
 import {
   IconExclamationCircleFilled,
-  IconPencil,
   IconPower,
   IconQuestionMark,
   IconServerCog,
@@ -12,7 +11,6 @@ import { ErrorBoundary } from "react-error-boundary"
 
 import { InfiniteScroll } from "@/components/infinite-scroll"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -20,12 +18,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import {
   Empty,
   EmptyContent,
