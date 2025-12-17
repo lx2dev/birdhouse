@@ -8,7 +8,7 @@ export default async function ComputePage({
 
   return (
     <HydrateClient>
-      <InstanceView />
+      <InstanceView id={id} />
     </HydrateClient>
   )
 }
