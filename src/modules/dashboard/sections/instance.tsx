@@ -13,6 +13,7 @@ import {
   IconSquareFilled,
   IconTerminal,
   IconTrash,
+  IconX,
 } from "@tabler/icons-react"
 import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
@@ -156,12 +157,14 @@ function InstanceSectionSuspense({ id }: { id: string }) {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>
+                <IconX /> Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 className="bg-destructive text-destructive-foreground"
                 // onClick={() => deleteMutation.mutate({ id: vmId })}
               >
-                Delete
+                <IconTrash /> Delete
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
