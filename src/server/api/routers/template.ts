@@ -2,7 +2,10 @@ import { TRPCError } from "@trpc/server"
 import { and, asc, eq, lt, or } from "drizzle-orm"
 import z from "zod"
 
-import { insertVMTemplateSchema } from "@/modules/admin/schemas"
+import {
+  insertVMTemplateSchema,
+  updateVMTemplateSchema,
+} from "@/modules/admin/schemas"
 import {
   adminProcedure,
   createTRPCRouter,
@@ -91,5 +94,43 @@ export const templateRouter = createTRPCRouter({
         items,
         nextCursor,
       }
+    }),
+
+  update: adminProcedure
+    .input(updateVMTemplateSchema)
+    .mutation(async ({ ctx, input }) => {
+      const [existingTemplate] = await ctx.db
+        .select()
+        .from(vmTemplateTable)
+        .where(eq(vmTemplateTable.id, input.id))
+      if (!existingTemplate) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `VM Template with ID ${input.id} not found`,
+        })
+      }
+
+      const updatedValues: Partial<typeof vmTemplateTable.$inferInsert> = {
+        cpuCores: input.cpuCores,
+        description: input.description,
+        diskGb: input.diskGb,
+        displayName: input.displayName,
+        memoryMb: input.memoryMb,
+        status: input.status,
+      }
+
+      const [updatedTemplate] = await ctx.db
+        .update(vmTemplateTable)
+        .set(updatedValues)
+        .where(eq(vmTemplateTable.id, input.id))
+        .returning()
+      if (!updatedTemplate) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update VM Template",
+        })
+      }
+
+      return updatedTemplate
     }),
 })
