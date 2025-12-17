@@ -268,15 +268,33 @@ function TemplateSectionSuspense() {
 
 TemplateSection.Skeleton = () => (
   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-    {[...Array(9)].map((_, idx) => (
+    {Array.from({ length: 9 }).map((_, idx) => (
       <Card key={idx}>
-        <CardHeader className="space-y-2">
-          <Skeleton className="h-5 w-2/3" />
-          <Skeleton className="h-4 w-1/2" />
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="flex flex-1 items-center gap-2">
+              <Skeleton className="size-10" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-5 w-1/2" />
+                <Skeleton className="h-4 w-1/3" />
+              </div>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-2">
           <Skeleton className="h-4" />
-          <Skeleton className="h-4" />
+          <div className="grid grid-cols-3 gap-4 pt-2">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <div key={idx}>
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="mt-1 h-5 w-1/3" />
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-2 border-t pt-2">
+            <Skeleton className="h-7 flex-1" />
+            <Skeleton className="h-7 w-28" />
+          </div>
         </CardContent>
       </Card>
     ))}
