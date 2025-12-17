@@ -1,7 +1,9 @@
-export function InstanceView() {
+import { InstanceSection } from "@/modules/dashboard/sections/instance"
+
+export function InstanceView({ id }: { id: string }) {
   return (
-    <div>
-      <h1>InstanceView</h1>
+    <div className="space-y-6">
+      <InstanceSection id={id} />
     </div>
   )
 }
