@@ -11,8 +11,11 @@ export const insertVMTemplateSchema = z.object({
   diskGb: z.number(),
   displayName: z.string(),
   memoryMb: z.number(),
-  operatingSystemId: z.uuid(),
   status: z.enum(vmTemplateStatusEnum.enumValues).default("testing"),
+})
+
+export const updateVMTemplateSchema = insertVMTemplateSchema.safeExtend({
+  id: z.uuid(),
 })
 
 export const insertOperatingSystemSchema = z.object({
