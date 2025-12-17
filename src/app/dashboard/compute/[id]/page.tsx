@@ -1,13 +1,14 @@
+import { HydrateClient } from "@/lib/api/server"
+import { InstanceView } from "@/modules/dashboard/views/instance"
+
 export default async function ComputePage({
   params,
 }: PageProps<"/dashboard/compute/[id]">) {
   const { id } = await params
 
   return (
-    <div>
-      <h1>ComputePage</h1>
-
-      <p>VM ID: {id}</p>
-    </div>
+    <HydrateClient>
+      <InstanceView />
+    </HydrateClient>
   )
 }
