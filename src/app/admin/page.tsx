@@ -1,7 +1,12 @@
+import { api, HydrateClient } from "@/lib/api/server"
+import { AdminView } from "@/modules/admin/views/admin"
+
 export default function AdminPage() {
+  void api.admin.getStats.prefetch()
+
   return (
-    <div>
-      <h1>AdminPage</h1>
-    </div>
+    <HydrateClient>
+      <AdminView />
+    </HydrateClient>
   )
 }
