@@ -16,14 +16,17 @@ import {
 
 export const adminRouter = createTRPCRouter({
   getStats: adminProcedure.query(async ({ ctx }) => {
-    const [[userCount], [templateCount], [vmCount]] = await Promise.all([
+    const [[userCount], [pendingApprovalCount], [vmCount]] = await Promise.all([
       ctx.db.select({ count: count() }).from(userTable),
-      ctx.db.select({ count: count() }).from(vmTemplateTable),
+      ctx.db
+        .select({ count: count() })
+        .from(userTable)
+        .where(eq(userTable.approved, false)),
       ctx.db.select({ count: count() }).from(vmTable),
     ])
 
     return {
-      templateCount,
+      pendingApprovalCount,
       userCount,
       vmCount,
     }
