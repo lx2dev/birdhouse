@@ -1,6 +1,6 @@
 import { adminRouter } from "@/modules/admin/server/api/admin"
+import { computeRouter } from "@/modules/dashboard/server/api/compute"
 import { createCallerFactory, createTRPCRouter } from "@/server/api/init"
-import { computeRouter } from "@/server/api/routers/compute"
 import { osRouter } from "@/server/api/routers/os"
 import { sshKeyRouter } from "@/server/api/routers/sshkey"
 import { templateRouter } from "@/server/api/routers/template"
