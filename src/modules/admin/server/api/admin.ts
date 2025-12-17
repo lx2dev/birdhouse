@@ -26,9 +26,9 @@ export const adminRouter = createTRPCRouter({
     ])
 
     return {
-      pendingApprovalCount,
-      userCount,
-      vmCount,
+      pendingApprovalCount: pendingApprovalCount.count || 0,
+      userCount: userCount.count || 0,
+      vmCount: vmCount.count || 0,
     }
   }),
 
