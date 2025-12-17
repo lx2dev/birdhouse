@@ -1,42 +1,10 @@
-import { TRPCError } from "@trpc/server"
 import { and, asc, eq, lt, or } from "drizzle-orm"
 import z from "zod"
 
-import { insertOperatingSystemSchema } from "@/modules/admin/schemas"
-import {
-  adminProcedure,
-  createTRPCRouter,
-  protectedProcedure,
-} from "@/server/api/init"
+import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import { operatingSystem as osTable } from "@/server/db/schema"
 
 export const osRouter = createTRPCRouter({
-  create: adminProcedure
-    .input(insertOperatingSystemSchema)
-    .mutation(async ({ ctx, input }) => {
-      const name = input.displayName.trim().toLowerCase().replace(/\s+/g, "-")
-
-      const [template] = await ctx.db
-        .insert(osTable)
-        .values({
-          displayName: input.displayName,
-          name,
-          osType: input.osType,
-          osVersion: input.osVersion,
-          proxmoxTemplateId: input.proxmoxTemplateId,
-          status: input.status,
-        })
-        .returning()
-      if (!template) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create VM template",
-        })
-      }
-
-      return template
-    }),
-
   list: protectedProcedure
     .input(
       z.object({
