@@ -9,6 +9,7 @@ import {
 import * as React from "react"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
+import { toast } from "sonner"
 
 import { InfiniteScroll } from "@/components/infinite-scroll"
 import type { QueryControlsValue } from "@/components/query-controls"
@@ -37,6 +38,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Spinner } from "@/components/ui/spinner"
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
@@ -56,6 +58,8 @@ export function TemplateSection() {
 }
 
 function TemplateSectionSuspense() {
+  const utils = api.useUtils()
+
   const [controls, setControls] = React.useState<QueryControlsValue>({
     sortBy: undefined,
     sortOrder: "desc",
@@ -82,6 +86,17 @@ function TemplateSectionSuspense() {
     params,
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
+  const updateTemplate = api.admin.template.update.useMutation({
+    onError(error) {
+      toast.error("Failed to update VM Template:", {
+        description: error.message,
+      })
+    },
+    onSuccess() {
+      toast.success("VM Template updated successfully")
+      utils.template.list.invalidate()
+    },
+  })
 
   function getStatusColor(status: VMTemplateStatus) {
     switch (status) {
@@ -144,85 +159,102 @@ function TemplateSectionSuspense() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {templates.pages
           .flatMap((page) => page.items)
-          .map((template) => (
-            <Card className="relative overflow-visible" key={template.id}>
-              {vmTemplateStatusEnum.enumValues.includes(template.status) && (
-                <div className="-top-2.5 absolute right-1/2 z-10 translate-x-1/2 rounded-4xl bg-card">
-                  <Badge
-                    className={cn(
-                      "text-sm capitalize",
-                      getStatusColor(template.status),
-                    )}
-                    variant="secondary"
-                  >
-                    {template.status}
-                  </Badge>
-                </div>
-              )}
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
-                      <IconServerCog className="size-5 text-primary" />
+          .map((template) => {
+            const isUpdating =
+              template.id === updateTemplate.variables?.id &&
+              updateTemplate.isPending
+
+            return (
+              <Card className="relative overflow-visible" key={template.id}>
+                {vmTemplateStatusEnum.enumValues.includes(template.status) && (
+                  <div className="-top-2.5 absolute right-1/2 z-10 translate-x-1/2 rounded-4xl bg-card">
+                    <Badge
+                      className={cn(
+                        "text-sm capitalize",
+                        getStatusColor(template.status),
+                      )}
+                      variant="secondary"
+                    >
+                      {template.status}
+                    </Badge>
+                  </div>
+                )}
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
+                        <IconServerCog className="size-5 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">
+                          {template.displayName}
+                        </CardTitle>
+                        <CardDescription className="text-xs">
+                          {template.name}
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="line-clamp-2 text-muted-foreground text-sm">
+                    {template.description || "No description provided"}
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <div className="text-muted-foreground">CPU Cores</div>
+                      <div className="font-medium">{template.cpuCores}</div>
                     </div>
                     <div>
-                      <CardTitle className="text-lg">
-                        {template.displayName}
-                      </CardTitle>
-                      <CardDescription className="text-xs">
-                        {template.name}
-                      </CardDescription>
+                      <div className="text-muted-foreground">RAM</div>
+                      <div className="font-medium">
+                        {template.memoryMb / 1024} GB
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground">Disk</div>
+                      <div className="font-medium">{template.diskGb} GB</div>
                     </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="line-clamp-2 text-muted-foreground text-sm">
-                  {template.description || "No description provided"}
-                </div>
 
-                <div className="grid grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <div className="text-muted-foreground">CPU Cores</div>
-                    <div className="font-medium">{template.cpuCores}</div>
-                  </div>
-                  <div>
-                    <div className="text-muted-foreground">RAM</div>
-                    <div className="font-medium">
-                      {template.memoryMb / 1024} GB
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-muted-foreground">Disk</div>
-                    <div className="font-medium">{template.diskGb} GB</div>
-                  </div>
-                </div>
+                  <div className="flex items-center gap-2 border-t pt-2">
+                    <EditTemplateDialog template={template} variant="outline" />
+                    <Select
+                      disabled={isUpdating}
+                      onValueChange={(v) => {
+                        if (v === template.status) return
 
-                <div className="flex items-center gap-2 border-t pt-2">
-                  <EditTemplateDialog template={template} variant="outline" />
-                  <Select onValueChange={() => {}} value={template.status}>
-                    <SelectTrigger className="h-7!">
-                      <SelectValue className="text-foreground capitalize">
-                        <IconPower />
-                        {template.status}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {vmTemplateStatusEnum.enumValues.map((status) => (
-                        <SelectItem
-                          className="capitalize"
-                          key={status}
-                          value={status}
-                        >
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                        updateTemplate.mutate({
+                          id: template.id,
+                          status: v as VMTemplateStatus,
+                        })
+                      }}
+                      value={template.status}
+                    >
+                      <SelectTrigger className="h-7!">
+                        <SelectValue className="text-foreground capitalize">
+                          {isUpdating ? <Spinner /> : <IconPower />}
+                          {template.status}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {vmTemplateStatusEnum.enumValues.map((status) => (
+                          <SelectItem
+                            className="capitalize"
+                            key={status}
+                            value={status}
+                          >
+                            {status}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
       </div>
       <InfiniteScroll
         fetchNextPage={query.fetchNextPage}

@@ -56,8 +56,15 @@ export const adminRouter = createTRPCRouter({
       }),
 
     update: adminProcedure
-      .input(updateVMTemplateSchema)
+      .input(updateVMTemplateSchema.partial())
       .mutation(async ({ ctx, input }) => {
+        if (!input.id) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Template ID is required",
+          })
+        }
+
         const [existingTemplate] = await ctx.db
           .select()
           .from(vmTemplateTable)
