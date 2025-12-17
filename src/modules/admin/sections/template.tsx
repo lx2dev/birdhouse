@@ -63,15 +63,20 @@ function TemplateSectionSuspense() {
   })
   const [appliedControls, setAppliedControls] = React.useState(controls)
 
-  const params: any = {
+  const params = {
     limit: DEFAULT_FETCH_LIMIT,
-    status: appliedControls.status ?? "any",
-  }
-
-  if (appliedControls.sortBy) {
-    params.sortBy = appliedControls.sortBy
-    params.sortOrder = appliedControls.sortOrder
-  }
+    status: (appliedControls.status ?? "any") as "any",
+    ...(appliedControls.sortBy && {
+      sortBy: appliedControls.sortBy as
+        | "cpuCores"
+        | "name"
+        | "createdAt"
+        | "diskGb"
+        | "displayName"
+        | "memoryMb",
+      sortOrder: appliedControls.sortOrder,
+    }),
+  } as const
 
   const [templates, query] = api.template.list.useSuspenseInfiniteQuery(
     params,
