@@ -1,6 +1,6 @@
 import crypto from "node:crypto"
 import { TRPCError } from "@trpc/server"
-import { and, desc, eq, lt, or } from "drizzle-orm"
+import { and, desc, eq, getTableColumns, lt, or } from "drizzle-orm"
 import z from "zod"
 
 import { PM_DEFAULT_NODE, PM_DEFAULT_POOL } from "@/constants"
@@ -143,9 +143,20 @@ export const computeRouter = createTRPCRouter({
       const { id } = input
 
       const [compute] = await ctx.db
-        .select()
+        .select({
+          ...getTableColumns(vmTable),
+          os: {
+            ...getTableColumns(osTable),
+          },
+          template: {
+            ...getTableColumns(vmTemplateTable),
+          },
+        })
         .from(vmTable)
+        .innerJoin(vmTemplateTable, eq(vmTemplateTable.id, vmTable.templateId))
+        .innerJoin(osTable, eq(osTable.id, vmTable.operatingSystemId))
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
+
       if (!compute) {
         throw new TRPCError({
           code: "NOT_FOUND",
