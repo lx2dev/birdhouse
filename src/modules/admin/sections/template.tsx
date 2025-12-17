@@ -6,10 +6,13 @@ import {
   IconQuestionMark,
   IconServerCog,
 } from "@tabler/icons-react"
+import * as React from "react"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 
 import { InfiniteScroll } from "@/components/infinite-scroll"
+import type { QueryControlsValue } from "@/components/query-controls"
+import QueryControls from "@/components/query-controls"
 import { Badge } from "@/components/ui/badge"
 import {
   Card,
@@ -52,10 +55,26 @@ export function TemplateSection() {
   )
 }
 
-// TODO: Add sorting and filtering options
 function TemplateSectionSuspense() {
+  const [controls, setControls] = React.useState<QueryControlsValue>({
+    sortBy: undefined,
+    sortOrder: "desc",
+    status: "any",
+  })
+  const [appliedControls, setAppliedControls] = React.useState(controls)
+
+  const params: any = {
+    limit: DEFAULT_FETCH_LIMIT,
+    status: appliedControls.status ?? "any",
+  }
+
+  if (appliedControls.sortBy) {
+    params.sortBy = appliedControls.sortBy
+    params.sortOrder = appliedControls.sortOrder
+  }
+
   const [templates, query] = api.template.list.useSuspenseInfiniteQuery(
-    { limit: DEFAULT_FETCH_LIMIT, status: "any" },
+    params,
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
 
@@ -89,6 +108,34 @@ function TemplateSectionSuspense() {
     </Empty>
   ) : (
     <>
+      <div className="mb-4">
+        <QueryControls
+          onApply={() => setAppliedControls(controls)}
+          onChange={setControls}
+          onReset={() => {
+            const reset: QueryControlsValue = {
+              sortBy: undefined,
+              sortOrder: "desc",
+              status: "any",
+            }
+            setControls(reset)
+            setAppliedControls(reset)
+          }}
+          sortOptions={[
+            { label: "Created At", value: "createdAt" },
+            { label: "Name", value: "displayName" },
+            { label: "CPU Cores", value: "cpuCores" },
+            { label: "Memory", value: "memoryMb" },
+            { label: "Disk", value: "diskGb" },
+          ]}
+          statusOptions={vmTemplateStatusEnum.enumValues.map((v) => ({
+            label: v,
+            value: v,
+          }))}
+          value={controls}
+        />
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {templates.pages
           .flatMap((page) => page.items)
