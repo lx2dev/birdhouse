@@ -132,6 +132,30 @@ export const computeRouter = createTRPCRouter({
       }
     }),
 
+  getInstance: protectedProcedure
+    .input(
+      z.object({
+        id: z.uuid(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { user } = ctx.session
+      const { id } = input
+
+      const [compute] = await ctx.db
+        .select()
+        .from(vmTable)
+        .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
+      if (!compute) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Compute instance not found",
+        })
+      }
+
+      return compute
+    }),
+
   list: protectedProcedure
     .input(
       z.object({
