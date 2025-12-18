@@ -4,6 +4,7 @@ import { and, desc, eq, getTableColumns, lt, or } from "drizzle-orm"
 import z from "zod"
 
 import { PM_DEFAULT_NODE, PM_DEFAULT_POOL } from "@/constants"
+import { getInstanceStatus } from "@/lib/proxmox/get-instance-status"
 import { getNextAvailableVmid } from "@/lib/proxmox/get-next-available-vmid"
 import { createComputeSchema } from "@/modules/dashboard/schemas"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
@@ -178,7 +179,8 @@ export const computeRouter = createTRPCRouter({
 
       const [compute] = await ctx.db
         .select({
-          status: vmTable.status,
+          proxmoxNode: vmTable.proxmoxNode,
+          vmid: vmTable.vmid,
         })
         .from(vmTable)
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
@@ -189,10 +191,9 @@ export const computeRouter = createTRPCRouter({
         })
       }
 
-      // TODO: implement real-time status fetching from Proxmox
-      // const status = await getVMStatus(compute.vmid)
+      const status = await getInstanceStatus(compute.proxmoxNode, compute.vmid)
 
-      return compute.status
+      return status
     }),
 
   list: protectedProcedure
