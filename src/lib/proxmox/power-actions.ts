@@ -1,4 +1,5 @@
 import { getProxmoxClient } from "@/lib/proxmox"
+import { waitForTask } from "@/lib/proxmox/wait-for-task"
 
 export async function startInstance(
   node: string,
@@ -55,7 +56,12 @@ export async function rebootInstance(
   const proxmox = getProxmoxClient()
 
   try {
-    await proxmox.nodes.$(node).qemu.$(vmid).status.reboot.$post()
+    const upid = await proxmox.nodes.$(node).qemu.$(vmid).status.reboot.$post()
+    for await (const task of waitForTask(proxmox, node, upid)) {
+      if (task.status === "error") {
+        return false
+      }
+    }
     return true
   } catch (error) {
     console.log(`Failed to reboot instance ${vmid} on node ${node}:`, error)
