@@ -22,7 +22,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api } from "@/lib/api/client"
-import { ComputeCard } from "@/modules/dashboard/ui/compute-card"
+import { InstanceCard } from "@/modules/dashboard/ui/instance-card"
 
 export function DashboardSection() {
   return (
@@ -66,7 +66,7 @@ function DashboardSectionSuspense() {
         {vms.pages
           .flatMap((page) => page.items)
           .map((vm) => (
-            <ComputeCard key={vm.id} vm={vm} />
+            <InstanceCard key={vm.id} vm={vm} />
           ))}
       </div>
       <InfiniteScroll

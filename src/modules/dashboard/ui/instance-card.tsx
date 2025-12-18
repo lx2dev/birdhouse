@@ -32,11 +32,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import type { VMStatus, VMTable } from "@/server/db/schema"
 
-interface ComputeCardProps {
+interface InstanceCardProps {
   vm: VMTable
 }
 
-export function ComputeCard({ vm }: ComputeCardProps) {
+export function InstanceCard({ vm }: InstanceCardProps) {
   function getStatusColor(status: VMStatus) {
     switch (status) {
       case "running":
