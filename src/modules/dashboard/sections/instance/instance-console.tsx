@@ -61,16 +61,18 @@ function InstanceConsoleSectionSuspense({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Link href={`/dashboard/compute/${instance.id}/console`}>
-          <Button
-            disabled={instance.status !== "running"}
-            size="lg"
-            variant="outline"
-          >
-            <IconTerminal className="size-4" />
-            Open Console
-          </Button>
-        </Link>
+        <Button
+          disabled={instance.status !== "running"}
+          nativeButton={false}
+          render={
+            <Link href={`/dashboard/compute/${instance.id}/console`}>
+              <IconTerminal className="size-4" />
+              Open Console
+            </Link>
+          }
+          size="lg"
+          variant="outline"
+        />
       </CardContent>
     </Card>
   )

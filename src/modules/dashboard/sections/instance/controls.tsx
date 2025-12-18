@@ -257,11 +257,15 @@ function InstanceControlsSectionSuspense({
         open={open.delete}
       >
         <AlertDialogTrigger
-          disabled={deleteMutation.isPending}
+          disabled={
+            deleteMutation.isPending || instance.status === "provisioning"
+          }
           render={
             <Button
               className="ml-auto"
-              disabled={deleteMutation.isPending}
+              disabled={
+                deleteMutation.isPending || instance.status === "provisioning"
+              }
               variant="destructive"
             >
               <IconTrash />

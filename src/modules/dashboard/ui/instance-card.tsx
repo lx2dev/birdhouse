@@ -65,6 +65,9 @@ export function InstanceCard({ vm }: InstanceCardProps) {
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger
+              disabled={
+                vm.status === "deleting" || vm.status === "provisioning"
+              }
               render={
                 <Button className="size-8" size="icon" variant="ghost">
                   <IconDotsVertical />
@@ -146,16 +149,19 @@ export function InstanceCard({ vm }: InstanceCardProps) {
           </div>
         </div>
 
-        <Link href={`/dashboard/compute/${vm.id}`}>
-          <Button
-            className="w-full gap-2 bg-transparent"
-            size="sm"
-            variant="outline"
-          >
-            <IconTerminal className="size-4" />
-            Manage
-          </Button>
-        </Link>
+        <Button
+          className="w-full gap-2 bg-transparent"
+          disabled={vm.status === "deleting"}
+          nativeButton={false}
+          render={
+            <Link href={`/dashboard/compute/${vm.id}`}>
+              <IconTerminal className="size-4" />
+              Manage
+            </Link>
+          }
+          size="sm"
+          variant="outline"
+        />
       </CardContent>
     </Card>
   )
