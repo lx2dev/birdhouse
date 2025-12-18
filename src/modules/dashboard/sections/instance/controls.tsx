@@ -70,6 +70,13 @@ function InstanceControlsSectionSuspense({
   const utils = api.useUtils()
 
   const [forceShutdown, setForceShutdown] = React.useState<boolean>(false)
+  const [open, setOpen] = React.useState<{
+    delete: boolean
+    shutdown: boolean
+  }>({
+    delete: false,
+    shutdown: false,
+  })
 
   const startMutation = api.compute.start.useMutation({
     onError(error) {
@@ -93,6 +100,8 @@ function InstanceControlsSectionSuspense({
       toast.success("Instance shutdown initiated")
       utils.compute.getInstance.invalidate({ id: instance.id })
       utils.compute.getInstanceStatus.invalidate({ id: instance.id })
+      setForceShutdown(false)
+      setOpen((prev) => ({ ...prev, shutdown: false }))
     },
   })
   const stopMutation = api.compute.stop.useMutation({
@@ -128,6 +137,7 @@ function InstanceControlsSectionSuspense({
     onSuccess() {
       toast.success("Instance deleted")
       utils.compute.list.invalidate()
+      setOpen((prev) => ({ ...prev, delete: false }))
     },
   })
 
@@ -143,7 +153,12 @@ function InstanceControlsSectionSuspense({
           <IconPlayerPlayFilled />
           Start
         </Button>
-        <AlertDialog>
+        <AlertDialog
+          onOpenChange={(isOpen) =>
+            setOpen((prev) => ({ ...prev, shutdown: isOpen }))
+          }
+          open={open.shutdown}
+        >
           <AlertDialogTrigger
             disabled={
               instance.status !== "running" || shutdownMutation.isPending
@@ -233,7 +248,12 @@ function InstanceControlsSectionSuspense({
         </Button>
       </ButtonGroup>
 
-      <AlertDialog>
+      <AlertDialog
+        onOpenChange={(isOpen) =>
+          setOpen((prev) => ({ ...prev, delete: isOpen }))
+        }
+        open={open.delete}
+      >
         <AlertDialogTrigger
           disabled={deleteMutation.isPending}
           render={
