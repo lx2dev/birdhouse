@@ -6,9 +6,9 @@ import { redirect, useRouter } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api/client"
+import { InstanceConsoleSection } from "@/modules/dashboard/sections/instance/console-link"
 import { InstanceControlsSection } from "@/modules/dashboard/sections/instance/controls"
-import { InstanceConsoleSection } from "@/modules/dashboard/sections/instance/instance-console"
-import { InstanceDetailsSection } from "@/modules/dashboard/sections/instance/instance-details"
+import { InstanceDetailsSection } from "@/modules/dashboard/sections/instance/details"
 import type { VMStatus } from "@/server/db/schema"
 
 export function InstanceView({ id }: { id: string }) {
