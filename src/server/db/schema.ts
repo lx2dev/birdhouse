@@ -74,6 +74,8 @@ export const operatingSystem = createTable(
   (t) => [index("operating_system_name_idx").on(t.name)],
 )
 
+export type OperatingSystemTable = typeof operatingSystem.$inferSelect
+
 export const vmStatusEnum = pgEnum("vm_status", [
   "running",
   "stopped",
