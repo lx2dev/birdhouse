@@ -1,6 +1,8 @@
-import { proxmox } from "@/lib/proxmox"
+import { getProxmoxClient } from "@/lib/proxmox"
 
 export async function getNextAvailableVmid(): Promise<number> {
+  const proxmox = getProxmoxClient()
+
   try {
     const resources = await proxmox.nodes.$get()
 

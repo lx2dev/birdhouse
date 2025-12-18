@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
 
 import { PM_DEFAULT_NODE, PM_DEFAULT_POOL } from "@/constants"
-import { proxmox } from "@/lib/proxmox"
+import { getProxmoxClient } from "@/lib/proxmox"
 import { getNextAvailableVmid } from "@/lib/proxmox/get-next-available-vmid"
 import { waitForTask } from "@/lib/proxmox/wait-for-task"
 import { db } from "@/server/db"
@@ -57,6 +57,8 @@ async function processOne(vm: VMTable) {
 
     let effectiveVmid = vmid
     let cloneUpid: string | undefined
+
+    const proxmox = getProxmoxClient()
 
     try {
       cloneUpid = await proxmox.nodes

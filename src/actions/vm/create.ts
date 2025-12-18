@@ -1,11 +1,13 @@
 "use server"
 
-import { proxmox } from "@/lib/proxmox"
+import { getProxmoxClient } from "@/lib/proxmox"
 import { waitForTask } from "@/lib/proxmox/wait-for-task"
 
 const DEFAULT_NODE = "pve01"
 
 export async function createVmAction() {
+  const proxmox = getProxmoxClient()
+
   const cloneUpid = await proxmox.nodes
     .$(DEFAULT_NODE)
     .qemu.$(9000)
