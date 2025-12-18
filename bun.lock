@@ -21,6 +21,7 @@
         "next": "^16.0.10",
         "next-themes": "^0.4.6",
         "node-forge": "^1.3.3",
+        "novnc-next": "^1.0.0",
         "postgres": "^3.4.7",
         "proxmox-api": "^1.1.1",
         "react": "^19.2.3",
@@ -386,6 +387,8 @@
     "next-themes": ["next-themes@0.4.6", "", { "peerDependencies": { "react": "^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc", "react-dom": "^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc" } }, "sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA=="],
 
     "node-forge": ["node-forge@1.3.3", "", {}, "sha512-rLvcdSyRCyouf6jcOIPe/BgwG/d7hKjzMKOas33/pHEr6gbq18IK9zV7DiPvzsz0oBJPme6qr6H6kGZuI9/DZg=="],
+
+    "novnc-next": ["novnc-next@1.0.0", "", { "dependencies": { "@babel/runtime": "^7.24.7" } }, "sha512-dQTNBHE+RxvljS/wVwqKOsYVBnx4Zqrp11wOJuH88jJCeDal3mT3DJeTAx1nKebUBcop5lM7ZXIs1OQCT98Ocw=="],
 
     "picocolors": ["picocolors@1.1.1", "", {}, "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA=="],
 
