@@ -145,7 +145,7 @@ function InstanceControlsSectionSuspense({
     <div className="flex flex-wrap gap-2">
       <ButtonGroup>
         <Button
-          className="not-disabled:text-green-500"
+          className="text-green-500"
           disabled={instance.status !== "stopped" || startMutation.isPending}
           onClick={() => startMutation.mutate({ id: instance.id })}
           variant="outline"
@@ -167,7 +167,7 @@ function InstanceControlsSectionSuspense({
             }
             render={
               <Button
-                className="not-disabled:text-yellow-500"
+                className="text-yellow-500"
                 disabled={
                   instance.status !== "running" || shutdownMutation.isPending
                 }
@@ -227,7 +227,7 @@ function InstanceControlsSectionSuspense({
           </AlertDialogContent>
         </AlertDialog>
         <Button
-          className="not-disabled:text-destructive"
+          className="text-destructive"
           disabled={instance.status !== "running" || stopMutation.isPending}
           onClick={() => stopMutation.mutate({ id: instance.id })}
           variant="outline"
@@ -238,7 +238,7 @@ function InstanceControlsSectionSuspense({
           Stop
         </Button>
         <Button
-          className="not-disabled:text-primary"
+          className="text-primary"
           disabled={instance.status !== "running" || rebootMutation.isPending}
           onClick={() => rebootMutation.mutate({ id: instance.id })}
           variant="outline"
