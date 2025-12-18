@@ -1,9 +1,9 @@
 declare module "novnc-next" {
   interface RFBOptions {
-    credentials?: any
+    credentials?: unknown
     shared?: boolean
     repeaterID?: string
-    [key: string]: any
+    [key: string]: unknown
   }
 
   class RFB {
@@ -16,8 +16,8 @@ declare module "novnc-next" {
     resizeSession: boolean
     showDotCursor: boolean
     disconnect(): void
-    addEventListener(event: string, listener: (e?: any) => void): void
-    removeEventListener(event: string, listener: (e?: any) => void): void
+    addEventListener(event: string, listener: (e?: unknown) => void): void
+    removeEventListener(event: string, listener: (e?: unknown) => void): void
   }
 
   export default RFB
