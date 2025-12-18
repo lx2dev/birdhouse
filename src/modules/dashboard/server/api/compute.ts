@@ -6,6 +6,13 @@ import z from "zod"
 import { PM_DEFAULT_NODE, PM_DEFAULT_POOL } from "@/constants"
 import { getInstanceStatus } from "@/lib/proxmox/get-instance-status"
 import { getNextAvailableVmid } from "@/lib/proxmox/get-next-available-vmid"
+import {
+  deleteInstance,
+  rebootInstance,
+  shutdownInstance,
+  startInstance,
+  stopInstance,
+} from "@/lib/proxmox/power-actions"
 import { createComputeSchema } from "@/modules/dashboard/schemas"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import {
@@ -133,6 +140,56 @@ export const computeRouter = createTRPCRouter({
       }
     }),
 
+  delete: protectedProcedure
+    .input(
+      z.object({
+        id: z.uuid(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { user } = ctx.session
+      const { id } = input
+
+      const [instance] = await ctx.db
+        .select()
+        .from(vmTable)
+        .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
+      if (!instance) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Compute instance not found",
+        })
+      }
+
+      await ctx.db
+        .update(vmTable)
+        .set({ status: "deleting" })
+        .where(eq(vmTable.id, instance.id))
+
+      const success = await deleteInstance(instance.proxmoxNode, instance.vmid)
+      if (!success) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete instance",
+        })
+      }
+
+      await ctx.db.delete(vmTable).where(eq(vmTable.id, instance.id))
+
+      await ctx.db.insert(auditLogTable).values({
+        action: "compute:instance_deleted",
+        details: {
+          vmid: instance.vmid,
+          vmName: instance.name,
+        },
+        resourceId: instance.id,
+        resourceType: "virtual_machine",
+        userId: user.id,
+      })
+
+      return true
+    }),
+
   getInstance: protectedProcedure
     .input(
       z.object({
@@ -246,5 +303,207 @@ export const computeRouter = createTRPCRouter({
         items,
         nextCursor,
       }
+    }),
+
+  reboot: protectedProcedure
+    .input(
+      z.object({
+        id: z.uuid(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { user } = ctx.session
+      const { id } = input
+
+      const [instance] = await ctx.db
+        .select()
+        .from(vmTable)
+        .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
+      if (!instance) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Compute instance not found",
+        })
+      }
+
+      await ctx.db
+        .update(vmTable)
+        .set({ status: "rebooting" })
+        .where(eq(vmTable.id, instance.id))
+
+      const success = await rebootInstance(instance.proxmoxNode, instance.vmid)
+      if (!success) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to reboot instance",
+        })
+      }
+
+      await ctx.db
+        .update(vmTable)
+        .set({ status: "running" })
+        .where(eq(vmTable.id, instance.id))
+
+      await ctx.db.insert(auditLogTable).values({
+        action: "compute:instance_rebooted",
+        details: {
+          vmid: instance.vmid,
+          vmName: instance.name,
+        },
+        resourceId: instance.id,
+        resourceType: "virtual_machine",
+        userId: user.id,
+      })
+
+      return true
+    }),
+
+  shutdown: protectedProcedure
+    .input(
+      z.object({
+        force: z.boolean().default(false),
+        id: z.uuid(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { user } = ctx.session
+      const { id, force } = input
+
+      const [instance] = await ctx.db
+        .select()
+        .from(vmTable)
+        .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
+      if (!instance) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Compute instance not found",
+        })
+      }
+
+      const success = await shutdownInstance(
+        instance.proxmoxNode,
+        instance.vmid,
+        force,
+      )
+      if (!success) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to shutdown instance",
+        })
+      }
+
+      await ctx.db
+        .update(vmTable)
+        .set({ status: "stopped" })
+        .where(eq(vmTable.id, instance.id))
+
+      await ctx.db.insert(auditLogTable).values({
+        action: "compute:instance_shutdown_initiated",
+        details: {
+          vmid: instance.vmid,
+          vmName: instance.name,
+        },
+        resourceId: instance.id,
+        resourceType: "virtual_machine",
+        userId: user.id,
+      })
+
+      return true
+    }),
+
+  start: protectedProcedure
+    .input(
+      z.object({
+        id: z.uuid(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { user } = ctx.session
+      const { id } = input
+
+      const [instance] = await ctx.db
+        .select()
+        .from(vmTable)
+        .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
+      if (!instance) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Compute instance not found",
+        })
+      }
+
+      const success = await startInstance(instance.proxmoxNode, instance.vmid)
+      if (!success) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to start instance",
+        })
+      }
+
+      await ctx.db
+        .update(vmTable)
+        .set({ status: "running" })
+        .where(eq(vmTable.id, instance.id))
+
+      await ctx.db.insert(auditLogTable).values({
+        action: "compute:instance_started",
+        details: {
+          vmid: instance.vmid,
+          vmName: instance.name,
+        },
+        resourceId: instance.id,
+        resourceType: "virtual_machine",
+        userId: user.id,
+      })
+
+      return true
+    }),
+
+  stop: protectedProcedure
+    .input(
+      z.object({
+        id: z.uuid(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { user } = ctx.session
+      const { id } = input
+
+      const [instance] = await ctx.db
+        .select()
+        .from(vmTable)
+        .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
+      if (!instance) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Compute instance not found",
+        })
+      }
+
+      const success = await stopInstance(instance.proxmoxNode, instance.vmid)
+      if (!success) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to stop instance",
+        })
+      }
+
+      await ctx.db
+        .update(vmTable)
+        .set({ status: "stopped" })
+        .where(eq(vmTable.id, instance.id))
+
+      await ctx.db.insert(auditLogTable).values({
+        action: "compute:instance_stopped",
+        details: {
+          vmid: instance.vmid,
+          vmName: instance.name,
+        },
+        resourceId: instance.id,
+        resourceType: "virtual_machine",
+        userId: user.id,
+      })
+
+      return true
     }),
 })
