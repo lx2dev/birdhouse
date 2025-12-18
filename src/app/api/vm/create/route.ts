@@ -1,9 +1,11 @@
-import { proxmox } from "@/lib/proxmox"
+import { getProxmoxClient } from "@/lib/proxmox"
 import { waitForTask } from "@/lib/proxmox/wait-for-task"
 
 const DEFAULT_NODE = "pve01"
 
 export async function GET() {
+  const proxmox = getProxmoxClient()
+
   const stream = new TransformStream()
   const writer = stream.writable.getWriter()
   const encoder = new TextEncoder()
