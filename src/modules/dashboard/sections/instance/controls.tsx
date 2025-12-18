@@ -150,7 +150,9 @@ function InstanceControlsSectionSuspense({
           onClick={() => startMutation.mutate({ id: instance.id })}
           variant="outline"
         >
-          <IconPlayerPlayFilled />
+          <IconPlayerPlayFilled
+            className={startMutation.isPending ? "animate-pulse" : ""}
+          />
           Start
         </Button>
         <AlertDialog
