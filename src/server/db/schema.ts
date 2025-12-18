@@ -82,6 +82,8 @@ export const vmStatusEnum = pgEnum("vm_status", [
   "provisioning",
   "suspended",
   "error",
+  "deleting",
+  "rebooting",
 ])
 
 export type VMStatus = (typeof vmStatusEnum.enumValues)[number]
