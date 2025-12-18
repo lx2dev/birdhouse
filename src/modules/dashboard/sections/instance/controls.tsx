@@ -136,7 +136,7 @@ function InstanceControlsSectionSuspense({
       <ButtonGroup>
         <Button
           className="not-disabled:text-green-500"
-          disabled={instance.status === "running" || startMutation.isPending}
+          disabled={instance.status !== "stopped" || startMutation.isPending}
           onClick={() => startMutation.mutate({ id: instance.id })}
           variant="outline"
         >
@@ -146,13 +146,13 @@ function InstanceControlsSectionSuspense({
         <AlertDialog>
           <AlertDialogTrigger
             disabled={
-              instance.status === "stopped" || shutdownMutation.isPending
+              instance.status !== "running" || shutdownMutation.isPending
             }
             render={
               <Button
                 className="not-disabled:text-yellow-500"
                 disabled={
-                  instance.status === "stopped" || shutdownMutation.isPending
+                  instance.status !== "running" || shutdownMutation.isPending
                 }
                 variant="outline"
               >
@@ -196,7 +196,12 @@ function InstanceControlsSectionSuspense({
               <AlertDialogAction
                 className="bg-yellow-500 text-background"
                 disabled={shutdownMutation.isPending}
-                onClick={() => shutdownMutation.mutate({ id: instance.id })}
+                onClick={() =>
+                  shutdownMutation.mutate({
+                    force: forceShutdown,
+                    id: instance.id,
+                  })
+                }
               >
                 {shutdownMutation.isPending ? <Spinner /> : <IconPower />}
                 Shutdown
@@ -206,7 +211,7 @@ function InstanceControlsSectionSuspense({
         </AlertDialog>
         <Button
           className="not-disabled:text-destructive"
-          disabled={instance.status === "stopped" || stopMutation.isPending}
+          disabled={instance.status !== "running" || stopMutation.isPending}
           onClick={() => stopMutation.mutate({ id: instance.id })}
           variant="outline"
         >
