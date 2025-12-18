@@ -86,6 +86,7 @@ function InstanceConsoleSuspense({ id }: { id: string }) {
           {vncAccess ? (
             <VNCConsole
               host={vncAccess.host}
+              node={vncAccess.node}
               port={vncAccess.port}
               ticket={vncAccess.ticket}
               vmid={vncAccess.vmid}
