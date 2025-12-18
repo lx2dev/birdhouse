@@ -1,6 +1,8 @@
 import { getProxmoxClient } from "@/lib/proxmox"
 import { waitForTask } from "@/lib/proxmox/wait-for-task"
 
+// TODO: Must await task completion for all actions before returning success and updating db
+
 export async function startInstance(
   node: string,
   vmid: number,
