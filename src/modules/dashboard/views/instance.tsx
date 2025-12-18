@@ -1,7 +1,7 @@
 "use client"
 
 import { IconArrowLeft } from "@tabler/icons-react"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,6 +20,8 @@ export function InstanceView({ id }: { id: string }) {
   const [status, statusQuery] = api.compute.getInstanceStatus.useSuspenseQuery({
     id,
   })
+
+  if (instance.status === "deleting") return redirect("/dashboard")
 
   function getStatusColor(status: VMStatus) {
     switch (status) {
