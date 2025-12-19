@@ -12,6 +12,8 @@ export function getProxmoxClient() {
 
   proxmoxClient = proxmoxApi({
     host: env.PM_HOST,
+    port: 8006,
+    schema: "https",
     tokenID: env.PM_TOKEN_ID,
     tokenSecret: env.PM_SECRET,
   })
