@@ -77,7 +77,10 @@ function InstanceConsoleSuspense({ id }: { id: string }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Terminal</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <IconTerminal className="size-5" />
+            Terminal
+          </CardTitle>
           <CardDescription>
             Direct console access to your virtual machine
           </CardDescription>
@@ -86,7 +89,7 @@ function InstanceConsoleSuspense({ id }: { id: string }) {
           {vncAccess ? (
             <VNCConsole
               host={vncAccess.host}
-              // node={vncAccess.node}
+              node={vncAccess.node}
               port={vncAccess.port}
               ticket={vncAccess.ticket}
               vmid={vncAccess.vmid}
