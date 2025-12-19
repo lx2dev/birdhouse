@@ -1,11 +1,9 @@
 "use client"
 
 import { IconAlertCircleFilled, IconLoader2 } from "@tabler/icons-react"
-import RFB from "novnc-next"
 import * as React from "react"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Skeleton } from "@/components/ui/skeleton"
 
 interface VNCConsoleProps {
   host: string
