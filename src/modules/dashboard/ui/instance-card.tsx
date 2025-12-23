@@ -42,7 +42,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -178,53 +180,68 @@ export function InstanceCard({ instance }: InstanceCardProps) {
             />
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                className="group text-green-500"
-                disabled={
-                  instance.status !== "stopped" || startMutation.isPending
+                render={
+                  <Link href={`/dashboard/compute/${instance.id}/console`}>
+                    <IconTerminal />
+                    Console
+                  </Link>
                 }
-                onClick={() => startMutation.mutate({ id: instance.id })}
-              >
-                <IconPlayerPlayFilled className="group-focus:animate-pulse" />
-                Start
-              </DropdownMenuItem>
+              />
 
-              <DropdownMenuItem
-                className="group text-yellow-500"
-                disabled={
-                  instance.status !== "running" || shutdownMutation.isPending
-                }
-                onClick={() => {
-                  setOpen((prev) => ({
-                    ...prev,
-                    shutdown: true,
-                  }))
-                }}
-              >
-                <IconPower className="group-focus:animate-pulse" />
-                Shutdown
-              </DropdownMenuItem>
+              <DropdownMenuSeparator />
 
-              <DropdownMenuItem
-                className="group text-destructive"
-                disabled={
-                  instance.status !== "running" || stopMutation.isPending
-                }
-                onClick={() => stopMutation.mutate({ id: instance.id })}
-              >
-                <IconCrop11Filled className="group-focus:animate-pulse" />
-                Stop
-              </DropdownMenuItem>
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>Power Actions</DropdownMenuLabel>
 
-              <DropdownMenuItem
-                className="group text-primary"
-                disabled={
-                  instance.status !== "running" || rebootMutation.isPending
-                }
-                onClick={() => rebootMutation.mutate({ id: instance.id })}
-              >
-                <IconRotateClockwise className="group-focus:animate-spin" />
-                Reboot
-              </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="group text-green-500"
+                  disabled={
+                    instance.status !== "stopped" || startMutation.isPending
+                  }
+                  onClick={() => startMutation.mutate({ id: instance.id })}
+                >
+                  <IconPlayerPlayFilled className="group-focus:animate-pulse" />
+                  Start
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  className="group text-yellow-500"
+                  disabled={
+                    instance.status !== "running" || shutdownMutation.isPending
+                  }
+                  onClick={() => {
+                    setOpen((prev) => ({
+                      ...prev,
+                      shutdown: true,
+                    }))
+                  }}
+                >
+                  <IconPower className="group-focus:animate-pulse" />
+                  Shutdown
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  className="group text-destructive"
+                  disabled={
+                    instance.status !== "running" || stopMutation.isPending
+                  }
+                  onClick={() => stopMutation.mutate({ id: instance.id })}
+                >
+                  <IconCrop11Filled className="group-focus:animate-pulse" />
+                  Stop
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  className="group text-primary"
+                  disabled={
+                    instance.status !== "running" || rebootMutation.isPending
+                  }
+                  onClick={() => rebootMutation.mutate({ id: instance.id })}
+                >
+                  <IconRotateClockwise className="group-focus:animate-spin" />
+                  Reboot
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
 
               <DropdownMenuSeparator />
 
