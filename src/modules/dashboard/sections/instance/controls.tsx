@@ -9,6 +9,7 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons-react"
+import { useRouter } from "next/navigation"
 import * as React from "react"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
@@ -67,6 +68,7 @@ export function InstanceControlsSection({
 function InstanceControlsSectionSuspense({
   instance,
 }: InstanceControlsSectionProps) {
+  const router = useRouter()
   const utils = api.useUtils()
 
   const [forceShutdown, setForceShutdown] = React.useState<boolean>(false)
@@ -88,6 +90,7 @@ function InstanceControlsSectionSuspense({
       toast.success("Instance started")
       utils.compute.getInstance.invalidate({ id: instance.id })
       utils.compute.getInstanceStatus.invalidate({ id: instance.id })
+      router.refresh()
     },
   })
   const shutdownMutation = api.compute.shutdown.useMutation({
@@ -102,6 +105,7 @@ function InstanceControlsSectionSuspense({
       utils.compute.getInstanceStatus.invalidate({ id: instance.id })
       setForceShutdown(false)
       setOpen((prev) => ({ ...prev, shutdown: false }))
+      router.refresh()
     },
   })
   const stopMutation = api.compute.stop.useMutation({
@@ -114,6 +118,7 @@ function InstanceControlsSectionSuspense({
       toast.success("Instance stopped")
       utils.compute.getInstance.invalidate({ id: instance.id })
       utils.compute.getInstanceStatus.invalidate({ id: instance.id })
+      router.refresh()
     },
   })
   const rebootMutation = api.compute.reboot.useMutation({
@@ -126,6 +131,7 @@ function InstanceControlsSectionSuspense({
       toast.success("Instance rebooted")
       utils.compute.getInstance.invalidate({ id: instance.id })
       utils.compute.getInstanceStatus.invalidate({ id: instance.id })
+      router.refresh()
     },
   })
   const deleteMutation = api.compute.delete.useMutation({
@@ -138,6 +144,7 @@ function InstanceControlsSectionSuspense({
       toast.success("Instance deleted")
       utils.compute.list.invalidate()
       setOpen((prev) => ({ ...prev, delete: false }))
+      router.refresh()
     },
   })
 
@@ -258,13 +265,17 @@ function InstanceControlsSectionSuspense({
       >
         <AlertDialogTrigger
           disabled={
-            deleteMutation.isPending || instance.status === "provisioning"
+            deleteMutation.isPending ||
+            instance.status === "provisioning" ||
+            instance.status === "running"
           }
           render={
             <Button
               className="ml-auto"
               disabled={
-                deleteMutation.isPending || instance.status === "provisioning"
+                deleteMutation.isPending ||
+                instance.status === "provisioning" ||
+                instance.status === "running"
               }
               variant="destructive"
             >
@@ -282,12 +293,22 @@ function InstanceControlsSectionSuspense({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteMutation.isPending}>
+            <AlertDialogCancel
+              disabled={
+                deleteMutation.isPending ||
+                instance.status === "provisioning" ||
+                instance.status === "running"
+              }
+            >
               <IconX /> Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground"
-              disabled={deleteMutation.isPending}
+              disabled={
+                deleteMutation.isPending ||
+                instance.status === "provisioning" ||
+                instance.status === "running"
+              }
               onClick={() => deleteMutation.mutate({ id: instance.id })}
             >
               {deleteMutation.isPending ? <Spinner /> : <IconTrash />}
