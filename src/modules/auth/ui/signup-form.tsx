@@ -2,6 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
+  IconEye,
+  IconEyeOff,
   IconKey,
   IconLoader2,
   IconLogin2,
@@ -10,6 +12,7 @@ import {
 } from "@tabler/icons-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type z from "zod"
@@ -25,17 +28,32 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group"
 import { authClient } from "@/lib/auth/client"
 import { SignUpSchema } from "@/modules/auth/schemas/auth"
 
 export function SignUpForm() {
   const router = useRouter()
 
+  const [showPassword, setShowPassword] = React.useState<{
+    password: boolean
+    passwordConfirmation: boolean
+  }>({
+    password: false,
+    passwordConfirmation: false,
+  })
+
   const form = useForm<z.infer<typeof SignUpSchema>>({
     defaultValues: {
       email: "",
       name: "",
       password: "",
+      passwordConfirmation: "",
     },
     resolver: zodResolver(SignUpSchema),
   })
@@ -121,26 +139,92 @@ export function SignUpForm() {
           )}
         />
 
-        <Controller
-          control={form.control}
-          name="password"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="password">
-                <IconKey className="size-4" /> Password
-              </FieldLabel>
-              <Input
-                {...field}
-                aria-invalid={fieldState.invalid}
-                disabled={isPending}
-                id="password"
-                placeholder="********"
-                type="password"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Controller
+            control={form.control}
+            name="password"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="password">
+                  <IconKey className="size-4" /> Password
+                </FieldLabel>
+                <InputGroup>
+                  <InputGroupInput
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    disabled={isPending}
+                    id="password"
+                    placeholder="********"
+                    type={showPassword.password ? "text" : "password"}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupButton
+                      onClick={() => {
+                        setShowPassword({
+                          ...showPassword,
+                          password: !showPassword.password,
+                        })
+                      }}
+                      size="icon-xs"
+                      variant="ghost"
+                    >
+                      {showPassword.password ? <IconEyeOff /> : <IconEye />}
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+
+          <Controller
+            control={form.control}
+            name="passwordConfirmation"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="passwordConfirmation">
+                  <IconKey className="size-4" /> Confirm Password
+                </FieldLabel>
+                <InputGroup>
+                  <InputGroupInput
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    disabled={isPending}
+                    id="passwordConfirmation"
+                    placeholder="********"
+                    type={
+                      showPassword.passwordConfirmation ? "text" : "password"
+                    }
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupButton
+                      onClick={() => {
+                        setShowPassword({
+                          ...showPassword,
+                          passwordConfirmation:
+                            !showPassword.passwordConfirmation,
+                        })
+                      }}
+                      size="icon-xs"
+                      variant="ghost"
+                    >
+                      {showPassword.passwordConfirmation ? (
+                        <IconEyeOff />
+                      ) : (
+                        <IconEye />
+                      )}
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        </div>
 
         <Field>
           <Button disabled={isPending} type="submit">

@@ -1,9 +1,17 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { IconKey, IconLoader2, IconLogin2, IconMail } from "@tabler/icons-react"
+import {
+  IconEye,
+  IconEyeOff,
+  IconKey,
+  IconLoader2,
+  IconLogin2,
+  IconMail,
+} from "@tabler/icons-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type z from "zod"
@@ -19,11 +27,19 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group"
 import { authClient } from "@/lib/auth/client"
 import { SignInSchema } from "@/modules/auth/schemas/auth"
 
 export function SignInForm() {
   const router = useRouter()
+
+  const [showPassword, setShowPassword] = React.useState<boolean>(false)
 
   const form = useForm<z.infer<typeof SignInSchema>>({
     defaultValues: {
@@ -115,14 +131,25 @@ export function SignInForm() {
                   </Button>
                 </Link>
               </div>
-              <Input
-                {...field}
-                aria-invalid={fieldState.invalid}
-                disabled={isPending}
-                id="password"
-                placeholder="********"
-                type="password"
-              />
+              <InputGroup>
+                <InputGroupInput
+                  {...field}
+                  aria-invalid={fieldState.invalid}
+                  disabled={isPending}
+                  id="password"
+                  placeholder="********"
+                  type={showPassword ? "text" : "password"}
+                />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    size="icon-xs"
+                    variant="ghost"
+                  >
+                    {showPassword ? <IconEyeOff /> : <IconEye />}
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
