@@ -4,7 +4,6 @@ import { IconBadge, IconBell, IconLogout, IconUser } from "@tabler/icons-react"
 import type { UserWithRole } from "better-auth/plugins"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useTheme } from "next-themes"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -101,7 +100,7 @@ export function UserMenu({ user }: UserMenuProps) {
             render={
               <Link href="/profile">
                 <IconUser />
-                Profile
+                Account
               </Link>
             }
           />
