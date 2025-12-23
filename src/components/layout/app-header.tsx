@@ -1,20 +1,13 @@
 "use client"
 
-import {
-  IconArrowUpRight,
-  IconKey,
-  IconLogout,
-  IconPlus,
-  IconServer2,
-} from "@tabler/icons-react"
+import { IconKey, IconPlus, IconServer2 } from "@tabler/icons-react"
 import type { UserWithRole } from "better-auth/plugins"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 
 import { Icons } from "@/components/icons"
+import { UserMenu } from "@/components/layout/user-menu"
 import { Button } from "@/components/ui/button"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { authClient } from "@/lib/auth/client"
 
 const NAV_ITEMS = [
   { href: "/dashboard", icon: IconServer2, label: "Dashboard" },
@@ -27,31 +20,19 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ user }: AppHeaderProps) {
-  const router = useRouter()
   const pathname = usePathname()
-  const mobile = useIsMobile()
-
-  async function handleSignOut() {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess() {
-          router.push("/auth/signin")
-        },
-      },
-    })
-  }
 
   return (
     <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/60">
       <div className="flex h-12 items-center gap-4 px-4 md:h-16 lg:px-8">
         <Link className="flex items-center gap-2" href="/dashboard">
           <Icons.logo className="size-12 text-primary md:size-16" />
-          <span className="hidden font-semibold text-lg sm:inline md:text-2xl">
+          <span className="hidden font-semibold text-lg md:inline lg:text-2xl">
             Birdhouse
           </span>
         </Link>
 
-        <nav className="ml-8 hidden flex-1 items-center gap-1 sm:flex">
+        <nav className="ml-8 hidden flex-1 items-center gap-1 md:flex">
           {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
             const isActive = pathname === href
 
@@ -70,27 +51,8 @@ export function AppHeader({ user }: AppHeaderProps) {
           })}
         </nav>
 
-        <div className="ml-auto flex items-center gap-3">
-          {user.role === "admin" && (
-            <Link
-              className="hidden items-center text-muted-foreground text-sm transition-colors hover:text-foreground sm:flex"
-              href="/admin"
-            >
-              Admin <IconArrowUpRight className="size-3" />
-            </Link>
-          )}
-          <div className="hidden text-muted-foreground text-sm sm:block">
-            {user.email}
-          </div>
-
-          <Button
-            onClick={handleSignOut}
-            size={mobile ? "icon" : "sm"}
-            variant="outline"
-          >
-            <IconLogout />
-            <span className="hidden md:inline">Sign Out</span>
-          </Button>
+        <div className="ml-auto">
+          <UserMenu user={user} />
         </div>
       </div>
     </header>
