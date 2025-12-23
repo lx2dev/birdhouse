@@ -7,6 +7,7 @@ import {
 } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
 import type RFB from "novnc-next"
+import type { DisconnectEvent } from "novnc-next"
 import * as React from "react"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -36,10 +37,9 @@ export function VNCConsole(props: VNCConsoleProps) {
   React.useEffect(() => {
     let cancelled = false
 
-    let onConnect: (() => void) | null = null
-    let onDisconnect: ((e: CustomEvent<{ clean: boolean }>) => void) | null =
-      null
-    let onCredentialsRequired: (() => void) | null = null
+    let onConnect: ((e: Event) => void) | null = null
+    let onDisconnect: ((e: DisconnectEvent) => void) | null = null
+    let onCredentialsRequired: ((e: Event) => void) | null = null
 
     async function initVNC() {
       if (!canvasRef.current) return
@@ -96,7 +96,7 @@ export function VNCConsole(props: VNCConsoleProps) {
           setError(null)
         }
 
-        onDisconnect = (event: CustomEvent<{ clean: boolean }>) => {
+        onDisconnect = (event: DisconnectEvent) => {
           if (cancelled) return
           setConnected(false)
           setConnecting(false)

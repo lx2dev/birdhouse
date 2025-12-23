@@ -1,5 +1,5 @@
 declare module "novnc-next" {
-  interface RFBOptions {
+  export interface RFBOptions {
     credentials?: {
       password?: string
       username?: string
@@ -12,7 +12,7 @@ declare module "novnc-next" {
     [key: string]: unknown
   }
 
-  interface RFBCapabilities {
+  export interface RFBCapabilities {
     /**
      * Machine power control is available
      */
@@ -20,35 +20,35 @@ declare module "novnc-next" {
     [key: string]: unknown
   }
 
-  interface CapabilitiesEvent extends CustomEvent {
+  export interface CapabilitiesEvent extends CustomEvent {
     detail: { capabilities: RFBCapabilities }
   }
 
-  interface ClippingViewportEvent extends CustomEvent {
+  export interface ClippingViewportEvent extends CustomEvent {
     detail: boolean
   }
 
-  interface ClipboardEvent extends CustomEvent {
+  export interface ClipboardEvent extends CustomEvent {
     detail: { text: string }
   }
 
-  interface CredentialsRequiredEvent extends CustomEvent {
+  export interface CredentialsRequiredEvent extends CustomEvent {
     detail: { types: string[] }
   }
 
-  interface DesktopNameEvent extends CustomEvent {
+  export interface DesktopNameEvent extends CustomEvent {
     detail: { name: string }
   }
 
-  interface DisconnectEvent extends CustomEvent {
+  export interface DisconnectEvent extends CustomEvent {
     detail: { clean: boolean }
   }
 
-  interface SecurityFailureEvent extends CustomEvent {
+  export interface SecurityFailureEvent extends CustomEvent {
     detail: { status: number; reason?: string }
   }
 
-  interface ServerVerificationEvent extends CustomEvent {
+  export interface ServerVerificationEvent extends CustomEvent {
     detail: { type: string; publickey?: Uint8Array; [key: string]: unknown }
   }
 
