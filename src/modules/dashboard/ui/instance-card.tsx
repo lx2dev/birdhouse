@@ -310,7 +310,7 @@ export function InstanceCard({ instance }: InstanceCardProps) {
           render={
             <Link href={`/dashboard/compute/${instance.id}`}>
               <IconTerminal className="size-4" />
-              Manage
+              Details
             </Link>
           }
           size="sm"
