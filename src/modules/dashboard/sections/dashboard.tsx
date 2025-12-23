@@ -36,7 +36,7 @@ export function DashboardSection() {
 }
 
 function DashboardSectionSuspense() {
-  const [vms, query] = api.compute.list.useSuspenseInfiniteQuery(
+  const [instances, query] = api.compute.list.useSuspenseInfiniteQuery(
     { limit: DEFAULT_FETCH_LIMIT },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
@@ -44,7 +44,7 @@ function DashboardSectionSuspense() {
     limit: DEFAULT_FETCH_LIMIT,
   })
 
-  return vms.pages.flatMap((page) => page.items).length === 0 ? (
+  return instances.pages.flatMap((page) => page.items).length === 0 ? (
     <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
@@ -82,10 +82,10 @@ function DashboardSectionSuspense() {
   ) : (
     <>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {vms.pages
+        {instances.pages
           .flatMap((page) => page.items)
-          .map((vm) => (
-            <InstanceCard key={vm.id} vm={vm} />
+          .map((instance) => (
+            <InstanceCard instance={instance} key={instance.id} />
           ))}
       </div>
       <InfiniteScroll
