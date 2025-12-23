@@ -5,7 +5,7 @@ import {
   IconExclamationCircleFilled,
   IconTerminal,
 } from "@tabler/icons-react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 
@@ -40,8 +40,6 @@ export function InstanceConsole({ id }: { id: string }) {
 }
 
 function InstanceConsoleSuspense({ id }: { id: string }) {
-  const router = useRouter()
-
   const [instance] = api.compute.getInstance.useSuspenseQuery({ id })
   const [vncAccess] = api.console.getVNCAccess.useSuspenseQuery({ id })
 
@@ -49,12 +47,15 @@ function InstanceConsoleSuspense({ id }: { id: string }) {
     <>
       <div className="flex items-center gap-4">
         <Button
-          onClick={() => router.push(`/dashboard/vm/${instance.vmid}`)}
+          nativeButton={false}
+          render={
+            <Link href={`/dashboard/compute/${instance.id}`}>
+              <IconArrowLeft />
+            </Link>
+          }
           size="icon"
           variant="ghost"
-        >
-          <IconArrowLeft className="size-4" />
-        </Button>
+        />
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <IconTerminal className="size-6" />
