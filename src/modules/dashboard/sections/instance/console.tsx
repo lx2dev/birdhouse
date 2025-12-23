@@ -101,7 +101,37 @@ function InstanceConsoleSuspense({ id }: { id: string }) {
   )
 }
 
-InstanceConsole.Skeleton = () => <Skeleton className="h-8 w-3/4" />
+InstanceConsole.Skeleton = () => (
+  <div className="space-y-6">
+    <div className="flex items-center gap-4">
+      <Skeleton className="size-10" />
+      <div className="flex-1 space-y-2">
+        <Skeleton className="h-8 w-1/3" />
+        <Skeleton className="h-4 w-1/4" />
+      </div>
+    </div>
+
+    <Skeleton className="h-12" />
+
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <IconTerminal className="size-5" />
+          <span>Terminal</span>
+        </CardTitle>
+        <CardDescription>
+          Direct console access to your virtual machine
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Skeleton className="h-[58vh] w-full" />
+        <div>
+          <Skeleton className="mx-auto mt-4 h-6 w-1/6" />
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+)
 
 InstanceConsole.Error = () => (
   <Empty>

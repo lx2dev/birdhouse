@@ -177,10 +177,7 @@ export function VNCConsole(props: VNCConsoleProps) {
         </Alert>
       )}
 
-      <div
-        className="relative flex items-center justify-center overflow-hidden rounded-lg border border-border bg-zinc-950"
-        style={{ height: "58vh" }}
-      >
+      <div className="relative flex h-[58vh] items-center justify-center overflow-hidden rounded-lg border border-border bg-zinc-950">
         <div
           className="flex size-full items-center justify-center [&>canvas]:max-h-full [&>canvas]:max-w-full"
           ref={canvasRef}
