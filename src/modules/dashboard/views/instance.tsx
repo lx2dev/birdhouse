@@ -13,10 +13,10 @@ import { InstanceDetailsSection } from "@/modules/dashboard/sections/instance/de
 import type { VMStatus } from "@/server/db/schema"
 
 export function InstanceView({ id }: { id: string }) {
-  const [instance, instanceQuery] = api.compute.getInstance.useSuspenseQuery({
+  const [instance] = api.compute.getInstance.useSuspenseQuery({
     id,
   })
-  const [status, statusQuery] = api.compute.getInstanceStatus.useSuspenseQuery({
+  const [status] = api.compute.getInstanceStatus.useSuspenseQuery({
     id,
   })
 
