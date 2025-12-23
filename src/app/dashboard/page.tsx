@@ -6,6 +6,9 @@ export default function DashboardPage() {
   void api.compute.list.prefetchInfinite({
     limit: DEFAULT_FETCH_LIMIT,
   })
+  void api.sshKey.list.prefetchInfinite({
+    limit: DEFAULT_FETCH_LIMIT,
+  })
 
   return (
     <HydrateClient>

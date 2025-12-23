@@ -22,6 +22,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api } from "@/lib/api/client"
+import { CreateSSHKeyDialog } from "@/modules/dashboard/ui/create-ssh-key-dialog"
 import { InstanceCard } from "@/modules/dashboard/ui/instance-card"
 
 export function DashboardSection() {
@@ -39,6 +40,9 @@ function DashboardSectionSuspense() {
     { limit: DEFAULT_FETCH_LIMIT },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
+  const [keys] = api.sshKey.list.useSuspenseQuery({
+    limit: DEFAULT_FETCH_LIMIT,
+  })
 
   return vms.pages.flatMap((page) => page.items).length === 0 ? (
     <Empty>
@@ -46,18 +50,33 @@ function DashboardSectionSuspense() {
         <EmptyMedia variant="icon">
           <IconServer2 />
         </EmptyMedia>
-        <EmptyTitle>No Virtual Compute Instances</EmptyTitle>
+        <EmptyTitle>
+          {keys.items.length === 0
+            ? "No instances yet"
+            : "No virtual compute instances found"}
+        </EmptyTitle>
         <EmptyDescription>
-          Get started by creating your first virtual compute instance.
+          {keys.items.length === 0
+            ? "You need to add an SSH key before creating virtual compute instances."
+            : "You have not created any virtual compute instances yet. Get started by creating a new instance."}
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Link href="/dashboard/new">
-          <Button size="sm" variant="outline">
-            <IconPlus />
-            Create Instance
-          </Button>
-        </Link>
+        {keys.items.length === 0 ? (
+          <CreateSSHKeyDialog>
+            <Button size="sm" variant="outline">
+              <IconPlus />
+              Add SSH Key
+            </Button>
+          </CreateSSHKeyDialog>
+        ) : (
+          <Link href="/dashboard/new">
+            <Button size="sm" variant="outline">
+              <IconPlus />
+              Create Instance
+            </Button>
+          </Link>
+        )}
       </EmptyContent>
     </Empty>
   ) : (
