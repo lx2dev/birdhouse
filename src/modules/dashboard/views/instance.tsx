@@ -1,8 +1,7 @@
 "use client"
 
 import { IconArrowLeft } from "@tabler/icons-react"
-import Link from "next/link"
-import { redirect } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -13,6 +12,8 @@ import { InstanceDetailsSection } from "@/modules/dashboard/sections/instance/de
 import type { VMStatus } from "@/server/db/schema"
 
 export function InstanceView({ id }: { id: string }) {
+  const router = useRouter()
+
   const [instance] = api.compute.getInstance.useSuspenseQuery({
     id,
   })
@@ -40,16 +41,10 @@ export function InstanceView({ id }: { id: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button
-          nativeButton={false}
-          render={
-            <Link href="/dashboard">
-              <IconArrowLeft />
-            </Link>
-          }
-          size="icon"
-          variant="ghost"
-        />
+        <Button onClick={() => router.back()} size="icon" variant="ghost">
+          <IconArrowLeft />
+        </Button>
+
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h1 className="font-bold text-3xl tracking-tight">
