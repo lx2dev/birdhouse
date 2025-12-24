@@ -61,7 +61,7 @@ export function UserMenu({ user }: UserMenuProps) {
           <div className="relative" suppressHydrationWarning>
             <Avatar className="size-8" suppressHydrationWarning>
               <AvatarImage alt={user.name} src={user.image ?? ""} />
-              <AvatarFallback className="text-sm">
+              <AvatarFallback className="text-sm capitalize">
                 {shortUserName}
               </AvatarFallback>
             </Avatar>
@@ -79,7 +79,7 @@ export function UserMenu({ user }: UserMenuProps) {
             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar className="size-8">
                 <AvatarImage alt={user.name} src={user.image ?? ""} />
-                <AvatarFallback className="text-sm">
+                <AvatarFallback className="text-sm capitalize">
                   {shortUserName}
                 </AvatarFallback>
               </Avatar>
