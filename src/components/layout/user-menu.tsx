@@ -56,6 +56,7 @@ export function UserMenu({ user }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
+        nativeButton={false}
         render={
           <div className="relative">
             <Avatar className="size-8">
