@@ -15,7 +15,6 @@ import { toast } from "sonner"
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -23,6 +22,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -267,7 +274,6 @@ function KeyItemActions({ item: key }: SSHKeyItemProps) {
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               disabled={deleteKey.isPending}
               onClick={handleDeleteKey}
@@ -280,14 +286,14 @@ function KeyItemActions({ item: key }: SSHKeyItemProps) {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog onOpenChange={() => setEditDialog(false)} open={editDialog}>
-        <AlertDialogContent className="sm:max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Rename SSH Key</AlertDialogTitle>
-            <AlertDialogDescription>
+      <Dialog onOpenChange={() => setEditDialog(false)} open={editDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Rename SSH Key</DialogTitle>
+            <DialogDescription>
               Change the display name for this SSH key.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+            </DialogDescription>
+          </DialogHeader>
 
           <div className="my-4">
             <Field>
@@ -300,9 +306,8 @@ function KeyItemActions({ item: key }: SSHKeyItemProps) {
             </Field>
           </div>
 
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
+          <DialogFooter>
+            <Button
               disabled={updateKey.isPending}
               onClick={async () => {
                 await updateKey.mutateAsync({ id: key.id, name: nameValue })
@@ -311,10 +316,10 @@ function KeyItemActions({ item: key }: SSHKeyItemProps) {
             >
               {updateKey.isPending ? <Spinner /> : <IconCheck />}
               Save
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

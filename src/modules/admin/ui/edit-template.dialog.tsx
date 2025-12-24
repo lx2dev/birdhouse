@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { IconDeviceFloppy, IconPencil, IconX } from "@tabler/icons-react"
+import { IconDeviceFloppy, IconPencil } from "@tabler/icons-react"
 import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -10,7 +10,6 @@ import type z from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -226,18 +225,6 @@ export function EditTemplateDialog({
           </div>
 
           <DialogFooter>
-            <DialogClose
-              render={
-                <Button
-                  disabled={isSubmitting}
-                  onClick={() => form.reset()}
-                  type="button"
-                  variant="outline"
-                >
-                  <IconX /> Cancel
-                </Button>
-              }
-            />
             <Button disabled={isSubmitting} type="submit">
               {isSubmitting ? (
                 <>

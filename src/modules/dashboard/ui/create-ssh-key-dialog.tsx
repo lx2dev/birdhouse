@@ -16,7 +16,6 @@ import type z from "zod"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
   AlertDialog,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -25,7 +24,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { DialogClose, DialogFooter } from "@/components/ui/dialog"
+import { DialogFooter } from "@/components/ui/dialog"
 import { Field, FieldError, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
@@ -105,13 +104,14 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
     URL.revokeObjectURL(url)
   }
 
-  function onClose() {
-    setSSHKey(null)
-    form.reset()
-  }
-
   return (
-    <AlertDialog onOpenChange={onOpenChange} open={open}>
+    <AlertDialog
+      onOpenChange={() => {
+        setSSHKey(null)
+        onOpenChange?.(open ?? false)
+      }}
+      open={open}
+    >
       {children && <AlertDialogTrigger render={children} />}
       <AlertDialogContent className="sm:max-w-md">
         {sshKey ? (
@@ -158,14 +158,6 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
                 </InputGroup>
               </div>
               <AlertDialogFooter className="border-0 bg-transparent dark:bg-transparent">
-                <AlertDialogCancel
-                  render={
-                    <Button onClick={onClose} type="button" variant="outline">
-                      Close
-                    </Button>
-                  }
-                  type="button"
-                />
                 <Button
                   onClick={() => {
                     handleDownloadPrivateKey(sshKey.privateKey, sshKey.name)
@@ -215,14 +207,6 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
               </FieldGroup>
 
               <DialogFooter className="border-0 bg-transparent dark:bg-transparent">
-                <DialogClose
-                  render={
-                    <Button onClick={onClose} type="button" variant="outline">
-                      Cancel
-                    </Button>
-                  }
-                  type="button"
-                />
                 <Button disabled={isSubmitting} size="sm" type="submit">
                   {isSubmitting ? (
                     <>

@@ -11,7 +11,6 @@ import {
   IconServer2,
   IconTerminal,
   IconTrash,
-  IconX,
 } from "@tabler/icons-react"
 import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
@@ -22,7 +21,6 @@ import { toast } from "sonner"
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -333,7 +331,7 @@ export function InstanceCard({ instance }: InstanceCardProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
 
-          <Label className="flex items-start gap-3 rounded-lg border p-3 hover:bg-accent/50 has-aria-checked:border-yellow-500/50 has-aria-checked:bg-yellow-500/10">
+          <Label className="flex items-start gap-3 rounded-lg border bg-background/50 p-3 transition-colors hover:bg-background/80 has-aria-checked:border-yellow-500/50 has-aria-checked:bg-yellow-500/10">
             <Checkbox
               className="data-checked:border-yellow-500 data-checked:bg-yellow-500 data-checked:text-white dark:data-checked:bg-yellow-500/80"
               onCheckedChange={(checked) => {
@@ -351,21 +349,12 @@ export function InstanceCard({ instance }: InstanceCardProps) {
           </Label>
 
           <AlertDialogFooter>
-            <AlertDialogCancel
-              disabled={
-                deleteMutation.isPending ||
-                instance.status === "provisioning" ||
-                instance.status === "running"
-              }
-            >
-              <IconX /> Cancel
-            </AlertDialogCancel>
             <AlertDialogAction
               className="bg-yellow-500 text-background"
               disabled={
                 deleteMutation.isPending ||
                 instance.status === "provisioning" ||
-                instance.status === "running"
+                instance.status !== "running"
               }
               onClick={() =>
                 shutdownMutation.mutate({
@@ -396,9 +385,6 @@ export function InstanceCard({ instance }: InstanceCardProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteMutation.isPending}>
-              <IconX /> Cancel
-            </AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground"
               disabled={deleteMutation.isPending}

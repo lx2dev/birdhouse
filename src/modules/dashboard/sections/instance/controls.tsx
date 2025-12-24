@@ -7,7 +7,6 @@ import {
   IconRefresh,
   IconSquareFilled,
   IconTrash,
-  IconX,
 } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
 import * as React from "react"
@@ -18,7 +17,6 @@ import { toast } from "sonner"
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -214,9 +212,6 @@ function InstanceControlsSectionSuspense({
             </Label>
 
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={shutdownMutation.isPending}>
-                <IconX /> Cancel
-              </AlertDialogCancel>
               <AlertDialogAction
                 className="bg-yellow-500 text-background"
                 disabled={shutdownMutation.isPending}
@@ -293,15 +288,6 @@ function InstanceControlsSectionSuspense({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel
-              disabled={
-                deleteMutation.isPending ||
-                instance.status === "provisioning" ||
-                instance.status === "running"
-              }
-            >
-              <IconX /> Cancel
-            </AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground"
               disabled={
