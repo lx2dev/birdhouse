@@ -1,15 +1,29 @@
-import { exec } from "node:child_process"
-import { promisify } from "node:util"
+import { createHash, generateKeyPair } from "node:crypto"
 import { TRPCError } from "@trpc/server"
 import { and, desc, eq, ilike, lt, or } from "drizzle-orm"
-import * as forge from "node-forge"
 import z from "zod"
 
 import { createSSHKeySchema } from "@/modules/dashboard/schemas"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import { sshKey as sshKeyTable } from "@/server/db/schema"
 
-const execAsync = promisify(exec)
+function getFingerprint(publicKeyDer: Buffer): string {
+  const md5 = createHash("md5").update(publicKeyDer).digest("hex")
+  return md5.match(/.{2}/g)?.join(":") || ""
+}
+
+function bufferToLengthEncoded(buf: Buffer): Buffer {
+  const len = Buffer.alloc(4)
+  len.writeUInt32BE(buf.length)
+  return Buffer.concat([len, buf])
+}
+
+function toMpInt(buf: Buffer): Buffer {
+  if ((buf[0] & 0x80) === 0x80) {
+    return Buffer.concat([Buffer.from([0x00]), buf])
+  }
+  return buf
+}
 
 export const sshKeyRouter = createTRPCRouter({
   create: protectedProcedure
@@ -34,55 +48,76 @@ export const sshKeyRouter = createTRPCRouter({
       let fingerprint: string
 
       if (keyType === "rsa") {
-        const keypair = forge.pki.rsa.generateKeyPair({
-          bits: bits || 2048,
-          workers: -1,
+        const { publicKey, privateKey } = await new Promise<{
+          publicKey: any
+          privateKey: any
+        }>((resolve, reject) => {
+          generateKeyPair(
+            "rsa",
+            {
+              modulusLength: bits || 2048,
+            },
+            (err, publicKey, privateKey) => {
+              if (err) reject(err)
+              else resolve({ privateKey, publicKey })
+            },
+          )
         })
-        privateKeyPEM = forge.pki.privateKeyToPem(keypair.privateKey)
-        publicKeyOpenSSH = forge.ssh.publicKeyToOpenSSH(keypair.publicKey, name)
 
-        const rsaPublicKeyDer = forge.asn1
-          .toDer(forge.pki.publicKeyToAsn1(keypair.publicKey))
-          .getBytes()
-        const md = forge.md.md5.create()
-        md.update(rsaPublicKeyDer)
-        fingerprint = md.digest().toHex().match(/.{2}/g)?.join(":") || ""
+        privateKeyPEM = privateKey.export({
+          format: "pem",
+          type: "pkcs1",
+        }) as string
+
+        const jwk = publicKey.export({ format: "jwk" })
+        if (!jwk.n || !jwk.e) throw new Error("Invalid JWK")
+
+        const n = Buffer.from(jwk.n, "base64url")
+        const e = Buffer.from(jwk.e, "base64url")
+
+        const sshKeyType = Buffer.from("ssh-rsa")
+        const eBuf = toMpInt(e)
+        const nBuf = toMpInt(n)
+
+        const blob = Buffer.concat([
+          bufferToLengthEncoded(sshKeyType),
+          bufferToLengthEncoded(eBuf),
+          bufferToLengthEncoded(nBuf),
+        ])
+
+        const base64 = blob.toString("base64")
+        publicKeyOpenSSH = `ssh-rsa ${base64} ${name}`
+        fingerprint = getFingerprint(blob)
       } else if (keyType === "ed25519") {
-        try {
-          const tempKeyBase = `/tmp/ssh_key_${crypto.randomUUID()}`
-          const tempKeyPath = tempKeyBase
-          const tempPubKeyPath = `${tempKeyBase}.pub`
-
-          const command = `ssh-keygen -t ed25519 -f ${tempKeyPath} -q -N "" -C "${name}"`
-          await execAsync(command)
-
-          const { stdout: pubKeyOutput } = await execAsync(
-            `cat ${tempPubKeyPath}`,
-          )
-          const { stdout: privKeyOutput } = await execAsync(
-            `cat ${tempKeyPath}`,
-          )
-
-          const { stdout: fingerprintOutput } = await execAsync(
-            `ssh-keygen -lf ${tempPubKeyPath} -E md5`,
-          )
-
-          fingerprint =
-            fingerprintOutput.split(" ")[1]?.replace("MD5:", "").trim() || ""
-
-          await execAsync(`rm ${tempKeyPath} ${tempPubKeyPath}`)
-
-          privateKeyPEM = privKeyOutput.trim()
-          publicKeyOpenSSH = pubKeyOutput.trim()
-        } catch (error) {
-          console.error("Error generating Ed25519 key with ssh-keygen:", error)
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: `Failed to generate Ed25519 SSH key: ${
-              (error as Error).message
-            }`,
+        const { publicKey, privateKey } = await new Promise<{
+          publicKey: any
+          privateKey: any
+        }>((resolve, reject) => {
+          generateKeyPair("ed25519", {}, (err, publicKey, privateKey) => {
+            if (err) reject(err)
+            else resolve({ privateKey, publicKey })
           })
-        }
+        })
+
+        privateKeyPEM = privateKey.export({
+          format: "pem",
+          type: "pkcs8",
+        }) as string
+
+        const jwk = publicKey.export({ format: "jwk" })
+        if (!jwk.x) throw new Error("Invalid JWK")
+
+        const pubKeyBytes = Buffer.from(jwk.x, "base64url")
+
+        const sshKeyType = Buffer.from("ssh-ed25519")
+        const blob = Buffer.concat([
+          bufferToLengthEncoded(sshKeyType),
+          bufferToLengthEncoded(pubKeyBytes),
+        ])
+
+        const base64 = blob.toString("base64")
+        publicKeyOpenSSH = `ssh-ed25519 ${base64} ${name}`
+        fingerprint = getFingerprint(blob)
       } else {
         throw new TRPCError({
           code: "BAD_REQUEST",
