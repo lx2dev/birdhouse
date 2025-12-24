@@ -92,6 +92,7 @@ function InstanceConsoleSectionSuspense({
       <CardContent>
         <ButtonGroup>
           <Button
+            nativeButton={false}
             render={
               <a
                 aria-disabled={instance.status !== "running"}
