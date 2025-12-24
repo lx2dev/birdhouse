@@ -1,6 +1,7 @@
 "use client"
 
 import { AlertDialog as AlertDialogPrimitive } from "@base-ui/react/alert-dialog"
+import { IconX } from "@tabler/icons-react"
 import type * as React from "react"
 
 import { Button } from "@/components/ui/button"
@@ -40,6 +41,7 @@ function AlertDialogOverlay({
 
 function AlertDialogContent({
   className,
+  children,
   size = "default",
   ...props
 }: AlertDialogPrimitive.Popup.Props & {
@@ -50,13 +52,36 @@ function AlertDialogContent({
       <AlertDialogOverlay />
       <AlertDialogPrimitive.Popup
         className={cn(
-          "data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-background p-4 outline-none ring-1 ring-foreground/10 duration-100 data-[size=default]:max-w-xs data-[size=sm]:max-w-xs data-closed:animate-out data-open:animate-in data-[size=default]:sm:max-w-sm",
+          "data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 duration-100 data-[size=default]:max-w-xs data-[size=sm]:max-w-xs data-closed:animate-out data-open:animate-in data-[size=default]:sm:max-w-sm",
           className,
         )}
         data-size={size}
         data-slot="alert-dialog-content"
         {...props}
-      />
+      >
+        <div className="flex-col rounded-xl bg-background! p-4 text-sm outline-none ring-1 ring-foreground/10">
+          <div className="flex">
+            <div className="relative">
+              <AlertDialogPrimitive.Close
+                data-slot="alert-dialog-close"
+                render={
+                  <Button
+                    className="relative z-20 rounded-4xl border-background bg-background! py-4 pr-4 hover:bg-background! hover:text-destructive focus-visible:border-background focus-visible:text-destructive focus-visible:outline-none focus-visible:ring-0"
+                    variant="ghost"
+                  />
+                }
+              >
+                <IconX /> Cancel
+              </AlertDialogPrimitive.Close>
+              <div className="absolute right-0 bottom-0 z-10 h-1/2 w-1/2 bg-border dark:bg-card" />
+            </div>
+            <div className="grow rounded-t-xl bg-border dark:bg-card" />
+          </div>
+          <div className="space-y-4 rounded-xl rounded-tr-none bg-border p-4 dark:bg-card">
+            {children}
+          </div>
+        </div>
+      </AlertDialogPrimitive.Popup>
     </AlertDialogPortal>
   )
 }
