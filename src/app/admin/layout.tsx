@@ -1,5 +1,5 @@
 import { SiteFooter } from "@/components/layout/site-footer"
-import { AdminHeader } from "@/modules/admin/layout/header"
+import { AdminHeader } from "@/modules/admin/ui/admin-header"
 
 export default function AdminLayout({ children }: LayoutProps<"/admin">) {
   return (

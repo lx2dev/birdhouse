@@ -6,8 +6,8 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { Icons } from "@/components/icons"
-import { UserMenu } from "@/components/layout/user-menu"
 import { Button } from "@/components/ui/button"
+import { UserMenu } from "@/modules/dashboard/ui/user-menu"
 
 const NAV_ITEMS = [
   { href: "/dashboard", icon: IconServer2, label: "Dashboard" },
