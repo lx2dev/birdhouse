@@ -1,6 +1,7 @@
 import type { KeyObject } from "node:crypto"
 import { TRPCError } from "@trpc/server"
 import { and, desc, eq, ilike, lt, or } from "drizzle-orm"
+import forge from "node-forge"
 import z from "zod"
 
 import { createSSHKeySchema } from "@/modules/dashboard/schemas"
@@ -13,26 +14,12 @@ function bufferToLengthEncoded(buf: Buffer): Buffer {
   return Buffer.concat([len, buf])
 }
 
-function toMpInt(buf: Buffer): Buffer {
-  if ((buf[0] & 0x80) === 0x80) {
-    return Buffer.concat([Buffer.from([0x00]), buf])
-  }
-  return buf
-}
-
 export const sshKeyRouter = createTRPCRouter({
   create: protectedProcedure
     .input(createSSHKeySchema)
     .mutation(async ({ ctx, input }) => {
       const { user } = ctx.session
       const { keyType, name, bits } = input
-
-      const { createHash, generateKeyPair } = await import("node:crypto")
-
-      function getFingerprint(publicKeyDer: Buffer): string {
-        const md5 = createHash("md5").update(publicKeyDer).digest("hex")
-        return md5.match(/.{2}/g)?.join(":") || ""
-      }
 
       const [existingKey] = await ctx.db
         .select()
@@ -50,47 +37,33 @@ export const sshKeyRouter = createTRPCRouter({
       let fingerprint: string
 
       if (keyType === "rsa") {
-        const { publicKey, privateKey } = await new Promise<{
-          publicKey: KeyObject
-          privateKey: KeyObject
-        }>((resolve, reject) => {
-          generateKeyPair(
-            "rsa",
-            {
-              modulusLength: bits || 2048,
-            },
-            (err, publicKey, privateKey) => {
-              if (err) reject(err)
-              else resolve({ privateKey, publicKey })
-            },
-          )
-        })
+        const keypair = await new Promise<forge.pki.KeyPair>(
+          (resolve, reject) => {
+            forge.pki.rsa.generateKeyPair(
+              { bits: bits || 2048, workers: -1 },
+              (err, keypair) => {
+                if (err) reject(err)
+                else resolve(keypair)
+              },
+            )
+          },
+        )
 
-        privateKeyPEM = privateKey.export({
-          format: "pem",
-          type: "pkcs1",
-        }) as string
-
-        const jwk = publicKey.export({ format: "jwk" })
-        if (!jwk.n || !jwk.e) throw new Error("Invalid JWK")
-
-        const n = Buffer.from(jwk.n, "base64url")
-        const e = Buffer.from(jwk.e, "base64url")
-
-        const sshKeyType = Buffer.from("ssh-rsa")
-        const eBuf = toMpInt(e)
-        const nBuf = toMpInt(n)
-
-        const blob = Buffer.concat([
-          bufferToLengthEncoded(sshKeyType),
-          bufferToLengthEncoded(eBuf),
-          bufferToLengthEncoded(nBuf),
-        ])
-
-        const base64 = blob.toString("base64")
-        publicKeyOpenSSH = `ssh-rsa ${base64} ${name}`
-        fingerprint = getFingerprint(blob)
+        privateKeyPEM = forge.pki.privateKeyToPem(keypair.privateKey)
+        publicKeyOpenSSH = forge.ssh.publicKeyToOpenSSH(
+          keypair.publicKey as forge.pki.rsa.PublicKey,
+          name,
+        )
+        fingerprint = forge.ssh.getPublicKeyFingerprint(
+          keypair.publicKey as forge.pki.rsa.PublicKey,
+          {
+            delimiter: ":",
+            encoding: "hex",
+          },
+        ) as string
       } else if (keyType === "ed25519") {
+        const { createHash, generateKeyPair } = await import("node:crypto")
+
         const { publicKey, privateKey } = await new Promise<{
           publicKey: KeyObject
           privateKey: KeyObject
@@ -119,7 +92,9 @@ export const sshKeyRouter = createTRPCRouter({
 
         const base64 = blob.toString("base64")
         publicKeyOpenSSH = `ssh-ed25519 ${base64} ${name}`
-        fingerprint = getFingerprint(blob)
+
+        const md5 = createHash("md5").update(blob).digest("hex")
+        fingerprint = md5.match(/.{2}/g)?.join(":") || ""
       } else {
         throw new TRPCError({
           code: "BAD_REQUEST",
