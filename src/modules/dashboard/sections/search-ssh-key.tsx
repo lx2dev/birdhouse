@@ -59,9 +59,7 @@ function SearchSSHKeySectionSuspense() {
 
   const [sshKeys, query] = api.sshKey.list.useSuspenseInfiniteQuery(
     { limit: DEFAULT_FETCH_LIMIT },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-    },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
 
   const filteredPages = sshKeys.pages.map((page) => ({

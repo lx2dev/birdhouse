@@ -9,9 +9,12 @@ import { api } from "@/lib/api/client"
 import { DashboardSection } from "@/modules/dashboard/sections/dashboard"
 
 export function DashboardView() {
-  const [keys] = api.sshKey.list.useSuspenseQuery({
-    limit: DEFAULT_FETCH_LIMIT,
-  })
+  const [sshKeys] = api.sshKey.list.useSuspenseInfiniteQuery(
+    { limit: DEFAULT_FETCH_LIMIT },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
+  )
+
+  const keys = sshKeys.pages.flatMap((page) => page.items)
 
   return (
     <div className="space-y-6">
@@ -24,7 +27,7 @@ export function DashboardView() {
             Manage your cloud instances
           </p>
         </div>
-        {keys.items.length === 0 ? null : (
+        {keys.length === 0 ? null : (
           <Link href="/dashboard/new">
             <Button>
               <IconPlus />

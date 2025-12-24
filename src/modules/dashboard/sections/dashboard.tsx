@@ -40,9 +40,12 @@ function DashboardSectionSuspense() {
     { limit: DEFAULT_FETCH_LIMIT },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
-  const [keys] = api.sshKey.list.useSuspenseQuery({
-    limit: DEFAULT_FETCH_LIMIT,
-  })
+  const [sshKeys] = api.sshKey.list.useSuspenseInfiniteQuery(
+    { limit: DEFAULT_FETCH_LIMIT },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
+  )
+
+  const keys = sshKeys.pages.flatMap((page) => page.items)
 
   return instances.pages.flatMap((page) => page.items).length === 0 ? (
     <Empty>
@@ -51,18 +54,18 @@ function DashboardSectionSuspense() {
           <IconServer2 />
         </EmptyMedia>
         <EmptyTitle>
-          {keys.items.length === 0
+          {keys.length === 0
             ? "No instances yet"
             : "No virtual compute instances found"}
         </EmptyTitle>
         <EmptyDescription>
-          {keys.items.length === 0
+          {keys.length === 0
             ? "You need to add an SSH key before creating virtual compute instances."
             : "You have not created any virtual compute instances yet. Get started by creating a new instance."}
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        {keys.items.length === 0 ? (
+        {keys.length === 0 ? (
           <CreateSSHKeyDialog>
             <Button size="sm" variant="outline">
               <IconPlus />
