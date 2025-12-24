@@ -1,13 +1,9 @@
 import Link from "next/link"
-import { redirect } from "next/navigation"
 
 import { Icons } from "@/components/icons"
-import { getSession } from "@/lib/auth/utils"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-export default async function AuthLayout({ children }: LayoutProps<"/auth">) {
-  const session = await getSession()
-  if (session) return redirect("/dashboard")
-
+export default function AuthLayout({ children }: LayoutProps<"/auth">) {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-2 md:gap-6">
@@ -18,6 +14,21 @@ export default async function AuthLayout({ children }: LayoutProps<"/auth">) {
           <Icons.logo className="size-16" />
           Birdhouse
         </Link>
+
+        <Alert
+          className="border-yellow-500/20 bg-yellow-500/10 text-yellow-500 *:data-[slot=alert-description]:text-yellow-500/90 *:[svg]:text-current"
+          variant="destructive"
+        >
+          <AlertTitle>
+            <strong>Warning:</strong> This is a demo
+          </AlertTitle>
+          <AlertDescription>
+            <p>
+              All data is periodically deleted. Do not use real credentials.
+            </p>
+          </AlertDescription>
+        </Alert>
+
         <main>{children}</main>
       </div>
     </div>
