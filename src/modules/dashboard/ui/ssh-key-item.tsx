@@ -71,11 +71,11 @@ export function SSHKeyItem({ item: key }: SSHKeyItemProps) {
   }
 
   return (
-    <Item className="not-last:mb-4" variant="outline">
+    <Item className="not-last:mb-4 bg-card" variant="outline">
       <ItemContent className="min-w-0">
         <ItemTitle>{key.name}</ItemTitle>
         <ItemDescription className="space-y-2">
-          <span className="flex items-center justify-between rounded-(--radius) bg-muted p-2.5 text-sm">
+          <span className="flex items-center justify-between rounded-md bg-muted p-2.5 text-sm">
             <span className="flex min-w-0 items-center gap-2">
               <span className="shrink-0 font-medium">Public Key:</span>
               <code
