@@ -1,6 +1,7 @@
 "use client"
 
 import { IconArrowLeft } from "@tabler/icons-react"
+import type { User } from "better-auth"
 import { redirect, useRouter } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
@@ -11,7 +12,12 @@ import { InstanceControlsSection } from "@/modules/dashboard/sections/instance/c
 import { InstanceDetailsSection } from "@/modules/dashboard/sections/instance/details"
 import type { VMStatus } from "@/server/db/schema"
 
-export function InstanceView({ id }: { id: string }) {
+interface InstanceViewProps {
+  id: string
+  user: User
+}
+
+export function InstanceView({ id, user }: InstanceViewProps) {
   const router = useRouter()
 
   const [instance] = api.compute.getInstance.useSuspenseQuery({
@@ -62,7 +68,7 @@ export function InstanceView({ id }: { id: string }) {
 
       <InstanceControlsSection instance={instance} />
       <InstanceDetailsSection instance={instance} status={status} />
-      <InstanceConsoleSection instance={instance} />
+      <InstanceConsoleSection instance={instance} user={user} />
     </div>
   )
 }
