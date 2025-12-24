@@ -4,6 +4,7 @@ import { api, HydrateClient } from "@/lib/api/server"
 import { getSession } from "@/lib/auth/utils"
 import InstanceConsoleView from "@/modules/dashboard/views/instance-console"
 
+// TODO: Remove this page, related components, prcedures, and server.ts
 export default async function InstanceConsolePage({
   params,
 }: PageProps<"/dashboard/compute/[id]/console">) {
