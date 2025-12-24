@@ -17,7 +17,7 @@ export default async function ComputePage({
 
   return (
     <HydrateClient>
-      <InstanceView id={id} />
+      <InstanceView id={id} user={session.user} />
     </HydrateClient>
   )
 }
