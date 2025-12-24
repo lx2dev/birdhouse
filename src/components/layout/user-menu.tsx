@@ -58,16 +58,13 @@ export function UserMenu({ user }: UserMenuProps) {
       <DropdownMenuTrigger
         nativeButton={false}
         render={
-          <div className="relative">
-            <Avatar className="size-8">
+          <div className="relative" suppressHydrationWarning>
+            <Avatar className="size-8" suppressHydrationWarning>
               <AvatarImage alt={user.name} src={user.image ?? ""} />
               <AvatarFallback className="text-sm">
                 {shortUserName}
               </AvatarFallback>
             </Avatar>
-
-            <span className="sr-only">User menu</span>
-
             {notifications.some((n) => !n.read) && (
               <div className="absolute top-0 right-0 flex size-2.5 text-xs">
                 <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75" />
