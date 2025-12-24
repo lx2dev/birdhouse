@@ -30,10 +30,12 @@ export const createSSHKeySchema = z.object({
   keyType: z.enum(["rsa", "ed25519"]).default("rsa"),
   name: z
     .string()
-    .min(3)
+    .min(3, {
+      error: "Name must be at least 3 characters long",
+    })
     .max(50)
     .regex(/^[a-zA-Z0-9-_ ]+$/, {
-      message:
+      error:
         "Name can only contain letters, numbers, spaces, hyphens, and underscores",
     }),
 })
