@@ -1,3 +1,4 @@
+import type { KeyObject } from "node:crypto"
 import { createHash, generateKeyPair } from "node:crypto"
 import { TRPCError } from "@trpc/server"
 import { and, desc, eq, ilike, lt, or } from "drizzle-orm"
@@ -49,8 +50,8 @@ export const sshKeyRouter = createTRPCRouter({
 
       if (keyType === "rsa") {
         const { publicKey, privateKey } = await new Promise<{
-          publicKey: any
-          privateKey: any
+          publicKey: KeyObject
+          privateKey: KeyObject
         }>((resolve, reject) => {
           generateKeyPair(
             "rsa",
@@ -90,8 +91,8 @@ export const sshKeyRouter = createTRPCRouter({
         fingerprint = getFingerprint(blob)
       } else if (keyType === "ed25519") {
         const { publicKey, privateKey } = await new Promise<{
-          publicKey: any
-          privateKey: any
+          publicKey: KeyObject
+          privateKey: KeyObject
         }>((resolve, reject) => {
           generateKeyPair("ed25519", {}, (err, publicKey, privateKey) => {
             if (err) reject(err)
