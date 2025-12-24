@@ -1,5 +1,4 @@
 import type { KeyObject } from "node:crypto"
-import { createHash, generateKeyPair } from "node:crypto"
 import { TRPCError } from "@trpc/server"
 import { and, desc, eq, ilike, lt, or } from "drizzle-orm"
 import z from "zod"
@@ -7,11 +6,6 @@ import z from "zod"
 import { createSSHKeySchema } from "@/modules/dashboard/schemas"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import { sshKey as sshKeyTable } from "@/server/db/schema"
-
-function getFingerprint(publicKeyDer: Buffer): string {
-  const md5 = createHash("md5").update(publicKeyDer).digest("hex")
-  return md5.match(/.{2}/g)?.join(":") || ""
-}
 
 function bufferToLengthEncoded(buf: Buffer): Buffer {
   const len = Buffer.alloc(4)
@@ -32,6 +26,13 @@ export const sshKeyRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { user } = ctx.session
       const { keyType, name, bits } = input
+
+      const { createHash, generateKeyPair } = await import("node:crypto")
+
+      function getFingerprint(publicKeyDer: Buffer): string {
+        const md5 = createHash("md5").update(publicKeyDer).digest("hex")
+        return md5.match(/.{2}/g)?.join(":") || ""
+      }
 
       const [existingKey] = await ctx.db
         .select()
