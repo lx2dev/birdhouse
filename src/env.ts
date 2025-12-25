@@ -21,6 +21,7 @@ export const env = createEnv({
     PM_SECRET: process.env.PM_SECRET,
     PM_TLS_SKIP_VERIFY: process.env.PM_TLS_SKIP_VERIFY,
     PM_TOKEN_ID: process.env.PM_TOKEN_ID,
+    REDIS_URL: process.env.REDIS_URL,
   },
   server: {
     BETTER_AUTH_SECRET: z.string(),
@@ -38,6 +39,7 @@ export const env = createEnv({
     PM_SECRET: z.string(),
     PM_TLS_SKIP_VERIFY: z.enum(["true", "false"]).default("false"),
     PM_TOKEN_ID: z.string(),
+    REDIS_URL: z.url(),
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 })
