@@ -1,7 +1,8 @@
+import { env } from "@/env"
 import { getProxmoxClient } from "@/lib/proxmox"
 import { waitForTask } from "@/lib/proxmox/wait-for-task"
 
-const DEFAULT_NODE = "pve01"
+const PM_DEFAULT_NODE = env.PM_DEFAULT_NODE
 
 export async function GET() {
   const proxmox = getProxmoxClient()
@@ -23,7 +24,7 @@ export async function GET() {
       await send("Starting VM creation...")
 
       const cloneUpid = await proxmox.nodes
-        .$(DEFAULT_NODE)
+        .$(PM_DEFAULT_NODE)
         .qemu.$(9000)
         .clone.$post({
           full: false,
@@ -35,7 +36,7 @@ export async function GET() {
 
       for await (const update of waitForTask(
         proxmox,
-        DEFAULT_NODE,
+        PM_DEFAULT_NODE,
         cloneUpid,
       )) {
         if (update.logs) {
@@ -48,19 +49,19 @@ export async function GET() {
 
       await send("Configuring VM...")
 
-      await proxmox.nodes.$(DEFAULT_NODE).qemu.$(5000).config.$post({
+      await proxmox.nodes.$(PM_DEFAULT_NODE).qemu.$(5000).config.$post({
         cipassword: "cloudpassword",
         ciuser: "clouduser",
         cores: 2,
         memory: "2048",
       })
 
-      await proxmox.nodes.$(DEFAULT_NODE).qemu.$(5000).cloudinit.$put()
+      await proxmox.nodes.$(PM_DEFAULT_NODE).qemu.$(5000).cloudinit.$put()
 
       await send("Starting VM...")
 
       const startUpid = await proxmox.nodes
-        .$(DEFAULT_NODE)
+        .$(PM_DEFAULT_NODE)
         .qemu.$(5000)
         .status.start.$post()
 
@@ -68,7 +69,7 @@ export async function GET() {
 
       for await (const update of waitForTask(
         proxmox,
-        DEFAULT_NODE,
+        PM_DEFAULT_NODE,
         startUpid,
       )) {
         if (update.logs) {

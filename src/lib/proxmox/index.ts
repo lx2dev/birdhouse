@@ -4,8 +4,7 @@ import { Agent, fetch as undiciFetch } from "undici"
 
 import { env } from "@/env"
 
-const shouldSkipTls =
-  env.PM_TLS_SKIP_VERIFY === "true" || env.NODE_ENV === "development"
+const shouldSkipTls = env.PM_TLS_SKIP_VERIFY === "true"
 
 if (shouldSkipTls) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
