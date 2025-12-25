@@ -56,6 +56,7 @@
   "scripts": {
     "auth:generate": "npx @better-auth/cli@latest generate --config ./src/server/auth/index.ts --yes",
     "build": "next build",
+    "clean": "rm -rf .next node_modules && bun install",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -69,7 +70,8 @@
     "lint:unsafe": "biome check --write --unsafe .",
     "lint:write": "biome check --write .",
     "shadcn": "bunx --bun shadcn@latest",
-    "start": "bun run db:push && bun run db:seed && bun server.ts"
+    "start": "next start",
+    "start:ws": "bun run db:push && bun run db:seed && bun server.ts"
   },
   "type": "module",
   "version": "0.1.0"
