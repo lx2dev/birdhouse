@@ -14,6 +14,7 @@ import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 import { toast } from "sonner"
 
+import { Hint } from "@/components/hint"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -258,26 +259,33 @@ function InstanceControlsSectionSuspense({
         }
         open={open.delete}
       >
-        <AlertDialogTrigger
-          disabled={
-            deleteMutation.isPending ||
-            instance.status === "provisioning" ||
-            instance.status === "running"
-          }
+        <Hint
+          label="Instance must be stopped to delete."
           render={
-            <Button
-              className="ml-auto"
-              disabled={
-                deleteMutation.isPending ||
-                instance.status === "provisioning" ||
-                instance.status === "running"
-              }
-              variant="destructive"
-            >
-              <IconTrash />
-              Delete
-            </Button>
+            <span className="md:ml-auto">
+              <AlertDialogTrigger
+                disabled={
+                  deleteMutation.isPending ||
+                  instance.status === "provisioning" ||
+                  instance.status === "running"
+                }
+                render={
+                  <Button
+                    disabled={
+                      deleteMutation.isPending ||
+                      instance.status === "provisioning" ||
+                      instance.status === "running"
+                    }
+                    variant="destructive"
+                  >
+                    <IconTrash />
+                    Delete
+                  </Button>
+                }
+              />
+            </span>
           }
+          side="left"
         />
         <AlertDialogContent>
           <AlertDialogHeader>
