@@ -4,8 +4,11 @@ import { nextCookies } from "better-auth/next-js"
 import { admin } from "better-auth/plugins"
 
 import { env } from "@/env"
+import { redis } from "@/lib/redis"
 import { db } from "@/server/db"
 import { user as userTable } from "@/server/db/schema"
+
+await redis.connect()
 
 // TODO: implement admin and roles
 export const auth = betterAuth({
@@ -33,6 +36,21 @@ export const auth = betterAuth({
     enabled: true,
   },
   plugins: [admin(), nextCookies()],
+  rateLimit: {
+    storage: "secondary-storage",
+  },
+  secondaryStorage: {
+    async delete(key) {
+      await redis.del(key)
+    },
+    async get(key) {
+      return await redis.get(key)
+    },
+    async set(key, value, ttl) {
+      if (ttl) await redis.set(key, value, { EX: ttl })
+      else await redis.set(key, value)
+    },
+  },
   socialProviders: {
     discord: {
       clientId: env.DISCORD_CLIENT_ID,
