@@ -2,6 +2,14 @@ import { createClient } from "redis"
 
 import { env } from "@/env"
 
-export const redis = createClient({
-  url: env.REDIS_URL,
-})
+let client: ReturnType<typeof createClient> | null = null
+
+export function getRedisClient() {
+  if (!client) {
+    client = createClient({
+      url: env.REDIS_URL,
+    })
+    client.connect().catch(console.error)
+  }
+  return client
+}

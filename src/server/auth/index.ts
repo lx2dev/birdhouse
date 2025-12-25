@@ -4,11 +4,11 @@ import { nextCookies } from "better-auth/next-js"
 import { admin } from "better-auth/plugins"
 
 import { env } from "@/env"
-import { redis } from "@/lib/redis"
+import { getRedisClient } from "@/lib/redis"
 import { db } from "@/server/db"
 import { user as userTable } from "@/server/db/schema"
 
-await redis.connect()
+const redis = getRedisClient()
 
 // TODO: implement admin and roles
 export const auth = betterAuth({
