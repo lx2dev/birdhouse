@@ -49,7 +49,8 @@ import {
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { api } from "@/lib/api/client"
-import type { VMStatus, VMTable } from "@/server/db/schema"
+import { getInstanceStatusColor } from "@/lib/utils"
+import type { VMTable } from "@/server/db/schema"
 
 interface InstanceCardProps {
   instance: VMTable
@@ -136,21 +137,6 @@ export function InstanceCard({ instance }: InstanceCardProps) {
     },
   })
 
-  function getStatusColor(status: VMStatus) {
-    switch (status) {
-      case "running":
-        return "bg-green-500/10 text-green-500 border-green-500/20"
-      case "stopped":
-        return "bg-muted-foreground/10 text-muted-foreground border-muted-foreground/20"
-      case "provisioning":
-        return "bg-blue-500/10 text-blue-500 border-blue-500/20"
-      case "error":
-        return "bg-red-500/10 text-red-500 border-red-500/20"
-      default:
-        return "bg-muted-foreground/10 text-muted-foreground border-muted-foreground/20"
-    }
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -160,7 +146,7 @@ export function InstanceCard({ instance }: InstanceCardProps) {
               <IconServer2 className="size-4" />
               {instance.name}
             </CardTitle>
-            <Badge className={getStatusColor(instance.status)}>
+            <Badge className={getInstanceStatusColor(instance.status)}>
               {instance.status}
             </Badge>
           </div>
