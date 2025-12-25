@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm"
 
-import { PM_DEFAULT_NODE, PM_DEFAULT_POOL } from "@/constants"
+import { env } from "@/env"
 import { getProxmoxClient } from "@/lib/proxmox"
 import { getNextAvailableVmid } from "@/lib/proxmox/get-next-available-vmid"
 import { waitForTask } from "@/lib/proxmox/wait-for-task"
@@ -14,6 +14,8 @@ import {
 } from "@/server/db/schema"
 
 const POLL_INTERVAL_MS = 5000
+const PM_DEFAULT_NODE = env.PM_DEFAULT_NODE
+const PM_DEFAULT_POOL = env.PM_DEFAULT_POOL
 
 async function processOne(vm: VMTable) {
   const {

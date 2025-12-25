@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server"
 import { and, desc, eq, getTableColumns, lt, or } from "drizzle-orm"
 import z from "zod"
 
-import { PM_DEFAULT_NODE, PM_DEFAULT_POOL } from "@/constants"
+import { env } from "@/env"
 import { getInstanceStatus } from "@/lib/proxmox/get-instance-status"
 import { getNextAvailableVmid } from "@/lib/proxmox/get-next-available-vmid"
 import {
@@ -97,8 +97,8 @@ export const computeRouter = createTRPCRouter({
           memoryMb: template.memoryMb,
           name,
           operatingSystemId: operatingSystem.id,
-          proxmoxNode: PM_DEFAULT_NODE,
-          proxmoxPool: PM_DEFAULT_POOL,
+          proxmoxNode: env.PM_DEFAULT_NODE,
+          proxmoxPool: env.PM_DEFAULT_POOL,
           rootPassword,
           sshKeyId,
           sshPublicKey,
