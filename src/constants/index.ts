@@ -1,9 +1,11 @@
 import { IconKey, IconPlus, IconServer2 } from "@tabler/icons-react"
 
+import { env } from "@/env"
+
 export const DEFAULT_FETCH_LIMIT = 10
 
-export const PM_DEFAULT_NODE = "pve01"
-export const PM_DEFAULT_POOL = "UserPool"
+export const PM_DEFAULT_NODE = env.PM_DEFAULT_NODE
+export const PM_DEFAULT_POOL = env.PM_DEFAULT_POOL
 
 export const NAV_ITEMS = [
   { href: "/dashboard", icon: IconServer2, label: "Dashboard" },
