@@ -5,7 +5,6 @@ import {
   IconEye,
   IconEyeOff,
   IconKey,
-  IconLoader2,
   IconLogin2,
   IconMail,
   IconUser,
@@ -34,12 +33,20 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group"
+import { Spinner } from "@/components/ui/spinner"
 import { authClient } from "@/lib/auth/client"
 import { SignUpSchema } from "@/modules/auth/schemas/auth"
 
 export function SignUpForm() {
   const router = useRouter()
 
+  const [isLoading, setIsLoading] = React.useState<{
+    discord: boolean
+    github: boolean
+  }>({
+    discord: false,
+    github: false,
+  })
   const [showPassword, setShowPassword] = React.useState<{
     password: boolean
     passwordConfirmation: boolean
@@ -58,37 +65,86 @@ export function SignUpForm() {
     resolver: zodResolver(SignUpSchema),
   })
 
-  const isPending = form.formState.isSubmitting
+  const { isSubmitting } = form.formState
+  const isPending = isLoading.discord || isLoading.github
 
   async function onSubmit(data: z.infer<typeof SignUpSchema>) {
-    await authClient.signUp.email({
-      ...data,
-      fetchOptions: {
-        onError({ error }) {
-          console.error(error.message)
-          toast.error("Something went wrong:", {
-            description: "Please check the console for more information.",
-          })
+    try {
+      await authClient.signUp.email({
+        ...data,
+        fetchOptions: {
+          onError({ error }) {
+            console.error(error.message)
+            toast.error("Something went wrong:", {
+              description: error.message,
+            })
+          },
+          onSuccess() {
+            form.reset()
+            toast.success("Account created successfully!")
+            router.push("/dashboard")
+          },
         },
-        onSuccess() {
-          form.reset()
-          toast.success("Account created successfully!")
-          router.push("/dashboard")
+      })
+    } catch (error) {
+      console.error(error)
+      toast.error("Something went wrong:", {
+        description: (error as Error).message,
+      })
+    }
+  }
+
+  async function handleOAuth(provider: "discord" | "github") {
+    try {
+      setIsLoading((prev) => ({
+        ...prev,
+        [provider]: true,
+      }))
+      await authClient.signIn.social({
+        callbackURL: "/dashboard",
+        fetchOptions: {
+          onError({ error }) {
+            console.error(error.message)
+            toast.error("Something went wrong:", {
+              description: error.message,
+            })
+          },
         },
-      },
-    })
+        provider,
+      })
+    } catch (error) {
+      console.error(error)
+      toast.error("Something went wrong:", {
+        description: (error as Error).message,
+      })
+    } finally {
+      setIsLoading((prev) => ({
+        ...prev,
+        [provider]: false,
+      }))
+    }
   }
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
         <Field>
-          <Button disabled={isPending} type="button" variant="outline">
-            <Icons.discord />
+          <Button
+            disabled={isPending || isSubmitting}
+            onClick={() => handleOAuth("discord")}
+            type="button"
+            variant="outline"
+          >
+            {isLoading.discord ? <Spinner /> : <Icons.discord />}
             Sign in with Discord
           </Button>
-          <Button disabled={isPending} type="button" variant="outline">
-            <Icons.github />
+          <Button
+            disabled={isPending || isSubmitting}
+            onClick={() => handleOAuth("github")}
+            type="button"
+            variant="outline"
+          >
+            {isLoading.github ? <Spinner /> : <Icons.github />}
             Sign in with GitHub
           </Button>
         </Field>
@@ -108,7 +164,7 @@ export function SignUpForm() {
               <Input
                 {...field}
                 aria-invalid={fieldState.invalid}
-                disabled={isPending}
+                disabled={isPending || isSubmitting}
                 id="username"
                 placeholder="Jarls Burg"
                 type="text"
@@ -129,9 +185,9 @@ export function SignUpForm() {
               <Input
                 {...field}
                 aria-invalid={fieldState.invalid}
-                disabled={isPending}
+                disabled={isPending || isSubmitting}
                 id="email"
-                placeholder="you@example.com"
+                placeholder="jburg@example.com"
                 type="email"
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -152,7 +208,7 @@ export function SignUpForm() {
                   <InputGroupInput
                     {...field}
                     aria-invalid={fieldState.invalid}
-                    disabled={isPending}
+                    disabled={isPending || isSubmitting}
                     id="password"
                     placeholder="********"
                     type={showPassword.password ? "text" : "password"}
@@ -192,7 +248,7 @@ export function SignUpForm() {
                   <InputGroupInput
                     {...field}
                     aria-invalid={fieldState.invalid}
-                    disabled={isPending}
+                    disabled={isPending || isSubmitting}
                     id="passwordConfirmation"
                     placeholder="********"
                     type={
@@ -201,6 +257,7 @@ export function SignUpForm() {
                   />
                   <InputGroupAddon align="inline-end">
                     <InputGroupButton
+                      disabled={isPending || isSubmitting}
                       onClick={() => {
                         setShowPassword({
                           ...showPassword,
@@ -229,15 +286,9 @@ export function SignUpForm() {
         </div>
 
         <Field>
-          <Button disabled={isPending} type="submit">
-            {isPending ? (
-              <IconLoader2 className="animate-spin" />
-            ) : (
-              <>
-                <IconLogin2 />
-                Sign Up
-              </>
-            )}
+          <Button disabled={isPending || isSubmitting} type="submit">
+            {isSubmitting ? <Spinner /> : <IconLogin2 />}
+            Sign Up
           </Button>
           <FieldDescription className="text-center">
             Already have an account? <Link href="/auth/signin">Sign in</Link>

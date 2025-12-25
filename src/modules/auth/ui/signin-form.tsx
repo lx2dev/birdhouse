@@ -5,7 +5,6 @@ import {
   IconEye,
   IconEyeOff,
   IconKey,
-  IconLoader2,
   IconLogin2,
   IconMail,
 } from "@tabler/icons-react"
@@ -33,12 +32,20 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group"
+import { Spinner } from "@/components/ui/spinner"
 import { authClient } from "@/lib/auth/client"
 import { SignInSchema } from "@/modules/auth/schemas/auth"
 
 export function SignInForm() {
   const router = useRouter()
 
+  const [isLoading, setIsLoading] = React.useState<{
+    discord: boolean
+    github: boolean
+  }>({
+    discord: false,
+    github: false,
+  })
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
 
   const form = useForm<z.infer<typeof SignInSchema>>({
@@ -49,36 +56,85 @@ export function SignInForm() {
     resolver: zodResolver(SignInSchema),
   })
 
-  const isPending = form.formState.isSubmitting
+  const { isSubmitting } = form.formState
+  const isPending = isLoading.discord || isLoading.github
 
   async function onSubmit(data: z.infer<typeof SignInSchema>) {
-    await authClient.signIn.email({
-      ...data,
-      fetchOptions: {
-        onError({ error }) {
-          toast.error("Something went wrong:", {
-            description: error.message,
-          })
+    try {
+      await authClient.signIn.email({
+        ...data,
+        fetchOptions: {
+          onError({ error }) {
+            toast.error("Something went wrong:", {
+              description: error.message,
+            })
+          },
+          onSuccess() {
+            form.reset()
+            toast.success("Successfully signed in!")
+            router.push("/dashboard")
+          },
         },
-        onSuccess() {
-          form.reset()
-          toast.success("Successfully signed in!")
-          router.push("/dashboard")
+      })
+    } catch (error) {
+      console.error(error)
+      toast.error("Something went wrong:", {
+        description: "See console for details.",
+      })
+    }
+  }
+
+  async function handleOAuth(provider: "discord" | "github") {
+    try {
+      setIsLoading((prev) => ({
+        ...prev,
+        [provider]: true,
+      }))
+      await authClient.signIn.social({
+        callbackURL: "/dashboard",
+        fetchOptions: {
+          onError({ error }) {
+            console.error(error.message)
+            toast.error("Something went wrong:", {
+              description: error.message,
+            })
+          },
         },
-      },
-    })
+        provider,
+      })
+    } catch (error) {
+      console.error(error)
+      toast.error("Something went wrong:", {
+        description: "See console for details.",
+      })
+    } finally {
+      setIsLoading((prev) => ({
+        ...prev,
+        [provider]: false,
+      }))
+    }
   }
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
         <Field>
-          <Button type="button" variant="outline">
-            <Icons.discord />
+          <Button
+            disabled={isPending || isSubmitting}
+            onClick={() => handleOAuth("discord")}
+            type="button"
+            variant="outline"
+          >
+            {isLoading.discord ? <Spinner /> : <Icons.discord />}
             Sign in with Discord
           </Button>
-          <Button type="button" variant="outline">
-            <Icons.github />
+          <Button
+            disabled={isPending || isSubmitting}
+            onClick={() => handleOAuth("github")}
+            type="button"
+            variant="outline"
+          >
+            {isLoading.github ? <Spinner /> : <Icons.github />}
             Sign in with GitHub
           </Button>
         </Field>
@@ -98,7 +154,7 @@ export function SignInForm() {
               <Input
                 {...field}
                 aria-invalid={fieldState.invalid}
-                disabled={isPending}
+                disabled={isPending || isSubmitting}
                 id="email"
                 placeholder="you@example.com"
                 type="email"
@@ -120,7 +176,7 @@ export function SignInForm() {
                 <Link className="ml-auto" href="#" tabIndex={-1}>
                   <Button
                     className="h-auto p-0"
-                    disabled={isPending}
+                    disabled={isPending || isSubmitting}
                     // TODO: Implement forgot password flow
                     onClick={() => alert("Not implemented yet")}
                     size="xs"
@@ -135,13 +191,14 @@ export function SignInForm() {
                 <InputGroupInput
                   {...field}
                   aria-invalid={fieldState.invalid}
-                  disabled={isPending}
+                  disabled={isPending || isSubmitting}
                   id="password"
                   placeholder="********"
                   type={showPassword ? "text" : "password"}
                 />
                 <InputGroupAddon align="inline-end">
                   <InputGroupButton
+                    disabled={isPending || isSubmitting}
                     onClick={() => setShowPassword(!showPassword)}
                     size="icon-xs"
                     tabIndex={-1}
@@ -157,15 +214,9 @@ export function SignInForm() {
         />
 
         <Field>
-          <Button disabled={isPending} type="submit">
-            {isPending ? (
-              <IconLoader2 className="animate-spin" />
-            ) : (
-              <>
-                <IconLogin2 />
-                Login
-              </>
-            )}
+          <Button disabled={isPending || isSubmitting} type="submit">
+            {isSubmitting ? <Spinner /> : <IconLogin2 />}
+            Login
           </Button>
           <FieldDescription className="text-center">
             Don&apos;t have an account? <Link href="/auth/signup">Sign up</Link>
