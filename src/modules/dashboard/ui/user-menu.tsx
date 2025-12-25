@@ -1,9 +1,16 @@
 "use client"
 
-import { IconBadge, IconBell, IconLogout, IconUser } from "@tabler/icons-react"
+import {
+  IconBadge,
+  IconBell,
+  IconLogout,
+  IconSunMoon,
+  IconUser,
+} from "@tabler/icons-react"
 import type { UserWithRole } from "better-auth/plugins"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useTheme } from "next-themes"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -26,6 +33,7 @@ interface UserMenuProps {
 export function UserMenu({ user }: UserMenuProps) {
   const router = useRouter()
   const mobile = useIsMobile()
+  const { resolvedTheme, setTheme } = useTheme()
 
   async function handleSignOut() {
     await authClient.signOut({
@@ -35,6 +43,10 @@ export function UserMenu({ user }: UserMenuProps) {
         },
       },
     })
+  }
+
+  function toggleTheme() {
+    setTheme(resolvedTheme === "light" ? "dark" : "light")
   }
 
   // TODO: Implement notifications
@@ -95,6 +107,7 @@ export function UserMenu({ user }: UserMenuProps) {
 
         <DropdownMenuGroup>
           <DropdownMenuItem
+            nativeButton={false}
             render={
               <Link href="/profile">
                 <IconUser />
@@ -104,6 +117,7 @@ export function UserMenu({ user }: UserMenuProps) {
           />
 
           <DropdownMenuItem
+            nativeButton={false}
             render={
               <Link className="justify-between" href="/notifications">
                 <span className="flex items-center gap-1.5">
@@ -121,6 +135,7 @@ export function UserMenu({ user }: UserMenuProps) {
 
           {user.role === "admin" && (
             <DropdownMenuItem
+              nativeButton={false}
               render={
                 <Link href="/admin">
                   <IconBadge />
@@ -130,6 +145,13 @@ export function UserMenu({ user }: UserMenuProps) {
             />
           )}
         </DropdownMenuGroup>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem onClick={toggleTheme}>
+          <IconSunMoon />
+          Toggle Theme
+        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
