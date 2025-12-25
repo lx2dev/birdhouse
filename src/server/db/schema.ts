@@ -224,30 +224,6 @@ export const user = createTable(
   ],
 )
 
-export const session = createTable(
-  "session",
-  (d) => ({
-    createdAt: d
-      .timestamp("created_at", { withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    expiresAt: d.timestamp("expires_at").notNull(),
-    id: d.text("id").primaryKey(),
-    impersonatedBy: d.text("impersonated_by"),
-    ipAddress: d.text("ip_address"),
-    token: d.text("token").notNull().unique(),
-    updatedAt: d
-      .timestamp("updated_at", { withTimezone: true })
-      .$onUpdate(() => /* @__PURE__ */ new Date()),
-    userAgent: d.text("user_agent"),
-    userId: d
-      .text("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-  }),
-  (t) => [index("session_userId_idx").on(t.userId)],
-)
-
 export const account = createTable(
   "account",
   (d) => ({
@@ -296,14 +272,6 @@ export const verification = createTable(
 
 export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
-  sessions: many(session),
-}))
-
-export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
 }))
 
 export const accountRelations = relations(account, ({ one }) => ({
