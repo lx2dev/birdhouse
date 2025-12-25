@@ -106,9 +106,11 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
 
   return (
     <AlertDialog
-      onOpenChange={() => {
-        setSSHKey(null)
-        onOpenChange?.(open ?? false)
+      onOpenChange={(open) => {
+        if (!open) {
+          setSSHKey(null)
+        }
+        onOpenChange?.(open)
       }}
       open={open}
     >

@@ -6,6 +6,7 @@ import {
   IconServer2,
 } from "@tabler/icons-react"
 import Link from "next/link"
+import * as React from "react"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 
@@ -36,6 +37,12 @@ export function DashboardSection() {
 }
 
 function DashboardSectionSuspense() {
+  const [open, setOpen] = React.useState<{
+    sshKey: boolean
+  }>({
+    sshKey: false,
+  })
+
   const [instances, query] = api.compute.list.useSuspenseInfiniteQuery(
     { limit: DEFAULT_FETCH_LIMIT },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
@@ -65,13 +72,30 @@ function DashboardSectionSuspense() {
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
+        <CreateSSHKeyDialog
+          onOpenChange={(open) => {
+            setOpen((prev) => ({
+              ...prev,
+              sshKey: open,
+            }))
+          }}
+          open={open.sshKey}
+        />
+
         {keys.length === 0 ? (
-          <CreateSSHKeyDialog>
-            <Button size="sm" variant="outline">
-              <IconPlus />
-              Add SSH Key
-            </Button>
-          </CreateSSHKeyDialog>
+          <Button
+            onClick={() => {
+              setOpen((prev) => ({
+                ...prev,
+                sshKey: true,
+              }))
+            }}
+            size="sm"
+            variant="outline"
+          >
+            <IconPlus />
+            Add SSH Key
+          </Button>
         ) : (
           <Link href="/dashboard/new">
             <Button size="sm" variant="outline">
