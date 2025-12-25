@@ -144,6 +144,7 @@ export function SignInForm() {
                   <InputGroupButton
                     onClick={() => setShowPassword(!showPassword)}
                     size="icon-xs"
+                    tabIndex={-1}
                     variant="ghost"
                   >
                     {showPassword ? <IconEyeOff /> : <IconEye />}

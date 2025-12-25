@@ -166,6 +166,7 @@ export function SignUpForm() {
                         })
                       }}
                       size="icon-xs"
+                      tabIndex={-1}
                       variant="ghost"
                     >
                       {showPassword.password ? <IconEyeOff /> : <IconEye />}
@@ -208,6 +209,7 @@ export function SignUpForm() {
                         })
                       }}
                       size="icon-xs"
+                      tabIndex={-1}
                       variant="ghost"
                     >
                       {showPassword.passwordConfirmation ? (
