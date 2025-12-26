@@ -67,7 +67,7 @@
     "lint:unsafe": "biome check --write --unsafe .",
     "lint:write": "biome check --write .",
     "shadcn": "bunx --bun shadcn@latest",
-    "start": "next start"
+    "start": "bun run db:push && bun run db:seed && next start"
   },
   "type": "module",
   "version": "0.1.0"
