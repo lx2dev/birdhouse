@@ -61,13 +61,13 @@ export function AppHeader({ user }: AppHeaderProps) {
             >
               <IconMenu2
                 className={cn(
-                  "size-5 transition-opacity duration-200",
+                  "size-6 transition-opacity duration-200",
                   openMobile ? "opacity-0" : "opacity-100",
                 )}
               />
               <IconMenuDeep
                 className={cn(
-                  "absolute size-5 transition-opacity duration-200",
+                  "absolute size-6 transition-opacity duration-200",
                   openMobile ? "opacity-100" : "opacity-0",
                 )}
               />
