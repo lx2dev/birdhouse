@@ -21,12 +21,12 @@ function sanitizeHost(host: string) {
 
 export function getInstanceSSHUrl(instanceId: string, username: string) {
   const hostname = sanitizeHost(env.NEXT_PUBLIC_URL)
-  return `ssh://${username}@${instanceId}.${hostname}`
+  return `ssh://${username}@${hostname}/connect/${instanceId}`
 }
 
 export function getInstanceSSHCommand(instanceId: string, username: string) {
   const hostname = sanitizeHost(env.NEXT_PUBLIC_URL)
-  return `ssh -p 22 ${username}@${instanceId}.${hostname}`
+  return `ssh -p 22 ${username}@${hostname}/connect/${instanceId}`
 }
 
 export function getInstanceStatusColor(status: VMStatus) {
