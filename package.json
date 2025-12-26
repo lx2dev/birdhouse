@@ -53,7 +53,7 @@
   "private": true,
   "scripts": {
     "auth:generate": "npx @better-auth/cli@latest generate --config ./src/server/auth/index.ts --yes",
-    "build": "next build",
+    "build": "bun ./src/scripts/generate-version.ts && next build",
     "clean": "rm -rf .next node_modules && bun install",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

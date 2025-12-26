@@ -3,6 +3,7 @@ import { Noto_Sans, Noto_Sans_Mono } from "next/font/google"
 
 import { ThemeProvider } from "@/components/providers/theme"
 import { Toaster } from "@/components/ui/sonner"
+import { VersionChecker } from "@/components/version-checker"
 import { TRPCReactProvider } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
 
@@ -35,6 +36,7 @@ export default function RootLayout({
         <TRPCReactProvider>
           <ThemeProvider>
             {children}
+            <VersionChecker />
             <Toaster richColors />
           </ThemeProvider>
         </TRPCReactProvider>
