@@ -8,8 +8,6 @@ import { getRedisClient } from "@/lib/redis"
 import { db } from "@/server/db"
 import { user as userTable } from "@/server/db/schema"
 
-const redis = getRedisClient()
-
 // TODO: implement admin and roles
 export const auth = betterAuth({
   baseURL: env.NEXT_PUBLIC_URL,
@@ -41,13 +39,22 @@ export const auth = betterAuth({
   },
   secondaryStorage: {
     async delete(key) {
+      const redis = getRedisClient()
       await redis.del(key)
     },
     async get(key) {
+      const redis = getRedisClient()
       return await redis.get(key)
     },
     async set(key, value, ttl) {
-      if (ttl) await redis.set(key, value, { EX: ttl })
+      const redis = getRedisClient()
+      if (ttl)
+        await redis.set(key, value, {
+          expiration: {
+            type: "EX",
+            value: ttl,
+          },
+        })
       else await redis.set(key, value)
     },
   },
