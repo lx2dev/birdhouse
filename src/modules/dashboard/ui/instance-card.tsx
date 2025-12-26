@@ -49,7 +49,8 @@ import {
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { api } from "@/lib/api/client"
-import { getInstanceStatusColor } from "@/lib/utils"
+import { useSession } from "@/lib/auth/client"
+import { getInstanceSSHUrl, getInstanceStatusColor } from "@/lib/utils"
 import type { VMTable } from "@/server/db/schema"
 
 interface InstanceCardProps {
@@ -59,6 +60,7 @@ interface InstanceCardProps {
 export function InstanceCard({ instance }: InstanceCardProps) {
   const router = useRouter()
   const utils = api.useUtils()
+  const { data: session } = useSession()
 
   const [forceShutdown, setForceShutdown] = React.useState<boolean>(false)
   const [open, setOpen] = React.useState<{
@@ -137,6 +139,14 @@ export function InstanceCard({ instance }: InstanceCardProps) {
     },
   })
 
+  if (!session) return router.push("/auth/signin")
+  const { user } = session
+
+  function handleConnect() {
+    const sshUrl = getInstanceSSHUrl(instance.id, user.name)
+    window.location.href = sshUrl
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -163,14 +173,10 @@ export function InstanceCard({ instance }: InstanceCardProps) {
               }
             />
             <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                render={
-                  <Link href={`/dashboard/compute/${instance.id}/console`}>
-                    <IconTerminal />
-                    Console
-                  </Link>
-                }
-              />
+              <DropdownMenuItem onClick={handleConnect}>
+                <IconTerminal />
+                Connect
+              </DropdownMenuItem>
 
               <DropdownMenuSeparator />
 
