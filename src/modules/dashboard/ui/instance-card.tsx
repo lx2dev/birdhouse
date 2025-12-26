@@ -139,14 +139,6 @@ export function InstanceCard({ instance }: InstanceCardProps) {
     },
   })
 
-  if (!session) return router.push("/auth/signin")
-  const { user } = session
-
-  function handleConnect() {
-    const sshUrl = getInstanceSSHUrl(instance.id, user.name)
-    window.location.href = sshUrl
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -173,7 +165,16 @@ export function InstanceCard({ instance }: InstanceCardProps) {
               }
             />
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleConnect}>
+              <DropdownMenuItem
+                onClick={() => {
+                  if (!session?.user) return
+                  const sshUrl = getInstanceSSHUrl(
+                    instance.id,
+                    session.user.name,
+                  )
+                  window.location.href = sshUrl
+                }}
+              >
                 <IconTerminal />
                 Connect
               </DropdownMenuItem>
