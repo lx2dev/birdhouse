@@ -74,11 +74,11 @@ function DialogContent({
                   <IconX /> Close
                 </DialogPrimitive.Close>
               )}
-              <div className="absolute right-0 bottom-0 z-10 h-1/2 w-1/2 bg-border dark:bg-card" />
+              <div className="absolute right-0 bottom-0 z-10 h-1/2 w-1/2 bg-muted dark:bg-card" />
             </div>
-            <div className="grow rounded-t-xl bg-border dark:bg-card" />
+            <div className="grow rounded-t-xl bg-muted dark:bg-card" />
           </div>
-          <div className="space-y-4 rounded-xl rounded-tr-none bg-border p-4 dark:bg-card">
+          <div className="space-y-4 rounded-xl rounded-tr-none bg-muted p-4 dark:bg-card **:[input]:bg-background">
             {children}
           </div>
         </div>
