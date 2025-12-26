@@ -148,6 +148,7 @@ async function processOne(vm: VMTable) {
         cipassword: rootPassword,
         ciuser: "root",
         cores: template.cpuCores,
+        ipconfig0: "ip=dhcp",
         memory: String(template.memoryMb),
         nameserver: "1.1.1.1",
         searchdomain: "local",
