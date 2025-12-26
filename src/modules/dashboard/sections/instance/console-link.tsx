@@ -64,6 +64,11 @@ function InstanceConsoleSectionSuspense({
   const [copied, setCopied] = React.useState<boolean>(false)
 
   function handleCopyCommand() {
+    if (instance.status !== "running") {
+      toast.error("Instance is not running")
+      return
+    }
+
     try {
       const command = getInstanceSSHCommand(instance.id, user.name)
       navigator.clipboard.writeText(command)
@@ -92,10 +97,13 @@ function InstanceConsoleSectionSuspense({
       <CardContent>
         <ButtonGroup>
           <Button
+            disabled
+            // disabled={instance.status !== "running"}
             nativeButton={false}
             render={
               <a
-                aria-disabled={instance.status !== "running"}
+                aria-disabled
+                // aria-disabled={instance.status !== "running"}
                 className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
                 href={getInstanceSSHUrl(instance.id, user.name)}
               >
@@ -107,7 +115,8 @@ function InstanceConsoleSectionSuspense({
             variant="outline"
           />
           <Button
-            disabled={instance.status !== "running"}
+            disabled
+            // disabled={instance.status !== "running"}
             onClick={handleCopyCommand}
             size="icon-lg"
             variant="outline"
