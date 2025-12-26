@@ -8,7 +8,6 @@ import * as schema from "@/server/db/schema"
 async function main() {
   const db = drizzle(env.DATABASE_URL)
   const redis = getRedisClient()
-  await redis.connect()
 
   try {
     console.log("Resetting database...")
