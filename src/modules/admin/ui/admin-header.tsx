@@ -12,6 +12,7 @@ import {
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
+import { Hint } from "@/components/hint"
 import { Icons } from "@/components/icons"
 import { Button } from "@/components/ui/button"
 import { useSidebar } from "@/components/ui/sidebar"
@@ -60,12 +61,18 @@ export function AdminHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <Link href="/">
-            <Button size={mobile ? "icon" : "sm"} variant="outline">
-              <IconLogout />
-              <span className="hidden md:inline">Exit Admin</span>
-            </Button>
-          </Link>
+          <Hint
+            label="Exit Admin Panel"
+            render={
+              <Link href="/">
+                <Button size={mobile ? "icon" : "sm"} variant="outline">
+                  <IconLogout />
+                  <span className="hidden md:inline">Exit Admin</span>
+                </Button>
+              </Link>
+            }
+            side="bottom"
+          />
 
           <div className="block md:hidden">
             <Button
