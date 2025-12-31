@@ -5,6 +5,7 @@ import { admin } from "better-auth/plugins"
 
 import { env } from "@/env"
 import { getRedisClient } from "@/lib/redis"
+import { resend } from "@/lib/resend"
 import { db } from "@/server/db"
 import { user as userTable } from "@/server/db/schema"
 
@@ -32,6 +33,17 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    async onPasswordReset({ user }) {
+      console.log(`Password for user ${user.email} has been reset.`)
+    },
+    async sendResetPassword({ url, user }) {
+      void resend.emails.send({
+        from: "Birdhouse <no-reply@bh.lx2.dev>",
+        subject: "Reset your password",
+        text: `Click the link to reset your password: ${url}`,
+        to: user.email,
+      })
+    },
   },
   plugins: [admin(), nextCookies()],
   rateLimit: {
