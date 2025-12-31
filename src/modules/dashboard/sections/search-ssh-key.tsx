@@ -93,7 +93,7 @@ function SearchSSHKeySectionSuspense() {
           </InputGroupAddon>
         </InputGroup>
         <Button
-          className="h-12"
+          className="h-12 border-border dark:border-input"
           onClick={() => {
             setInput("")
             const params = new URLSearchParams(searchString)
