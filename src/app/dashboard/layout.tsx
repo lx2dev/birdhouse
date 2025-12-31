@@ -2,10 +2,10 @@ import type { UserWithRole } from "better-auth/plugins"
 import { redirect } from "next/navigation"
 
 import { SiteFooter } from "@/components/layout/site-footer"
+import { AppSidebar } from "@/components/layout/site-sidebar"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { getSession } from "@/lib/auth/utils"
 import { AppHeader } from "@/modules/dashboard/ui/app-header"
-import { AppSidebar } from "@/modules/dashboard/ui/app-sidebar"
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const session = await getSession()

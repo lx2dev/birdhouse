@@ -3,6 +3,8 @@
 import {
   IconLayoutDashboard,
   IconLogout,
+  IconMenu2,
+  IconMenuDeep,
   IconServer2,
   IconServerCog,
   IconUsers,
@@ -12,7 +14,9 @@ import { usePathname } from "next/navigation"
 
 import { Icons } from "@/components/icons"
 import { Button } from "@/components/ui/button"
+import { useSidebar } from "@/components/ui/sidebar"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { cn } from "@/lib/utils"
 
 const NAV_ITEMS = [
   { href: "/admin", icon: IconLayoutDashboard, label: "Admin" },
@@ -24,6 +28,7 @@ const NAV_ITEMS = [
 export function AdminHeader() {
   const pathname = usePathname()
   const mobile = useIsMobile()
+  const { openMobile, toggleSidebar } = useSidebar()
 
   return (
     <header className="sticky top-0 z-50 border-border border-b bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/60">
@@ -35,7 +40,7 @@ export function AdminHeader() {
           </span>
         </Link>
 
-        <nav className="ml-8 hidden flex-1 items-center gap-1 sm:flex">
+        <nav className="ml-8 hidden flex-1 items-center gap-1 md:flex">
           {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
             const isActive = pathname === href
 
@@ -54,13 +59,35 @@ export function AdminHeader() {
           })}
         </nav>
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
           <Link href="/">
             <Button size={mobile ? "icon" : "sm"} variant="outline">
               <IconLogout />
               <span className="hidden md:inline">Exit Admin</span>
             </Button>
           </Link>
+
+          <div className="block md:hidden">
+            <Button
+              className="relative"
+              onClick={toggleSidebar}
+              size="icon"
+              variant="ghost"
+            >
+              <IconMenu2
+                className={cn(
+                  "size-6 transition-opacity duration-200",
+                  openMobile ? "opacity-0" : "opacity-100",
+                )}
+              />
+              <IconMenuDeep
+                className={cn(
+                  "absolute size-6 transition-opacity duration-200",
+                  openMobile ? "opacity-100" : "opacity-0",
+                )}
+              />
+            </Button>
+          </div>
         </div>
       </div>
     </header>
