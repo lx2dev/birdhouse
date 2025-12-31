@@ -357,7 +357,7 @@ function NewComputeSectionSuspense() {
                         <FieldError errors={[fieldState.error]} />
                       )}
                     </FieldContent>
-                    <ButtonGroup className="w-full">
+                    <ButtonGroup>
                       <Select
                         name={field.name}
                         onValueChange={field.onChange}
@@ -365,7 +365,7 @@ function NewComputeSectionSuspense() {
                       >
                         <SelectTrigger
                           aria-invalid={fieldState.invalid}
-                          className="flex-1"
+                          className="w-0 flex-1"
                           disabled={
                             isSubmitting ||
                             sshKeys.pages.flatMap((page) => page.items)
@@ -378,8 +378,10 @@ function NewComputeSectionSuspense() {
                               <>
                                 <span className="font-semibold">
                                   {selectedKey.name}
-                                </span>{" "}
-                                ({selectedKey.fingerprint})
+                                </span>
+                                <span className="truncate text-muted-foreground">
+                                  ({selectedKey.fingerprint})
+                                </span>
                               </>
                             ) : (
                               "Select an SSH key"
@@ -393,8 +395,10 @@ function NewComputeSectionSuspense() {
                               <SelectItem key={key.id} value={key.id}>
                                 <span className="font-semibold">
                                   {key.name}
-                                </span>{" "}
-                                ({key.fingerprint})
+                                </span>
+                                <span className="truncate text-muted-foreground!">
+                                  ({key.fingerprint})
+                                </span>
                               </SelectItem>
                             ))}
                         </SelectContent>
