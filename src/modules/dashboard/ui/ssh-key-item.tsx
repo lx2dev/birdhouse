@@ -45,7 +45,6 @@ import {
   Item,
   ItemActions,
   ItemContent,
-  ItemDescription,
   ItemFooter,
   ItemTitle,
 } from "@/components/ui/item"
@@ -81,7 +80,7 @@ export function SSHKeyItem({ item: key }: SSHKeyItemProps) {
     <Item className="not-last:mb-4 bg-card" variant="outline">
       <ItemContent className="min-w-0">
         <ItemTitle>{key.name}</ItemTitle>
-        <ItemDescription className="space-y-2">
+        <div className="space-y-2 text-muted-foreground">
           <span className="flex items-center justify-between rounded-md bg-muted p-2.5 text-sm">
             <span className="flex min-w-0 items-center gap-2">
               <span className="shrink-0 font-medium">Public Key:</span>
@@ -133,7 +132,7 @@ export function SSHKeyItem({ item: key }: SSHKeyItemProps) {
               )}
             </Button>
           </span>
-        </ItemDescription>
+        </div>
       </ItemContent>
       <ItemActions>
         <KeyItemActions item={key} />
