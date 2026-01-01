@@ -35,7 +35,6 @@ import {
 } from "@/components/ui/input-group"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
-import { useIsMobile } from "@/hooks/use-mobile"
 import { api } from "@/lib/api/client"
 import { createSSHKeySchema } from "@/modules/dashboard/schemas"
 import type { SSHKeyTable } from "@/server/db/schema"
@@ -50,7 +49,6 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
   const { children, open, onOpenChange } = props
 
   const utils = api.useUtils()
-  const isMobile = useIsMobile()
 
   const [sshKey, setSSHKey] = React.useState<
     (SSHKeyTable & { privateKey: string }) | null
