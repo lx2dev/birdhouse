@@ -117,7 +117,7 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
       open={open}
     >
       {children && <AlertDialogTrigger render={children} />}
-      <AlertDialogContent size={isMobile ? "sm" : "default"}>
+      <AlertDialogContent>
         {sshKey ? (
           <>
             <AlertDialogHeader>
