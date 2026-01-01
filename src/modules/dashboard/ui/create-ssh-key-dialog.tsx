@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/input-group"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { api } from "@/lib/api/client"
 import { createSSHKeySchema } from "@/modules/dashboard/schemas"
 import type { SSHKeyTable } from "@/server/db/schema"
@@ -49,6 +50,7 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
   const { children, open, onOpenChange } = props
 
   const utils = api.useUtils()
+  const isMobile = useIsMobile()
 
   const [sshKey, setSSHKey] = React.useState<
     (SSHKeyTable & { privateKey: string }) | null
@@ -115,7 +117,7 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
       open={open}
     >
       {children && <AlertDialogTrigger render={children} />}
-      <AlertDialogContent>
+      <AlertDialogContent size={isMobile ? "sm" : "default"}>
         {sshKey ? (
           <>
             <AlertDialogHeader>
@@ -136,9 +138,9 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
             <div className="mt-4 flex flex-col gap-4">
               <div>
                 <Label className="mb-2 block font-medium">Private Key:</Label>
-                <InputGroup className="w-full">
+                <InputGroup>
                   <InputGroupTextarea
-                    className="max-h-34 resize-none font-mono"
+                    className="wrap-break-word max-h-34 resize-none font-mono"
                     readOnly
                     rows={6}
                     value={sshKey.privateKey}
