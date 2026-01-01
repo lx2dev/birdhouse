@@ -15,10 +15,7 @@ export default function AuthLayout({ children }: LayoutProps<"/auth">) {
           Birdhouse
         </Link>
 
-        <Alert
-          className="border-yellow-500/20 bg-yellow-500/10 text-yellow-500 *:data-[slot=alert-description]:text-yellow-500/90 *:[svg]:text-current"
-          variant="destructive"
-        >
+        <Alert variant="warning">
           <AlertTitle>
             <strong>Warning:</strong> This is a demo
           </AlertTitle>

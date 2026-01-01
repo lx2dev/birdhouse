@@ -124,10 +124,10 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
               </AlertDialogTitle>
             </AlertDialogHeader>
 
-            <Alert className="border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400">
+            <Alert variant="warning">
               <IconAlertCircleFilled />
               <AlertTitle className="font-semibold">Important:</AlertTitle>
-              <AlertDescription className="text-amber-600 dark:text-amber-500">
+              <AlertDescription>
                 For security reasons, this is the only time you will be able to
                 view or download your private key. Make sure to store it safely.
               </AlertDescription>
