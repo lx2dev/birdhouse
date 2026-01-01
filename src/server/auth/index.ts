@@ -35,7 +35,7 @@ export const auth = betterAuth({
     async onPasswordReset({ user }) {
       console.log(`Password for user ${user.email} has been reset.`)
     },
-    resetPasswordTokenExpiresIn: 60 * 5,
+    resetPasswordTokenExpiresIn: 60 * 10,
     async sendResetPassword({ url, user }) {
       // TODO: Use a proper email template
       void resend.emails.send({
