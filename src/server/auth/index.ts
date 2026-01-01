@@ -33,17 +33,45 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     async onPasswordReset({ user }) {
-      console.log(`Password for user ${user.email} has been reset.`)
+      const year = new Date().getFullYear()
+      const timeOfReset = new Date().toLocaleString("en-US", {
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        month: "short",
+        second: "2-digit",
+        year: "numeric",
+      })
+
+      void resend.emails.send({
+        from: "Birdhouse <no-reply@lx2.dev>",
+        subject: "Your password has been reset",
+        template: {
+          id: "after-reset-password",
+          variables: {
+            TIME_OF_RESET: timeOfReset,
+            USER_NAME: user.name,
+            YEAR: year,
+          },
+        },
+        to: user.email,
+      })
     },
     resetPasswordTokenExpiresIn: 60 * 10,
     async sendResetPassword({ url, user }) {
-      // TODO: Use a proper email template
+      const year = new Date().getFullYear()
+
       void resend.emails.send({
         from: "Birdhouse <no-reply@lx2.dev>",
         subject: "Reset your password",
-        text: `Click the link to reset your password: ${url}
-If you did not request this, please ignore this email.
-This link will expire in 5 minutes.`,
+        template: {
+          id: "reset-password",
+          variables: {
+            RESET_URL: url,
+            USER_NAME: user.name,
+            YEAR: year,
+          },
+        },
         to: user.email,
       })
     },
