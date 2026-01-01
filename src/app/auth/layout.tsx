@@ -11,7 +11,7 @@ export default function AuthLayout({ children }: LayoutProps<"/auth">) {
           className="flex items-center gap-2 self-center font-medium text-2xl"
           href="/"
         >
-          <Icons.logo className="size-16" />
+          <Icons.logo className="size-16 text-primary" />
           Birdhouse
         </Link>
 
