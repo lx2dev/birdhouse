@@ -20,3 +20,17 @@ export const SignUpSchema = z
     error: "Passwords do not match",
     path: ["passwordConfirmation"],
   })
+
+export const ResetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(12, "Password must be at least 12 characters long"),
+    passwordConfirmation: z
+      .string()
+      .min(12, "Password confirmation must be at least 12 characters long"),
+  })
+  .refine((data) => data.password === data.passwordConfirmation, {
+    message: "Passwords do not match",
+    path: ["passwordConfirmation"],
+  })
