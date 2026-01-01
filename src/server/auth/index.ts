@@ -35,11 +35,15 @@ export const auth = betterAuth({
     async onPasswordReset({ user }) {
       console.log(`Password for user ${user.email} has been reset.`)
     },
+    resetPasswordTokenExpiresIn: 60 * 5,
     async sendResetPassword({ url, user }) {
+      // TODO: Use a proper email template
       void resend.emails.send({
         from: "Birdhouse <no-reply@lx2.dev>",
         subject: "Reset your password",
-        text: `Click the link to reset your password: ${url}`,
+        text: `Click the link to reset your password: ${url}
+If you did not request this, please ignore this email.
+This link will expire in 5 minutes.`,
         to: user.email,
       })
     },
