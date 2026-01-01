@@ -140,7 +140,7 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
                 <Label className="mb-2 block font-medium">Private Key:</Label>
                 <InputGroup>
                   <InputGroupTextarea
-                    className="max-h-34 resize-none break-all font-mono"
+                    className="wrap-break-word field-sizing-fixed max-h-34 resize-none font-mono"
                     readOnly
                     rows={6}
                     value={sshKey.privateKey}
