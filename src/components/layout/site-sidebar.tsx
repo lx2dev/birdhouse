@@ -21,12 +21,15 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { ADMIN_NAV_ITEMS, NAV_ITEMS } from "@/constants"
+import { useSession } from "@/lib/auth/client"
 
 export function AppSidebar() {
   const pathname = usePathname()
   const { setOpenMobile } = useSidebar()
+  const { data: session } = useSession()
+  const isAdmin = session?.user.role === "admin"
 
-  const adminPath = pathname.startsWith("/admin")
+  const isAdminPath = pathname.startsWith("/admin")
 
   // TODO: Implement notifications
   const notifications = [
@@ -76,40 +79,47 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <div className="mx-4">
-          <SidebarSeparator className="mx-auto" />
-        </div>
+        {isAdmin && (
+          <>
+            <div className="mx-4">
+              <SidebarSeparator className="mx-auto" />
+            </div>
 
-        <SidebarGroup>
-          <div className="flex items-center justify-between">
-            <SidebarGroupLabel>Admin</SidebarGroupLabel>
-            {adminPath && (
-              <Link href="/dashboard">
-                <Badge className="text-[10px] text-foreground!" variant="ghost">
-                  <IconLogout />
-                  Exit Admin
-                </Badge>
-              </Link>
-            )}
-          </div>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {ADMIN_NAV_ITEMS.map(({ href, icon: Icon, label }) => (
-                <SidebarMenuItem key={href}>
-                  <SidebarMenuButton
-                    onClick={navigate}
-                    render={
-                      <Link href={href}>
-                        <Icon />
-                        <span>{label}</span>
-                      </Link>
-                    }
-                  />
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+            <SidebarGroup>
+              <div className="flex items-center justify-between">
+                <SidebarGroupLabel>Admin</SidebarGroupLabel>
+                {isAdminPath && (
+                  <Link href="/dashboard">
+                    <Badge
+                      className="text-[10px] text-foreground!"
+                      variant="ghost"
+                    >
+                      <IconLogout />
+                      Exit Admin
+                    </Badge>
+                  </Link>
+                )}
+              </div>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {ADMIN_NAV_ITEMS.map(({ href, icon: Icon, label }) => (
+                    <SidebarMenuItem key={href}>
+                      <SidebarMenuButton
+                        onClick={navigate}
+                        render={
+                          <Link href={href}>
+                            <Icon />
+                            <span>{label}</span>
+                          </Link>
+                        }
+                      />
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </>
+        )}
       </SidebarContent>
 
       <SidebarFooter>
