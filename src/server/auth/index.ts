@@ -9,7 +9,6 @@ import { resend } from "@/lib/resend"
 import { db } from "@/server/db"
 import { user as userTable } from "@/server/db/schema"
 
-// TODO: implement admin and roles
 export const auth = betterAuth({
   baseURL: env.NEXT_PUBLIC_URL,
   database: drizzleAdapter(db, {
@@ -38,7 +37,7 @@ export const auth = betterAuth({
     },
     async sendResetPassword({ url, user }) {
       void resend.emails.send({
-        from: "Birdhouse <no-reply@bh.lx2.dev>",
+        from: "Birdhouse <no-reply@lx2.dev>",
         subject: "Reset your password",
         text: `Click the link to reset your password: ${url}`,
         to: user.email,

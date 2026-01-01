@@ -33,6 +33,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
+import { env } from "@/env"
 import { authClient } from "@/lib/auth/client"
 import { SignInSchema } from "@/modules/auth/schemas/auth"
 
@@ -42,9 +43,11 @@ export function SignInForm() {
   const [isLoading, setIsLoading] = React.useState<{
     discord: boolean
     github: boolean
+    resetPassword: boolean
   }>({
     discord: false,
     github: false,
+    resetPassword: false,
   })
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
 
@@ -57,7 +60,8 @@ export function SignInForm() {
   })
 
   const { isSubmitting } = form.formState
-  const isPending = isLoading.discord || isLoading.github
+  const isPending =
+    isLoading.discord || isLoading.github || isLoading.resetPassword
 
   async function onSubmit(data: z.infer<typeof SignInSchema>) {
     try {
@@ -113,6 +117,45 @@ export function SignInForm() {
         [provider]: false,
       }))
     }
+  }
+
+  async function handleForgotPassword() {
+    if (!form.getValues("email")) {
+      form.setError("email", {
+        message: "Email is required to reset password.",
+      })
+      form.setFocus("email")
+      return
+    }
+
+    setIsLoading((prev) => ({
+      ...prev,
+      resetPassword: true,
+    }))
+
+    await authClient.requestPasswordReset({
+      email: form.getValues("email"),
+      fetchOptions: {
+        onError({ error }) {
+          toast.error("Something went wrong:", {
+            description: error.message,
+          })
+          setIsLoading((prev) => ({
+            ...prev,
+            resetPassword: false,
+          }))
+        },
+        onSuccess() {
+          toast.success("Password reset email sent!")
+          form.reset()
+          setIsLoading((prev) => ({
+            ...prev,
+            resetPassword: false,
+          }))
+        },
+      },
+      redirectTo: `${env.NEXT_PUBLIC_URL}/auth/reset-password`,
+    })
   }
 
   return (
@@ -173,19 +216,17 @@ export function SignInForm() {
                 <FieldLabel htmlFor="password">
                   <IconKey className="size-4" /> Password
                 </FieldLabel>
-                <Link className="ml-auto" href="#" tabIndex={-1}>
-                  <Button
-                    className="h-auto p-0"
-                    disabled={isPending || isSubmitting}
-                    // TODO: Implement forgot password flow
-                    onClick={() => alert("Not implemented yet")}
-                    size="xs"
-                    tabIndex={-1}
-                    variant="link"
-                  >
-                    Forgot your password?
-                  </Button>
-                </Link>
+                <Button
+                  className="ml-auto h-auto p-0"
+                  disabled={isPending || isSubmitting}
+                  onClick={handleForgotPassword}
+                  size="xs"
+                  tabIndex={-1}
+                  variant="link"
+                >
+                  {isLoading.resetPassword ? <Spinner /> : null}
+                  Forgot your password?
+                </Button>
               </div>
               <InputGroup>
                 <InputGroupInput
