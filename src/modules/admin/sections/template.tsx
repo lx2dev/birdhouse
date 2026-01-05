@@ -167,7 +167,7 @@ function TemplateSectionSuspense() {
             return (
               <Card className="relative overflow-visible" key={template.id}>
                 {vmTemplateStatusEnum.enumValues.includes(template.status) && (
-                  <div className="-top-2.5 absolute right-1/2 z-10 translate-x-1/2 rounded-4xl bg-card">
+                  <div className="absolute -top-2.5 right-1/2 z-10 translate-x-1/2 rounded-4xl bg-card">
                     <Badge
                       className={cn(
                         "text-sm capitalize",
