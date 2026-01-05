@@ -89,7 +89,7 @@
     "enabled": true,
     "rules": {
       "a11y": {
-        "noLabelWithoutControl": "off"
+        "noLabelWithoutControl": "warn"
       },
       "complexity": {
         "noExtraBooleanCast": "warn",
@@ -120,7 +120,7 @@
       },
       "suspicious": {
         "noArrayIndexKey": "off",
-        "noUnknownAtRules": "off"
+        "noDocumentCookie": "off"
       }
     }
   },
