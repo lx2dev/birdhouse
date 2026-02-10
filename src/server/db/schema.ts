@@ -190,6 +190,37 @@ export const auditLog = createTable(
   ],
 )
 
+export const notificationStatusEnum = pgEnum("audit_log_status", [
+  "success",
+  "failure",
+  "alert",
+  "info",
+])
+
+export const notificationTable = createTable(
+  "notification",
+  (d) => ({
+    createdAt: d
+      .timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    id: d
+      .text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    message: d.text("message").notNull(),
+    read: d.boolean("read").default(false).notNull(),
+    status: notificationStatusEnum("status").default("info").notNull(),
+    userId: d
+      .text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+  }),
+  (t) => [index("notification_userId_idx").on(t.userId)],
+)
+
+export type Notification = typeof notificationTable.$inferSelect
+
 export const user = createTable(
   "user",
   (d) => ({
