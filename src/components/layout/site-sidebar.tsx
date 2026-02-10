@@ -1,6 +1,6 @@
 "use client"
 
-import { IconBell, IconLogout } from "@tabler/icons-react"
+import { IconLogout } from "@tabler/icons-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge"
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -30,13 +29,6 @@ export function AppSidebar() {
   const isAdmin = session?.user.role === "admin"
 
   const isAdminPath = pathname.startsWith("/admin")
-
-  // TODO: Implement notifications
-  const notifications = [
-    { id: 1, message: "New login from unknown device", read: false },
-    { id: 2, message: "Your password was changed successfully", read: true },
-    { id: 3, message: "New SSH key added", read: false },
-  ]
 
   function navigate() {
     setOpenMobile(false)
@@ -122,7 +114,7 @@ export function AppSidebar() {
         )}
       </SidebarContent>
 
-      <SidebarFooter>
+      {/* <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -141,7 +133,7 @@ export function AppSidebar() {
             />
           </SidebarMenuItem>
         </SidebarMenu>
-      </SidebarFooter>
+      </SidebarFooter> */}
     </Sidebar>
   )
 }
