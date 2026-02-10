@@ -50,7 +50,10 @@ import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { api } from "@/lib/api/client"
 import { useSession } from "@/lib/auth/client"
-import { getInstanceSSHUrl, getInstanceStatusColor } from "@/lib/utils"
+import {
+  getInstanceSSHUrl,
+  getInstanceStatusColor,
+} from "@/modules/dashboard/lib/utils"
 import type { VMTable } from "@/server/db/schema"
 
 interface InstanceCardProps {

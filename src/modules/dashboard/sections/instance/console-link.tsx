@@ -29,7 +29,10 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getInstanceSSHCommand, getInstanceSSHUrl } from "@/lib/utils"
+import {
+  getInstanceSSHCommand,
+  getInstanceSSHUrl,
+} from "@/modules/dashboard/lib/utils"
 import type {
   OperatingSystemTable,
   VMTable,

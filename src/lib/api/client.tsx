@@ -8,10 +8,16 @@ import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
 import React from "react"
 import superjson from "superjson"
 
-import { getBaseUrl } from "@/lib/utils"
+import { env } from "@/env"
 import type { AppRouter } from "@/server/api/root"
 
 import { createQueryClient } from "./query-client"
+
+function getBaseUrl() {
+  if (typeof window !== "undefined") return window.location.origin
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  return env.NEXT_PUBLIC_URL
+}
 
 let clientQueryClientSingleton: QueryClient | undefined
 function getQueryClient(): QueryClient {
