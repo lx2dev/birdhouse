@@ -45,12 +45,12 @@ export function getInstanceStatusColor(status: VMStatus) {
 }
 
 export function getNotificationStatusIcon(
-  status: "success" | "error" | "info" | "alert",
+  status: "success" | "failure" | "info" | "alert",
 ) {
   switch (status) {
     case "success":
       return IconCircleCheck
-    case "error":
+    case "failure":
       return IconSquareX
     case "info":
       return IconInfoHexagon
@@ -62,12 +62,12 @@ export function getNotificationStatusIcon(
 }
 
 export function getNotificationStatusColor(
-  status: "success" | "error" | "info" | "alert",
+  status: "success" | "failure" | "info" | "alert",
 ) {
   switch (status) {
     case "success":
       return "bg-green-600/10 text-green-600"
-    case "error":
+    case "failure":
       return "bg-destructive/10 text-destructive"
     case "info":
       return "bg-sky-500/10 text-sky-500"

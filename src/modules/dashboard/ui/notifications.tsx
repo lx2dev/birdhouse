@@ -38,7 +38,7 @@ import {
 type Notification = {
   id: number
   message: string
-  status: "success" | "error" | "info" | "alert"
+  status: "success" | "failure" | "info" | "alert"
   read: boolean
 }
 
@@ -69,7 +69,7 @@ export function Notifications() {
       id: 5,
       message: "Your instance 'web-server-1' has been stopped",
       read: false,
-      status: "error",
+      status: "failure",
     },
     {
       id: 6,
@@ -81,7 +81,7 @@ export function Notifications() {
       id: i + 7,
       message: `Notification ${i + 7}`,
       read: Math.random() < 0.5,
-      status: ["success", "error", "info", "alert"][
+      status: ["success", "failure", "info", "alert"][
         Math.floor(Math.random() * 4)
       ] as Notification["status"],
     })),
