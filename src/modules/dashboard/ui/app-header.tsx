@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { useSidebar } from "@/components/ui/sidebar"
 import { NAV_ITEMS } from "@/constants"
 import { cn } from "@/lib/utils"
+import { Notifications } from "@/modules/dashboard/ui/notifications"
 import { UserMenu } from "@/modules/dashboard/ui/user-menu"
 
 interface AppHeaderProps {
@@ -50,6 +51,7 @@ export function AppHeader({ user }: AppHeaderProps) {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <Notifications />
           <UserMenu user={user} />
 
           <div className="block md:hidden">
