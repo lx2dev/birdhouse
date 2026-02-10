@@ -2,7 +2,6 @@
 
 import {
   IconBadge,
-  IconBell,
   IconLogout,
   IconSunMoon,
   IconUser,
@@ -13,7 +12,6 @@ import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,13 +47,6 @@ export function UserMenu({ user }: UserMenuProps) {
     setTheme(resolvedTheme === "light" ? "dark" : "light")
   }
 
-  // TODO: Implement notifications
-  const notifications = [
-    { id: 1, message: "New login from unknown device", read: false },
-    { id: 2, message: "Your password was changed successfully", read: true },
-    { id: 3, message: "New SSH key added", read: false },
-  ]
-
   const shortUserName = user.name
     ? mobile
       ? user.name.split(" ")[0][0]
@@ -70,19 +61,12 @@ export function UserMenu({ user }: UserMenuProps) {
       <DropdownMenuTrigger
         nativeButton={false}
         render={
-          <div className="relative" suppressHydrationWarning>
-            <Avatar className="size-8" suppressHydrationWarning>
-              <AvatarImage alt={user.name} src={user.image ?? ""} />
-              <AvatarFallback className="text-sm capitalize">
-                {shortUserName}
-              </AvatarFallback>
-            </Avatar>
-            {notifications.some((n) => !n.read) && (
-              <div className="absolute top-0 right-0 flex size-2.5 text-xs">
-                <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75" />
-              </div>
-            )}
-          </div>
+          <Avatar className="size-8" suppressHydrationWarning>
+            <AvatarImage alt={user.name} src={user.image ?? ""} />
+            <AvatarFallback className="text-sm capitalize">
+              {shortUserName}
+            </AvatarFallback>
+          </Avatar>
         }
       />
       <DropdownMenuContent align="end" className="min-w-56 rounded-lg">
@@ -112,23 +96,6 @@ export function UserMenu({ user }: UserMenuProps) {
               <Link href="/profile">
                 <IconUser />
                 Account
-              </Link>
-            }
-          />
-
-          <DropdownMenuItem
-            nativeButton={false}
-            render={
-              <Link className="justify-between" href="/notifications">
-                <span className="flex items-center gap-1.5">
-                  <IconBell />
-                  Notifications
-                </span>
-                {notifications.some((n) => !n.read) && (
-                  <Badge className="size-5 bg-primary/10 text-primary focus-visible:ring-primary/20 dark:bg-primary/20 dark:focus-visible:ring-primary/40 [a]:hover:bg-primary/20">
-                    {notifications.filter((n) => !n.read).length}
-                  </Badge>
-                )}
               </Link>
             }
           />
