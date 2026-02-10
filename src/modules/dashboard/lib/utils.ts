@@ -7,7 +7,7 @@ import {
 
 import { env } from "@/env"
 import { cn } from "@/lib/utils"
-import type { VMStatus } from "@/server/db/schema"
+import type { Notification, VMStatus } from "@/server/db/schema"
 
 function sanitizeHost(host: string) {
   return host.replace(/^https?:\/\//, "").split(":")[0]
@@ -44,9 +44,7 @@ export function getInstanceStatusColor(status: VMStatus) {
   }
 }
 
-export function getNotificationStatusIcon(
-  status: "success" | "failure" | "info" | "alert",
-) {
+export function getNotificationStatusIcon(status: Notification["status"]) {
   switch (status) {
     case "success":
       return IconCircleCheck
@@ -61,9 +59,7 @@ export function getNotificationStatusIcon(
   }
 }
 
-export function getNotificationStatusColor(
-  status: "success" | "failure" | "info" | "alert",
-) {
+export function getNotificationStatusColor(status: Notification["status"]) {
   switch (status) {
     case "success":
       return "bg-green-600/10 text-green-600"
