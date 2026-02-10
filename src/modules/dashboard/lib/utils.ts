@@ -1,8 +1,8 @@
 import {
   IconAlertTriangle,
   IconCircleCheck,
-  IconCircleX,
-  IconInfoCircle,
+  IconInfoHexagon,
+  IconSquareX,
 } from "@tabler/icons-react"
 
 import { env } from "@/env"
@@ -51,13 +51,13 @@ export function getNotificationStatusIcon(
     case "success":
       return IconCircleCheck
     case "error":
-      return IconCircleX
+      return IconSquareX
     case "info":
-      return IconInfoCircle
+      return IconInfoHexagon
     case "alert":
       return IconAlertTriangle
     default:
-      return IconInfoCircle
+      return IconInfoHexagon
   }
 }
 
