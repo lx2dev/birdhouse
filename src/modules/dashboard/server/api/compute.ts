@@ -4,6 +4,7 @@ import { and, desc, eq, getTableColumns, lt, or } from "drizzle-orm"
 import z from "zod"
 
 import { env } from "@/env"
+import { auditLog } from "@/helpers/audit"
 import { getInstanceStatus } from "@/lib/proxmox/get-instance-status"
 import { getNextAvailableVmid } from "@/lib/proxmox/get-next-available-vmid"
 import {
@@ -16,7 +17,6 @@ import {
 import { createComputeSchema } from "@/modules/dashboard/schemas"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import {
-  auditLog as auditLogTable,
   operatingSystem as osTable,
   sshKey as sshKeyTable,
   vm as vmTable,
@@ -119,8 +119,9 @@ export const computeRouter = createTRPCRouter({
       // runs in a separate process to avoid blocking the request
       void startProvisionRunner()
 
-      await ctx.db.insert(auditLogTable).values({
+      await auditLog({
         action: "compute:provision_requested",
+        ctx,
         details: {
           template: template.displayName,
           vmid,
@@ -176,8 +177,9 @@ export const computeRouter = createTRPCRouter({
 
       await ctx.db.delete(vmTable).where(eq(vmTable.id, instance.id))
 
-      await ctx.db.insert(auditLogTable).values({
+      await auditLog({
         action: "compute:instance_deleted",
+        ctx,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
@@ -344,8 +346,9 @@ export const computeRouter = createTRPCRouter({
         .set({ status: "running" })
         .where(eq(vmTable.id, instance.id))
 
-      await ctx.db.insert(auditLogTable).values({
+      await auditLog({
         action: "compute:instance_rebooted",
+        ctx,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
@@ -397,8 +400,9 @@ export const computeRouter = createTRPCRouter({
         .set({ status: "stopped" })
         .where(eq(vmTable.id, instance.id))
 
-      await ctx.db.insert(auditLogTable).values({
+      await auditLog({
         action: "compute:instance_shutdown_initiated",
+        ctx,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
@@ -445,8 +449,9 @@ export const computeRouter = createTRPCRouter({
         .set({ status: "running" })
         .where(eq(vmTable.id, instance.id))
 
-      await ctx.db.insert(auditLogTable).values({
+      await auditLog({
         action: "compute:instance_started",
+        ctx,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
@@ -493,8 +498,9 @@ export const computeRouter = createTRPCRouter({
         .set({ status: "stopped" })
         .where(eq(vmTable.id, instance.id))
 
-      await ctx.db.insert(auditLogTable).values({
+      await auditLog({
         action: "compute:instance_stopped",
+        ctx,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,

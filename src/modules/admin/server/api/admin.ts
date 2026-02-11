@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server"
 import { count, eq } from "drizzle-orm"
 
+import { auditLog } from "@/helpers/audit"
 import {
   insertOperatingSystemSchema,
   insertVMTemplateSchema,
@@ -36,9 +37,11 @@ export const adminRouter = createTRPCRouter({
     create: adminProcedure
       .input(insertOperatingSystemSchema)
       .mutation(async ({ ctx, input }) => {
+        const { id: userId } = ctx.session.user
+
         const name = input.displayName.trim().toLowerCase().replace(/\s+/g, "-")
 
-        const [template] = await ctx.db
+        const [os] = await ctx.db
           .insert(osTable)
           .values({
             displayName: input.displayName,
@@ -49,14 +52,27 @@ export const adminRouter = createTRPCRouter({
             status: input.status,
           })
           .returning()
-        if (!template) {
+        if (!os) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to create VM template",
+            message: "Failed to create operating system",
           })
         }
 
-        return template
+        await auditLog({
+          action: "admin:create_operating_system",
+          ctx,
+          details: {
+            displayName: os.displayName,
+            proxmoxTemplateId: os.proxmoxTemplateId,
+            status: os.status,
+          },
+          resourceId: os.id,
+          resourceType: "operating_system",
+          userId,
+        })
+
+        return os
       }),
   }),
 
@@ -64,6 +80,8 @@ export const adminRouter = createTRPCRouter({
     create: adminProcedure
       .input(insertVMTemplateSchema)
       .mutation(async ({ ctx, input }) => {
+        const { id: userId } = ctx.session.user
+
         const name = input.displayName.trim().toLowerCase().replace(/\s+/g, "-")
 
         const [template] = await ctx.db
@@ -85,12 +103,26 @@ export const adminRouter = createTRPCRouter({
           })
         }
 
+        await auditLog({
+          action: "admin:create_vm_template",
+          ctx,
+          details: {
+            displayName: template.displayName,
+            status: template.status,
+          },
+          resourceId: template.id,
+          resourceType: "vm_template",
+          userId,
+        })
+
         return template
       }),
 
     update: adminProcedure
       .input(updateVMTemplateSchema.partial())
       .mutation(async ({ ctx, input }) => {
+        const { id: userId } = ctx.session.user
+
         if (!input.id) {
           throw new TRPCError({
             code: "BAD_REQUEST",
@@ -129,6 +161,18 @@ export const adminRouter = createTRPCRouter({
             message: "Failed to update VM Template",
           })
         }
+
+        await auditLog({
+          action: "admin:update_vm_template",
+          ctx,
+          details: {
+            displayName: updatedTemplate.displayName,
+            status: updatedTemplate.status,
+          },
+          resourceId: updatedTemplate.id,
+          resourceType: "vm_template",
+          userId,
+        })
 
         return updatedTemplate
       }),

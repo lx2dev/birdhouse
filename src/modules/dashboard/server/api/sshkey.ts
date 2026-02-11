@@ -4,6 +4,7 @@ import { and, desc, eq, ilike, lt, or } from "drizzle-orm"
 import forge from "node-forge"
 import z from "zod"
 
+import { auditLog } from "@/helpers/audit"
 import { createSSHKeySchema } from "@/modules/dashboard/schemas"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import { sshKey as sshKeyTable } from "@/server/db/schema"
@@ -112,6 +113,18 @@ export const sshKeyRouter = createTRPCRouter({
         })
         .returning()
 
+      await auditLog({
+        action: "sshkey:create",
+        ctx,
+        details: {
+          fingerprint,
+          name,
+        },
+        resourceId: newKey.id,
+        resourceType: "ssh_key",
+        userId: user.id,
+      })
+
       return {
         ...newKey,
         privateKey: privateKeyPEM,
@@ -139,6 +152,18 @@ export const sshKeyRouter = createTRPCRouter({
           message: "SSH key not found.",
         })
       }
+
+      await auditLog({
+        action: "sshkey:delete",
+        ctx,
+        details: {
+          fingerprint: key.fingerprint,
+          name: key.name,
+        },
+        resourceId: key.id,
+        resourceType: "ssh_key",
+        userId: user.id,
+      })
 
       return {
         keyId: key.id,
@@ -239,6 +264,18 @@ export const sshKeyRouter = createTRPCRouter({
           message: "SSH key not found.",
         })
       }
+
+      await auditLog({
+        action: "sshkey:update",
+        ctx,
+        details: {
+          fingerprint: updated.fingerprint,
+          name,
+        },
+        resourceId: updated.id,
+        resourceType: "ssh_key",
+        userId: user.id,
+      })
 
       return updated
     }),
