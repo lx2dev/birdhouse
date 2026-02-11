@@ -190,6 +190,8 @@ export const auditLog = createTable(
   ],
 )
 
+export type AuditLogInsert = typeof auditLog.$inferInsert
+
 export const notificationStatusEnum = pgEnum("audit_log_status", [
   "success",
   "failure",
