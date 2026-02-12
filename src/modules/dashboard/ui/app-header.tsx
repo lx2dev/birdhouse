@@ -32,20 +32,27 @@ export function AppHeader({ user }: AppHeaderProps) {
         </Link>
 
         <nav className="ml-8 hidden flex-1 items-center gap-1 md:flex">
-          {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
+          {NAV_ITEMS.map(({ href, icon: Icon, label, disabled }) => {
             const isActive = pathname === href
 
             return (
-              <Link href={href} key={href}>
-                <Button
-                  className="gap-2"
-                  size="sm"
-                  variant={isActive ? "secondary" : "ghost"}
-                >
-                  <Icon />
-                  {label}
-                </Button>
-              </Link>
+              <Button
+                className="gap-2"
+                key={href}
+                nativeButton={false}
+                render={
+                  <Link
+                    className="data-disabled:pointer-events-none data-disabled:opacity-50"
+                    data-disabled={disabled}
+                    href={href}
+                  />
+                }
+                size="sm"
+                variant={isActive ? "secondary" : "ghost"}
+              >
+                <Icon />
+                {label}
+              </Button>
             )
           })}
         </nav>
