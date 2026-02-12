@@ -141,11 +141,20 @@ const failureDetails = z.object({
   reason: z.string().optional(),
 })
 
+const notificationMarkAsReadDetails = z.object({
+  notificationId: z.string(),
+})
+
+const notificationMarkAllAsReadDetails = z.object({
+  userId: z.string(),
+})
+
 // Action type mapping
 
 export const auditActionMap = {
   "admin:approve_user": adminApproveUserDetails,
   "admin:ban_user": adminBanUserDetails,
+
   // Admin actions
   "admin:create_operating_system": adminCreateOperatingSystemDetails,
   "admin:create_vm_template": adminCreateVMTemplateDetails,
@@ -161,6 +170,7 @@ export const auditActionMap = {
   "compute:fetch_status_failed": computeFailedDetails,
   "compute:provision_completed": computeProvisionCompletedDetails,
   "compute:provision_failed": computeProvisionFailedDetails,
+
   // Compute actions
   "compute:provision_requested": computeProvisionRequestedDetails,
   "compute:reboot_failed": computeFailedDetails,
@@ -176,9 +186,8 @@ export const auditActionMap = {
   error: failureDetails,
 
   // notification actions
-  "notification:mark_as_read": z.object({
-    notificationId: z.string(),
-  }),
+  "notification:mark_all_as_read": notificationMarkAllAsReadDetails,
+  "notification:mark_as_read": notificationMarkAsReadDetails,
 
   // SSH key actions
   "sshkey:create": sshKeyCreatedDetails,

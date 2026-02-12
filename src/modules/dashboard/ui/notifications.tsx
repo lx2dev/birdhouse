@@ -82,12 +82,25 @@ export function Notifications() {
 }
 
 function NotificationsSuspense() {
+  const utils = api.useUtils()
+
   const [data, query] = api.notification.list.useSuspenseInfiniteQuery(
     { limit: 5 },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
 
   const notifications = data.pages.flatMap((page) => page.items)
+
+  const archiveAll = api.notification.archiveAll.useMutation({
+    onError(error) {
+      toast.error("Something went wrong", {
+        description: error.message,
+      })
+    },
+    onSuccess() {
+      utils.notification.list.invalidate()
+    },
+  })
 
   return (
     <Tabs className="flex h-full flex-col" defaultValue="inbox">
@@ -182,6 +195,20 @@ function NotificationsSuspense() {
           </>
         )}
       </TabsContent>
+
+      {notifications.filter((n) => !n.read).length > 0 && (
+        <div className="flex justify-end border-t px-3 py-1.5">
+          <Button
+            className="text-muted-foreground hover:text-foreground"
+            disabled={archiveAll.isPending}
+            onClick={() => archiveAll.mutate()}
+            size="sm"
+            variant="ghost"
+          >
+            <IconArchive /> Archive all
+          </Button>
+        </div>
+      )}
     </Tabs>
   )
 }
@@ -191,7 +218,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
 
   const utils = api.useUtils()
 
-  const markAsRead = api.notification.markAsRead.useMutation({
+  const archive = api.notification.archive.useMutation({
     onError(error) {
       toast.error("Something went wrong", {
         description: error.message,
@@ -234,16 +261,16 @@ function NotificationItem({ notification }: { notification: Notification }) {
         <ItemContent className="flex-none text-center">
           <Button
             className="z-10"
-            disabled={markAsRead.isPending}
+            disabled={archive.isPending}
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              markAsRead.mutate({ id })
+              archive.mutate({ id })
             }}
             size="icon-xs"
             variant="outline"
           >
-            {markAsRead.isPending ? <Spinner /> : <IconArchive />}
+            {archive.isPending ? <Spinner /> : <IconArchive />}
           </Button>
         </ItemContent>
       )}

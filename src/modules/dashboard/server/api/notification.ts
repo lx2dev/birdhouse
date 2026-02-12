@@ -6,6 +6,58 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import { notificationTable } from "@/server/db/schema"
 
 export const notificationRouter = createTRPCRouter({
+  archive: protectedProcedure
+    .input(
+      z.object({
+        id: z.uuid(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { user } = ctx.session
+      const { id } = input
+
+      logOnly({
+        action: "notification:mark_as_read",
+        db: ctx.db,
+        details: {
+          notificationId: id,
+        },
+        resourceId: id,
+        resourceType: "notification",
+        userId: user.id,
+      })
+
+      await ctx.db
+        .update(notificationTable)
+        .set({ read: true })
+        .where(
+          and(
+            eq(notificationTable.id, id),
+            eq(notificationTable.userId, user.id),
+          ),
+        )
+    }),
+
+  archiveAll: protectedProcedure.mutation(async ({ ctx }) => {
+    const { user } = ctx.session
+
+    logOnly({
+      action: "notification:mark_all_as_read",
+      db: ctx.db,
+      details: {
+        userId: user.id,
+      },
+      resourceId: user.id,
+      resourceType: "user",
+      userId: user.id,
+    })
+
+    await ctx.db
+      .update(notificationTable)
+      .set({ read: true })
+      .where(eq(notificationTable.userId, user.id))
+  }),
+
   list: protectedProcedure
     .input(
       z.object({
@@ -56,37 +108,5 @@ export const notificationRouter = createTRPCRouter({
         items,
         nextCursor,
       }
-    }),
-
-  markAsRead: protectedProcedure
-    .input(
-      z.object({
-        id: z.uuid(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { user } = ctx.session
-      const { id } = input
-
-      logOnly({
-        action: "notification:mark_as_read",
-        db: ctx.db,
-        details: {
-          notificationId: id,
-        },
-        resourceId: id,
-        resourceType: "notification",
-        userId: user.id,
-      })
-
-      await ctx.db
-        .update(notificationTable)
-        .set({ read: true })
-        .where(
-          and(
-            eq(notificationTable.id, id),
-            eq(notificationTable.userId, user.id),
-          ),
-        )
     }),
 })
