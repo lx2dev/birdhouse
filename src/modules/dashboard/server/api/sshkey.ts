@@ -115,7 +115,7 @@ export const sshKeyRouter = createTRPCRouter({
 
       await auditLog({
         action: "sshkey:create",
-        ctx,
+        db: ctx.db,
         details: {
           fingerprint,
           name,
@@ -155,7 +155,7 @@ export const sshKeyRouter = createTRPCRouter({
 
       await auditLog({
         action: "sshkey:delete",
-        ctx,
+        db: ctx.db,
         details: {
           fingerprint: key.fingerprint,
           name: key.name,
@@ -267,7 +267,7 @@ export const sshKeyRouter = createTRPCRouter({
 
       await auditLog({
         action: "sshkey:update",
-        ctx,
+        db: ctx.db,
         details: {
           fingerprint: updated.fingerprint,
           name,

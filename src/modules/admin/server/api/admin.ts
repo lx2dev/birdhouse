@@ -61,7 +61,7 @@ export const adminRouter = createTRPCRouter({
 
         await auditLog({
           action: "admin:create_operating_system",
-          ctx,
+          db: ctx.db,
           details: {
             displayName: os.displayName,
             proxmoxTemplateId: os.proxmoxTemplateId,
@@ -105,7 +105,7 @@ export const adminRouter = createTRPCRouter({
 
         await auditLog({
           action: "admin:create_vm_template",
-          ctx,
+          db: ctx.db,
           details: {
             displayName: template.displayName,
             status: template.status,
@@ -164,7 +164,7 @@ export const adminRouter = createTRPCRouter({
 
         await auditLog({
           action: "admin:update_vm_template",
-          ctx,
+          db: ctx.db,
           details: {
             displayName: updatedTemplate.displayName,
             status: updatedTemplate.status,

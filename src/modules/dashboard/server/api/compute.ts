@@ -121,7 +121,7 @@ export const computeRouter = createTRPCRouter({
 
       await auditLog({
         action: "compute:provision_requested",
-        ctx,
+        db: ctx.db,
         details: {
           template: template.displayName,
           vmid,
@@ -179,7 +179,7 @@ export const computeRouter = createTRPCRouter({
 
       await auditLog({
         action: "compute:instance_deleted",
-        ctx,
+        db: ctx.db,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
@@ -348,7 +348,7 @@ export const computeRouter = createTRPCRouter({
 
       await auditLog({
         action: "compute:instance_rebooted",
-        ctx,
+        db: ctx.db,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
@@ -402,7 +402,7 @@ export const computeRouter = createTRPCRouter({
 
       await auditLog({
         action: "compute:instance_shutdown_initiated",
-        ctx,
+        db: ctx.db,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
@@ -451,7 +451,7 @@ export const computeRouter = createTRPCRouter({
 
       await auditLog({
         action: "compute:instance_started",
-        ctx,
+        db: ctx.db,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
@@ -500,7 +500,7 @@ export const computeRouter = createTRPCRouter({
 
       await auditLog({
         action: "compute:instance_stopped",
-        ctx,
+        db: ctx.db,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
