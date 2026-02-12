@@ -1,8 +1,7 @@
 import { eq } from "drizzle-orm"
 
 import { env } from "@/env"
-import { auditLog } from "@/helpers/audit"
-import { notification } from "@/helpers/notification"
+import { logAndNotify } from "@/helpers/audit/log-and-notify"
 import { getProxmoxClient } from "@/lib/proxmox"
 import { getNextAvailableVmid } from "@/lib/proxmox/get-next-available-vmid"
 import { waitForTask } from "@/lib/proxmox/wait-for-task"
@@ -172,23 +171,18 @@ async function processOne(vm: VMTable) {
       .set({ status: "running" })
       .where(eq(vmTable.id, id))
 
-    await auditLog({
-      action: "compute:provision",
+    await logAndNotify({
+      action: "compute:provision_completed",
       db,
       details: {
         template: template.displayName,
         vmid: effectiveVmid,
         vmName,
       },
+      notifyMessage: `Your VM "${vmName}" has been provisioned and is now running.`,
+      notifyStatus: "success",
       resourceId: id,
       resourceType: "virtual_machine",
-      userId,
-    })
-
-    await notification({
-      db,
-      message: `Your VM "${vmName}" has been provisioned and is now running.`,
-      status: "success",
       userId,
     })
 
@@ -202,7 +196,7 @@ async function processOne(vm: VMTable) {
       })
       .where(eq(vmTable.id, id))
 
-    await auditLog({
+    await logAndNotify({
       action: "compute:provision_failed",
       db,
       details: {
@@ -210,15 +204,10 @@ async function processOne(vm: VMTable) {
         vmid,
         vmName,
       },
+      notifyMessage: `Provisioning failed for your VM "${vmName}". Please try again or contact support if the issue persists.`,
+      notifyStatus: "failure",
       resourceId: id,
       resourceType: "virtual_machine",
-      userId,
-    })
-
-    await notification({
-      db,
-      message: `Provisioning failed for your VM "${vmName}". Please try again or contact support if the issue persists.`,
-      status: "failure",
       userId,
     })
   }

@@ -4,8 +4,7 @@ import { and, desc, eq, ilike, lt, or } from "drizzle-orm"
 import forge from "node-forge"
 import z from "zod"
 
-import { auditLog } from "@/helpers/audit"
-import { notification } from "@/helpers/notification"
+import { logAndNotify } from "@/helpers/audit/log-and-notify"
 import { createSSHKeySchema } from "@/modules/dashboard/schemas"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import { sshKey as sshKeyTable } from "@/server/db/schema"
@@ -28,22 +27,16 @@ export const sshKeyRouter = createTRPCRouter({
         .from(sshKeyTable)
         .where(and(eq(sshKeyTable.name, name), eq(sshKeyTable.userId, user.id)))
       if (existingKey) {
-        await auditLog({
+        await logAndNotify({
           action: "sshkey:create_failed",
           db: ctx.db,
           details: {
             name,
             reason: "Duplicate key name",
           },
-          resourceId: "",
+          notifyMessage: "Failed to create SSH key: Duplicate key name",
+          notifyStatus: "failure",
           resourceType: "ssh_key",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: "Failed to create SSH key: Duplicate key name",
-          status: "failure",
           userId: user.id,
         })
 
@@ -117,22 +110,16 @@ export const sshKeyRouter = createTRPCRouter({
         const md5 = createHash("md5").update(blob).digest("hex")
         fingerprint = md5.match(/.{2}/g)?.join(":") || ""
       } else {
-        await auditLog({
+        await logAndNotify({
           action: "sshkey:create_failed",
           db: ctx.db,
           details: {
             name,
             reason: "Unsupported key type",
           },
-          resourceId: "",
+          notifyMessage: "Failed to create SSH key: Unsupported key type",
+          notifyStatus: "failure",
           resourceType: "ssh_key",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: "Failed to create SSH key: Unsupported key type",
-          status: "failure",
           userId: user.id,
         })
 
@@ -152,22 +139,18 @@ export const sshKeyRouter = createTRPCRouter({
         })
         .returning()
 
-      await auditLog({
+      await logAndNotify({
         action: "sshkey:create",
         db: ctx.db,
         details: {
           fingerprint,
+          keyType,
           name,
         },
+        notifyMessage: `SSH key "${name}" has been created`,
+        notifyStatus: "success",
         resourceId: newKey.id,
         resourceType: "ssh_key",
-        userId: user.id,
-      })
-
-      await notification({
-        db: ctx.db,
-        message: `SSH key "${name}" has been created`,
-        status: "success",
         userId: user.id,
       })
 
@@ -193,22 +176,17 @@ export const sshKeyRouter = createTRPCRouter({
         .returning()
 
       if (!key) {
-        await auditLog({
+        await logAndNotify({
           action: "sshkey:delete_failed",
           db: ctx.db,
           details: {
             keyId: id,
             reason: "SSH key not found",
           },
+          notifyMessage: "Failed to delete SSH key: Key not found",
+          notifyStatus: "failure",
           resourceId: id,
           resourceType: "ssh_key",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: "Failed to delete SSH key: Key not found",
-          status: "failure",
           userId: user.id,
         })
 
@@ -218,22 +196,17 @@ export const sshKeyRouter = createTRPCRouter({
         })
       }
 
-      await auditLog({
+      await logAndNotify({
         action: "sshkey:delete",
         db: ctx.db,
         details: {
           fingerprint: key.fingerprint,
           name: key.name,
         },
+        notifyMessage: `SSH key "${key.name}" deleted`,
+        notifyStatus: "success",
         resourceId: key.id,
         resourceType: "ssh_key",
-        userId: user.id,
-      })
-
-      await notification({
-        db: ctx.db,
-        message: `SSH key "${key.name}" deleted`,
-        status: "success",
         userId: user.id,
       })
 
@@ -318,7 +291,7 @@ export const sshKeyRouter = createTRPCRouter({
         .where(and(eq(sshKeyTable.name, name), eq(sshKeyTable.userId, user.id)))
 
       if (existing && existing.id !== id) {
-        await auditLog({
+        await logAndNotify({
           action: "sshkey:update_failed",
           db: ctx.db,
           details: {
@@ -326,15 +299,10 @@ export const sshKeyRouter = createTRPCRouter({
             name,
             reason: "Duplicate key name",
           },
+          notifyMessage: "Failed to update SSH key: Duplicate key name",
+          notifyStatus: "failure",
           resourceId: id,
           resourceType: "ssh_key",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: "Failed to update SSH key: Duplicate key name",
-          status: "failure",
           userId: user.id,
         })
 
@@ -351,7 +319,7 @@ export const sshKeyRouter = createTRPCRouter({
         .returning()
 
       if (!updated) {
-        await auditLog({
+        await logAndNotify({
           action: "sshkey:update_failed",
           db: ctx.db,
           details: {
@@ -359,15 +327,10 @@ export const sshKeyRouter = createTRPCRouter({
             name,
             reason: "SSH key not found",
           },
+          notifyMessage: "Failed to update SSH key: Key not found",
+          notifyStatus: "failure",
           resourceId: id,
           resourceType: "ssh_key",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: "Failed to update SSH key: Key not found",
-          status: "failure",
           userId: user.id,
         })
 
@@ -377,22 +340,17 @@ export const sshKeyRouter = createTRPCRouter({
         })
       }
 
-      await auditLog({
+      await logAndNotify({
         action: "sshkey:update",
         db: ctx.db,
         details: {
           fingerprint: updated.fingerprint,
           name,
         },
+        notifyMessage: `SSH key "${name}" updated`,
+        notifyStatus: "success",
         resourceId: updated.id,
         resourceType: "ssh_key",
-        userId: user.id,
-      })
-
-      await notification({
-        db: ctx.db,
-        message: `SSH key "${name}" updated`,
-        status: "success",
         userId: user.id,
       })
 

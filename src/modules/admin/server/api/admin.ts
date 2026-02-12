@@ -1,8 +1,7 @@
 import { TRPCError } from "@trpc/server"
 import { count, eq } from "drizzle-orm"
 
-import { auditLog } from "@/helpers/audit"
-import { notification } from "@/helpers/notification"
+import { logAndNotify } from "@/helpers/audit/log-and-notify"
 import {
   insertOperatingSystemSchema,
   insertVMTemplateSchema,
@@ -54,7 +53,7 @@ export const adminRouter = createTRPCRouter({
           })
           .returning()
         if (!os) {
-          await auditLog({
+          await logAndNotify({
             action: "admin:create_operating_system",
             db: ctx.db,
             details: {
@@ -62,15 +61,9 @@ export const adminRouter = createTRPCRouter({
               proxmoxTemplateId: input.proxmoxTemplateId,
               status: input.status,
             },
-            resourceId: "",
+            notifyMessage: "Failed to create operating system",
+            notifyStatus: "failure",
             resourceType: "operating_system",
-            userId,
-          })
-
-          await notification({
-            db: ctx.db,
-            message: "Failed to create operating system",
-            status: "failure",
             userId,
           })
 
@@ -80,7 +73,7 @@ export const adminRouter = createTRPCRouter({
           })
         }
 
-        await auditLog({
+        await logAndNotify({
           action: "admin:create_operating_system",
           db: ctx.db,
           details: {
@@ -88,15 +81,10 @@ export const adminRouter = createTRPCRouter({
             proxmoxTemplateId: os.proxmoxTemplateId,
             status: os.status,
           },
+          notifyMessage: `Operating system "${os.displayName}" created`,
+          notifyStatus: "success",
           resourceId: os.id,
           resourceType: "operating_system",
-          userId,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Operating system "${os.displayName}" created`,
-          status: "success",
           userId,
         })
 
@@ -125,22 +113,19 @@ export const adminRouter = createTRPCRouter({
           })
           .returning()
         if (!template) {
-          await auditLog({
+          await logAndNotify({
             action: "admin:create_vm_template",
             db: ctx.db,
             details: {
+              cpuCores: input.cpuCores,
+              diskGb: input.diskGb,
               displayName: input.displayName,
+              memoryMb: input.memoryMb,
               status: input.status,
             },
-            resourceId: "",
+            notifyMessage: "Failed to create VM template",
+            notifyStatus: "failure",
             resourceType: "vm_template",
-            userId,
-          })
-
-          await notification({
-            db: ctx.db,
-            message: "Failed to create VM template",
-            status: "failure",
             userId,
           })
 
@@ -150,22 +135,20 @@ export const adminRouter = createTRPCRouter({
           })
         }
 
-        await auditLog({
+        await logAndNotify({
           action: "admin:create_vm_template",
           db: ctx.db,
           details: {
+            cpuCores: template.cpuCores,
+            diskGb: template.diskGb,
             displayName: template.displayName,
+            memoryMb: template.memoryMb,
             status: template.status,
           },
+          notifyMessage: `VM template "${template.displayName}" created`,
+          notifyStatus: "success",
           resourceId: template.id,
           resourceType: "vm_template",
-          userId,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `VM template "${template.displayName}" created`,
-          status: "success",
           userId,
         })
 
@@ -189,21 +172,16 @@ export const adminRouter = createTRPCRouter({
           .from(vmTemplateTable)
           .where(eq(vmTemplateTable.id, input.id))
         if (!existingTemplate) {
-          await auditLog({
+          await logAndNotify({
             action: "admin:update_vm_template_failed",
             db: ctx.db,
             details: {
               error: `VM Template with ID ${input.id} not found`,
             },
+            notifyMessage: `Failed to update VM Template: Not found`,
+            notifyStatus: "failure",
             resourceId: input.id,
             resourceType: "vm_template",
-            userId,
-          })
-
-          await notification({
-            db: ctx.db,
-            message: `Failed to update VM Template: Not found`,
-            status: "failure",
             userId,
           })
 
@@ -228,21 +206,16 @@ export const adminRouter = createTRPCRouter({
           .where(eq(vmTemplateTable.id, input.id))
           .returning()
         if (!updatedTemplate) {
-          await auditLog({
+          await logAndNotify({
             action: "admin:update_vm_template_failed",
             db: ctx.db,
             details: {
               error: `Failed to update VM Template with ID ${input.id}`,
             },
+            notifyMessage: "Failed to update VM Template",
+            notifyStatus: "failure",
             resourceId: input.id,
             resourceType: "vm_template",
-            userId,
-          })
-
-          await notification({
-            db: ctx.db,
-            message: "Failed to update VM Template",
-            status: "failure",
             userId,
           })
 
@@ -252,22 +225,20 @@ export const adminRouter = createTRPCRouter({
           })
         }
 
-        await auditLog({
+        await logAndNotify({
           action: "admin:update_vm_template",
           db: ctx.db,
           details: {
+            cpuCores: updatedTemplate.cpuCores,
+            diskGb: updatedTemplate.diskGb,
             displayName: updatedTemplate.displayName,
+            memoryMb: updatedTemplate.memoryMb,
             status: updatedTemplate.status,
           },
+          notifyMessage: `VM Template "${updatedTemplate.displayName}" updated`,
+          notifyStatus: "success",
           resourceId: updatedTemplate.id,
           resourceType: "vm_template",
-          userId,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `VM Template "${updatedTemplate.displayName}" updated`,
-          status: "success",
           userId,
         })
 

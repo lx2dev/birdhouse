@@ -4,8 +4,7 @@ import { and, desc, eq, getTableColumns, lt, or } from "drizzle-orm"
 import z from "zod"
 
 import { env } from "@/env"
-import { auditLog } from "@/helpers/audit"
-import { notification } from "@/helpers/notification"
+import { logAndNotify, logOnly } from "@/helpers/audit/log-and-notify"
 import { getInstanceStatus } from "@/lib/proxmox/get-instance-status"
 import { getNextAvailableVmid } from "@/lib/proxmox/get-next-available-vmid"
 import {
@@ -37,21 +36,16 @@ export const computeRouter = createTRPCRouter({
         .from(vmTemplateTable)
         .where(eq(vmTemplateTable.id, templateId))
       if (!template) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:provision_failed",
           db: ctx.db,
           details: {
-            templateId,
+            reason: "Template not found",
           },
+          notifyMessage: `Provisioning failed: Template not found`,
+          notifyStatus: "failure",
           resourceId: templateId,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Provisioning failed: Template not found`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -66,21 +60,16 @@ export const computeRouter = createTRPCRouter({
         .from(osTable)
         .where(eq(osTable.id, operatingSystemId))
       if (!operatingSystem) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:provision_failed",
           db: ctx.db,
           details: {
-            operatingSystemId,
+            reason: "Operating System not found",
           },
+          notifyMessage: `Provisioning failed: Operating System not found`,
+          notifyStatus: "failure",
           resourceId: operatingSystemId,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Provisioning failed: Operating System not found`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -113,21 +102,16 @@ export const computeRouter = createTRPCRouter({
             and(eq(sshKeyTable.id, sshKeyId), eq(sshKeyTable.userId, user.id)),
           )
         if (!sshKey) {
-          await auditLog({
+          await logAndNotify({
             action: "compute:provision_failed",
             db: ctx.db,
             details: {
-              sshKeyId,
+              reason: "SSH Key not found",
             },
+            notifyMessage: `Provisioning failed: SSH Key not found`,
+            notifyStatus: "failure",
             resourceId: sshKeyId,
             resourceType: "virtual_machine",
-            userId: user.id,
-          })
-
-          await notification({
-            db: ctx.db,
-            message: `Provisioning failed: SSH Key not found`,
-            status: "failure",
             userId: user.id,
           })
 
@@ -164,23 +148,19 @@ export const computeRouter = createTRPCRouter({
         })
         .returning()
       if (!compute) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:provision_failed",
           db: ctx.db,
           details: {
+            error: "Failed to create compute instance",
             template: template.displayName,
             vmid,
             vmName: name,
           },
+          notifyMessage: `Provisioning failed: Failed to create compute instance`,
+          notifyStatus: "failure",
           resourceId: String(vmid),
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Provisioning failed: Failed to create compute instance`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -194,7 +174,7 @@ export const computeRouter = createTRPCRouter({
       // runs in a separate process to avoid blocking the request
       void startProvisionRunner()
 
-      await auditLog({
+      await logAndNotify({
         action: "compute:provision_requested",
         db: ctx.db,
         details: {
@@ -202,15 +182,10 @@ export const computeRouter = createTRPCRouter({
           vmid,
           vmName: name,
         },
+        notifyMessage: `Provisioning started for compute instance "${name}"`,
+        notifyStatus: "info",
         resourceId: compute.id,
         resourceType: "virtual_machine",
-        userId: user.id,
-      })
-
-      await notification({
-        db: ctx.db,
-        message: `Provisioning started for compute instance "${name}"`,
-        status: "info",
         userId: user.id,
       })
 
@@ -238,21 +213,16 @@ export const computeRouter = createTRPCRouter({
         .from(vmTable)
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!instance) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:deletion_failed",
           db: ctx.db,
           details: {
-            instanceId: id,
+            reason: "Compute instance not found",
           },
+          notifyMessage: `Deletion failed: Compute instance not found`,
+          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Deletion failed: Compute instance not found`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -269,22 +239,18 @@ export const computeRouter = createTRPCRouter({
 
       const success = await deleteInstance(instance.proxmoxNode, instance.vmid)
       if (!success) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:deletion_failed",
           db: ctx.db,
           details: {
+            error: "Failed to delete instance on Proxmox",
             vmid: instance.vmid,
             vmName: instance.name,
           },
+          notifyMessage: `Deletion failed: Failed to delete instance on Proxmox`,
+          notifyStatus: "failure",
           resourceId: instance.id,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Deletion failed: Failed to delete instance on Proxmox`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -296,22 +262,17 @@ export const computeRouter = createTRPCRouter({
 
       await ctx.db.delete(vmTable).where(eq(vmTable.id, instance.id))
 
-      await auditLog({
-        action: "compute:instance_deleted",
+      await logAndNotify({
+        action: "compute:deleted",
         db: ctx.db,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
         },
+        notifyMessage: `Compute instance "${instance.name}" has been deleted`,
+        notifyStatus: "info",
         resourceId: instance.id,
         resourceType: "virtual_machine",
-        userId: user.id,
-      })
-
-      await notification({
-        db: ctx.db,
-        message: `Compute instance "${instance.name}" has been deleted`,
-        status: "info",
         userId: user.id,
       })
 
@@ -343,21 +304,16 @@ export const computeRouter = createTRPCRouter({
         .innerJoin(osTable, eq(osTable.id, vmTable.operatingSystemId))
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!compute) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:fetch_failed",
           db: ctx.db,
           details: {
-            instanceId: id,
+            reason: "Compute instance not found",
           },
+          notifyMessage: `Fetch failed: Compute instance not found`,
+          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Fetch failed: Compute instance not found`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -388,21 +344,16 @@ export const computeRouter = createTRPCRouter({
         .from(vmTable)
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!compute) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:fetch_status_failed",
           db: ctx.db,
           details: {
-            instanceId: id,
+            reason: "Compute instance not found",
           },
+          notifyMessage: `Fetch status failed: Compute instance not found`,
+          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Fetch status failed: Compute instance not found`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -484,21 +435,16 @@ export const computeRouter = createTRPCRouter({
         .from(vmTable)
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!instance) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:reboot_failed",
           db: ctx.db,
           details: {
-            instanceId: id,
+            reason: "Compute instance not found",
           },
+          notifyMessage: `Reboot failed: Compute instance not found`,
+          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Reboot failed: Compute instance not found`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -515,22 +461,18 @@ export const computeRouter = createTRPCRouter({
 
       const success = await rebootInstance(instance.proxmoxNode, instance.vmid)
       if (!success) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:reboot_failed",
           db: ctx.db,
           details: {
+            error: "Failed to reboot instance on Proxmox",
             vmid: instance.vmid,
             vmName: instance.name,
           },
+          notifyMessage: `Reboot failed: Failed to reboot instance on Proxmox`,
+          notifyStatus: "failure",
           resourceId: instance.id,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Reboot failed: Failed to reboot instance on Proxmox`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -545,8 +487,8 @@ export const computeRouter = createTRPCRouter({
         .set({ status: "running" })
         .where(eq(vmTable.id, instance.id))
 
-      await auditLog({
-        action: "compute:instance_rebooted",
+      await logOnly({
+        action: "compute:rebooted",
         db: ctx.db,
         details: {
           vmid: instance.vmid,
@@ -576,21 +518,16 @@ export const computeRouter = createTRPCRouter({
         .from(vmTable)
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!instance) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:shutdown_failed",
           db: ctx.db,
           details: {
-            instanceId: id,
+            reason: "Compute instance not found",
           },
+          notifyMessage: `Shutdown failed: Compute instance not found`,
+          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Shutdown failed: Compute instance not found`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -606,22 +543,18 @@ export const computeRouter = createTRPCRouter({
         force,
       )
       if (!success) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:shutdown_failed",
           db: ctx.db,
           details: {
+            error: "Failed to shutdown instance on Proxmox",
             vmid: instance.vmid,
             vmName: instance.name,
           },
+          notifyMessage: `Shutdown failed: Failed to shutdown instance on Proxmox`,
+          notifyStatus: "failure",
           resourceId: instance.id,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Shutdown failed: Failed to shutdown instance on Proxmox`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -636,8 +569,8 @@ export const computeRouter = createTRPCRouter({
         .set({ status: "stopped" })
         .where(eq(vmTable.id, instance.id))
 
-      await auditLog({
-        action: "compute:instance_shutdown_initiated",
+      await logOnly({
+        action: "compute:shutdown_initiated",
         db: ctx.db,
         details: {
           vmid: instance.vmid,
@@ -666,21 +599,16 @@ export const computeRouter = createTRPCRouter({
         .from(vmTable)
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!instance) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:start_failed",
           db: ctx.db,
           details: {
-            instanceId: id,
+            reason: "Compute instance not found",
           },
+          notifyMessage: `Start failed: Compute instance not found`,
+          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Start failed: Compute instance not found`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -692,22 +620,18 @@ export const computeRouter = createTRPCRouter({
 
       const success = await startInstance(instance.proxmoxNode, instance.vmid)
       if (!success) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:start_failed",
           db: ctx.db,
           details: {
+            error: "Failed to start instance on Proxmox",
             vmid: instance.vmid,
             vmName: instance.name,
           },
+          notifyMessage: `Start failed: Failed to start instance on Proxmox`,
+          notifyStatus: "failure",
           resourceId: instance.id,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Start failed: Failed to start instance on Proxmox`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -722,8 +646,8 @@ export const computeRouter = createTRPCRouter({
         .set({ status: "running" })
         .where(eq(vmTable.id, instance.id))
 
-      await auditLog({
-        action: "compute:instance_started",
+      await logOnly({
+        action: "compute:started",
         db: ctx.db,
         details: {
           vmid: instance.vmid,
@@ -752,21 +676,16 @@ export const computeRouter = createTRPCRouter({
         .from(vmTable)
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!instance) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:stop_failed",
           db: ctx.db,
           details: {
-            instanceId: id,
+            reason: "Compute instance not found",
           },
+          notifyMessage: `Stop failed: Compute instance not found`,
+          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Stop failed: Compute instance not found`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -778,22 +697,18 @@ export const computeRouter = createTRPCRouter({
 
       const success = await stopInstance(instance.proxmoxNode, instance.vmid)
       if (!success) {
-        await auditLog({
+        await logAndNotify({
           action: "compute:stop_failed",
           db: ctx.db,
           details: {
+            error: "Failed to stop instance on Proxmox",
             vmid: instance.vmid,
             vmName: instance.name,
           },
+          notifyMessage: `Stop failed: Failed to stop instance on Proxmox`,
+          notifyStatus: "failure",
           resourceId: instance.id,
           resourceType: "virtual_machine",
-          userId: user.id,
-        })
-
-        await notification({
-          db: ctx.db,
-          message: `Stop failed: Failed to stop instance on Proxmox`,
-          status: "failure",
           userId: user.id,
         })
 
@@ -808,8 +723,8 @@ export const computeRouter = createTRPCRouter({
         .set({ status: "stopped" })
         .where(eq(vmTable.id, instance.id))
 
-      await auditLog({
-        action: "compute:instance_stopped",
+      await logOnly({
+        action: "compute:stopped",
         db: ctx.db,
         details: {
           vmid: instance.vmid,
