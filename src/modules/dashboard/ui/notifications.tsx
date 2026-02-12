@@ -61,6 +61,7 @@ export function Notifications() {
         {hasUnread && (
           <div className="absolute top-1.5 right-1.5 flex size-2.5 text-xs">
             <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75" />
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75" />
           </div>
         )}
       </PopoverTrigger>
