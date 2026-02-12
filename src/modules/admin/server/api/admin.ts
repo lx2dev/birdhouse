@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server"
 import { count, eq } from "drizzle-orm"
 
 import { auditLog } from "@/helpers/audit"
+import { notification } from "@/helpers/notification"
 import {
   insertOperatingSystemSchema,
   insertVMTemplateSchema,
@@ -66,6 +67,13 @@ export const adminRouter = createTRPCRouter({
             userId,
           })
 
+          await notification({
+            db: ctx.db,
+            message: "Failed to create operating system",
+            status: "failure",
+            userId,
+          })
+
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Failed to create operating system",
@@ -82,6 +90,13 @@ export const adminRouter = createTRPCRouter({
           },
           resourceId: os.id,
           resourceType: "operating_system",
+          userId,
+        })
+
+        await notification({
+          db: ctx.db,
+          message: `Operating system "${os.displayName}" created`,
+          status: "success",
           userId,
         })
 
@@ -122,6 +137,13 @@ export const adminRouter = createTRPCRouter({
             userId,
           })
 
+          await notification({
+            db: ctx.db,
+            message: "Failed to create VM template",
+            status: "failure",
+            userId,
+          })
+
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Failed to create VM template",
@@ -137,6 +159,13 @@ export const adminRouter = createTRPCRouter({
           },
           resourceId: template.id,
           resourceType: "vm_template",
+          userId,
+        })
+
+        await notification({
+          db: ctx.db,
+          message: `VM template "${template.displayName}" created`,
+          status: "success",
           userId,
         })
 
@@ -168,6 +197,13 @@ export const adminRouter = createTRPCRouter({
             },
             resourceId: input.id,
             resourceType: "vm_template",
+            userId,
+          })
+
+          await notification({
+            db: ctx.db,
+            message: `Failed to update VM Template: Not found`,
+            status: "failure",
             userId,
           })
 
@@ -203,6 +239,13 @@ export const adminRouter = createTRPCRouter({
             userId,
           })
 
+          await notification({
+            db: ctx.db,
+            message: "Failed to update VM Template",
+            status: "failure",
+            userId,
+          })
+
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Failed to update VM Template",
@@ -218,6 +261,13 @@ export const adminRouter = createTRPCRouter({
           },
           resourceId: updatedTemplate.id,
           resourceType: "vm_template",
+          userId,
+        })
+
+        await notification({
+          db: ctx.db,
+          message: `VM Template "${updatedTemplate.displayName}" updated`,
+          status: "success",
           userId,
         })
 

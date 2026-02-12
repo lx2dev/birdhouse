@@ -164,6 +164,13 @@ export const sshKeyRouter = createTRPCRouter({
         userId: user.id,
       })
 
+      await notification({
+        db: ctx.db,
+        message: `SSH key "${name}" has been created`,
+        status: "success",
+        userId: user.id,
+      })
+
       return {
         ...newKey,
         privateKey: privateKeyPEM,
@@ -220,6 +227,13 @@ export const sshKeyRouter = createTRPCRouter({
         },
         resourceId: key.id,
         resourceType: "ssh_key",
+        userId: user.id,
+      })
+
+      await notification({
+        db: ctx.db,
+        message: `SSH key "${key.name}" deleted`,
+        status: "success",
         userId: user.id,
       })
 
@@ -372,6 +386,13 @@ export const sshKeyRouter = createTRPCRouter({
         },
         resourceId: updated.id,
         resourceType: "ssh_key",
+        userId: user.id,
+      })
+
+      await notification({
+        db: ctx.db,
+        message: `SSH key "${name}" updated`,
+        status: "success",
         userId: user.id,
       })
 

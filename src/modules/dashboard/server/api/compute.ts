@@ -207,6 +207,13 @@ export const computeRouter = createTRPCRouter({
         userId: user.id,
       })
 
+      await notification({
+        db: ctx.db,
+        message: `Provisioning started for compute instance "${name}"`,
+        status: "info",
+        userId: user.id,
+      })
+
       return {
         compute,
         credentials: {
