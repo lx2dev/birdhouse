@@ -56,4 +56,25 @@ export const notificationRouter = createTRPCRouter({
         nextCursor,
       }
     }),
+
+  markAsRead: protectedProcedure
+    .input(
+      z.object({
+        id: z.uuid(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { user } = ctx.session
+      const { id } = input
+
+      await ctx.db
+        .update(notificationTable)
+        .set({ read: true })
+        .where(
+          and(
+            eq(notificationTable.id, id),
+            eq(notificationTable.userId, user.id),
+          ),
+        )
+    }),
 })

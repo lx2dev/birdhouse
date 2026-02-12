@@ -6,9 +6,11 @@ import {
   IconInbox,
   IconSettings,
 } from "@tabler/icons-react"
+import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
+import { toast } from "sonner"
 
 import { InfiniteScroll } from "@/components/infinite-scroll"
 import { Button } from "@/components/ui/button"
@@ -42,13 +44,10 @@ import {
 import type { Notification } from "@/server/db/schema"
 
 export function Notifications() {
-  const { data } = api.notification.list.useQuery(
-    { limit: 1 },
-    { enabled: true },
-  )
+  const [data] = api.notification.list.useSuspenseQuery({ limit: 1 })
 
   const hasUnread = data?.items?.some((n) => !n.read) ?? false
-  const length = data?.items?.filter((n) => !n.read).length || 8
+  const length = data?.items?.filter((n) => !n.read).length || 0
 
   return (
     <Popover>
@@ -192,6 +191,19 @@ function NotificationsSuspense() {
 function NotificationItem({ notification }: { notification: Notification }) {
   const { id, message, status, read } = notification
 
+  const utils = api.useUtils()
+
+  const markAsRead = api.notification.markAsRead.useMutation({
+    onError(error) {
+      toast.error("Something went wrong", {
+        description: error.message,
+      })
+    },
+    onSuccess() {
+      utils.notification.list.invalidate()
+    },
+  })
+
   return (
     <Item
       className="rounded-none border-x-0 border-t-0 border-b-border last:border-b-0"
@@ -214,8 +226,9 @@ function NotificationItem({ notification }: { notification: Notification }) {
       <ItemContent>
         <ItemTitle className="line-clamp-2">{message}</ItemTitle>
         <ItemDescription className="text-muted-foreground text-xs">
-          {/* TODO */}
-          Just now
+          {formatDistanceToNow(new Date(notification.createdAt), {
+            addSuffix: true,
+          })}
         </ItemDescription>
       </ItemContent>
 
@@ -226,6 +239,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
+              markAsRead.mutate({ id })
             }}
             size="icon-xs"
             variant="outline"
