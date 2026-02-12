@@ -108,38 +108,9 @@ async function seedOperatingSystems() {
   }
 }
 
-// async function seedVM() {
-//   try {
-//     console.log("Seeding VMs...")
-//     await db
-//       .insert(schema.vm)
-//       .values({
-//         cpuCores: 2,
-//         diskGb: 20,
-//         hostname: "vm-ubuntu-2204",
-//         ipv4Address: "10.0.100.1",
-//         memoryMb: 2048,
-//         name: "Ubuntu VM 1",
-//         proxmoxNode: "node1",
-//         rootPassword: "securepassword",
-//         sshPublicKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC...",
-//         status: "provisioning",
-//         templateId: vmTemplateId,
-//         userId: "13EKN93ccV5sDwqAZWE05tjc0aaiZjZM",
-//         vmid: 100,
-//       })
-//       .onConflictDoNothing()
-//       .execute()
-//   } catch (error) {
-//     console.error("Error seeding VMs:", error)
-//     process.exit(1)
-//   }
-// }
-
 async function main() {
   await seedVMTemplates()
   await seedOperatingSystems()
-  // await seedVM()
 }
 
 main()
