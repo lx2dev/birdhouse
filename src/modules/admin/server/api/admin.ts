@@ -53,6 +53,19 @@ export const adminRouter = createTRPCRouter({
           })
           .returning()
         if (!os) {
+          await auditLog({
+            action: "admin:create_operating_system",
+            db: ctx.db,
+            details: {
+              displayName: input.displayName,
+              proxmoxTemplateId: input.proxmoxTemplateId,
+              status: input.status,
+            },
+            resourceId: "",
+            resourceType: "operating_system",
+            userId,
+          })
+
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Failed to create operating system",
@@ -97,6 +110,18 @@ export const adminRouter = createTRPCRouter({
           })
           .returning()
         if (!template) {
+          await auditLog({
+            action: "admin:create_vm_template",
+            db: ctx.db,
+            details: {
+              displayName: input.displayName,
+              status: input.status,
+            },
+            resourceId: "",
+            resourceType: "vm_template",
+            userId,
+          })
+
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Failed to create VM template",
@@ -135,6 +160,17 @@ export const adminRouter = createTRPCRouter({
           .from(vmTemplateTable)
           .where(eq(vmTemplateTable.id, input.id))
         if (!existingTemplate) {
+          await auditLog({
+            action: "admin:update_vm_template_failed",
+            db: ctx.db,
+            details: {
+              error: `VM Template with ID ${input.id} not found`,
+            },
+            resourceId: input.id,
+            resourceType: "vm_template",
+            userId,
+          })
+
           throw new TRPCError({
             code: "NOT_FOUND",
             message: `VM Template with ID ${input.id} not found`,
@@ -156,6 +192,17 @@ export const adminRouter = createTRPCRouter({
           .where(eq(vmTemplateTable.id, input.id))
           .returning()
         if (!updatedTemplate) {
+          await auditLog({
+            action: "admin:update_vm_template_failed",
+            db: ctx.db,
+            details: {
+              error: `Failed to update VM Template with ID ${input.id}`,
+            },
+            resourceId: input.id,
+            resourceType: "vm_template",
+            userId,
+          })
+
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Failed to update VM Template",

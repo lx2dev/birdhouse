@@ -5,6 +5,7 @@ import forge from "node-forge"
 import z from "zod"
 
 import { auditLog } from "@/helpers/audit"
+import { notification } from "@/helpers/notification"
 import { createSSHKeySchema } from "@/modules/dashboard/schemas"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import { sshKey as sshKeyTable } from "@/server/db/schema"
@@ -27,6 +28,25 @@ export const sshKeyRouter = createTRPCRouter({
         .from(sshKeyTable)
         .where(and(eq(sshKeyTable.name, name), eq(sshKeyTable.userId, user.id)))
       if (existingKey) {
+        await auditLog({
+          action: "sshkey:create_failed",
+          db: ctx.db,
+          details: {
+            name,
+            reason: "Duplicate key name",
+          },
+          resourceId: "",
+          resourceType: "ssh_key",
+          userId: user.id,
+        })
+
+        await notification({
+          db: ctx.db,
+          message: "Failed to create SSH key: Duplicate key name",
+          status: "failure",
+          userId: user.id,
+        })
+
         throw new TRPCError({
           code: "CONFLICT",
           message: "An SSH key with this name already exists for your account.",
@@ -97,6 +117,25 @@ export const sshKeyRouter = createTRPCRouter({
         const md5 = createHash("md5").update(blob).digest("hex")
         fingerprint = md5.match(/.{2}/g)?.join(":") || ""
       } else {
+        await auditLog({
+          action: "sshkey:create_failed",
+          db: ctx.db,
+          details: {
+            name,
+            reason: "Unsupported key type",
+          },
+          resourceId: "",
+          resourceType: "ssh_key",
+          userId: user.id,
+        })
+
+        await notification({
+          db: ctx.db,
+          message: "Failed to create SSH key: Unsupported key type",
+          status: "failure",
+          userId: user.id,
+        })
+
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Unsupported key type provided.",
@@ -147,6 +186,25 @@ export const sshKeyRouter = createTRPCRouter({
         .returning()
 
       if (!key) {
+        await auditLog({
+          action: "sshkey:delete_failed",
+          db: ctx.db,
+          details: {
+            keyId: id,
+            reason: "SSH key not found",
+          },
+          resourceId: id,
+          resourceType: "ssh_key",
+          userId: user.id,
+        })
+
+        await notification({
+          db: ctx.db,
+          message: "Failed to delete SSH key: Key not found",
+          status: "failure",
+          userId: user.id,
+        })
+
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "SSH key not found.",
@@ -246,6 +304,26 @@ export const sshKeyRouter = createTRPCRouter({
         .where(and(eq(sshKeyTable.name, name), eq(sshKeyTable.userId, user.id)))
 
       if (existing && existing.id !== id) {
+        await auditLog({
+          action: "sshkey:update_failed",
+          db: ctx.db,
+          details: {
+            keyId: id,
+            name,
+            reason: "Duplicate key name",
+          },
+          resourceId: id,
+          resourceType: "ssh_key",
+          userId: user.id,
+        })
+
+        await notification({
+          db: ctx.db,
+          message: "Failed to update SSH key: Duplicate key name",
+          status: "failure",
+          userId: user.id,
+        })
+
         throw new TRPCError({
           code: "CONFLICT",
           message: "An SSH key with this name already exists for your account.",
@@ -259,6 +337,26 @@ export const sshKeyRouter = createTRPCRouter({
         .returning()
 
       if (!updated) {
+        await auditLog({
+          action: "sshkey:update_failed",
+          db: ctx.db,
+          details: {
+            keyId: id,
+            name,
+            reason: "SSH key not found",
+          },
+          resourceId: id,
+          resourceType: "ssh_key",
+          userId: user.id,
+        })
+
+        await notification({
+          db: ctx.db,
+          message: "Failed to update SSH key: Key not found",
+          status: "failure",
+          userId: user.id,
+        })
+
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "SSH key not found.",
