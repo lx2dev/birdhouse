@@ -177,7 +177,7 @@ export const auditLog = createTable(
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
     ipAddress: d.text("ip_address"),
-    resourceId: d.text("resource_id").notNull(),
+    resourceId: d.text("resource_id"),
     resourceType: d.text("resource_type").notNull(),
     userId: d
       .text("user_id")
@@ -186,13 +186,15 @@ export const auditLog = createTable(
   }),
   (t) => [
     index("audit_log_userId_idx").on(t.userId),
-    index("audit_log_createdAt_idx").on(t.createdAt),
+    index("audit_log_action_idx").on(t.action),
+    index("audit_log_resourceType_idx").on(t.resourceType),
+    index("audit_log_userId_createdAt_id_idx").on(t.userId, t.createdAt, t.id),
   ],
 )
 
 export type AuditLogInsert = typeof auditLog.$inferInsert
 
-export const notificationStatusEnum = pgEnum("audit_log_status", [
+export const notificationStatusEnum = pgEnum("notification_status", [
   "success",
   "failure",
   "alert",
@@ -218,7 +220,11 @@ export const notificationTable = createTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
   }),
-  (t) => [index("notification_userId_idx").on(t.userId)],
+  (t) => [
+    index("notification_id_idx").on(t.id),
+    index("notification_userId_idx").on(t.userId),
+    index("notification_createdAt_idx").on(t.createdAt),
+  ],
 )
 
 export type Notification = typeof notificationTable.$inferSelect
