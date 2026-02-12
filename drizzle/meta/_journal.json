@@ -8,6 +8,13 @@
       "when": 1770858869721,
       "tag": "0001_charming_odin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770864447783,
+      "tag": "0001_empty_paibok",
+      "breakpoints": true
     }
   ]
 }

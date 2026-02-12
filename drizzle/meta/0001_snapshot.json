@@ -1,6 +1,6 @@
 {
-  "id": "8c447a15-62d7-4d09-925a-566825ba8ccb",
-  "prevId": "d2207b2f-33d2-4059-8bbf-61b22608c84e",
+  "id": "431a023a-a3e6-4770-8b90-a578badfefb4",
+  "prevId": "8c447a15-62d7-4d09-925a-566825ba8ccb",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1005,15 +1005,7 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "birdhouse_vm_operating_system_id_unique": {
-          "name": "birdhouse_vm_operating_system_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "operating_system_id"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
