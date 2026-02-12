@@ -144,7 +144,7 @@ function InstanceControlsSectionSuspense({
       utils.compute.list.invalidate()
       utils.notification.list.invalidate()
       setOpen((prev) => ({ ...prev, delete: false }))
-      router.refresh()
+      router.push("/dashboard")
     },
   })
 
