@@ -34,6 +34,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Spinner } from "@/components/ui/spinner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { api } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
@@ -236,6 +237,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
         <ItemContent className="flex-none text-center">
           <Button
             className="z-10"
+            disabled={markAsRead.isPending}
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -244,7 +246,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
             size="icon-xs"
             variant="outline"
           >
-            <IconArchive />
+            {markAsRead.isPending ? <Spinner /> : <IconArchive />}
           </Button>
         </ItemContent>
       )}
