@@ -162,6 +162,7 @@ function KeyItemActions({ item: key }: SSHKeyItemProps) {
     onSuccess() {
       toast.success("SSH key deleted successfully.")
       utils.sshKey.list.invalidate()
+      utils.notification.list.invalidate()
     },
   })
 
@@ -174,6 +175,7 @@ function KeyItemActions({ item: key }: SSHKeyItemProps) {
     onSuccess() {
       toast.success("SSH key renamed successfully.")
       utils.sshKey.list.invalidate()
+      utils.notification.list.invalidate()
     },
   })
 

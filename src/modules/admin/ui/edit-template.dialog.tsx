@@ -80,6 +80,7 @@ export function EditTemplateDialog({
     onSuccess() {
       toast.success("VM Template updated successfully")
       utils.template.list.invalidate()
+      utils.notification.list.invalidate()
       form.reset()
       setOpen(false)
     },

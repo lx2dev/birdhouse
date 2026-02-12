@@ -137,6 +137,7 @@ export function InstanceCard({ instance }: InstanceCardProps) {
     onSuccess() {
       toast.success("Instance deleted")
       utils.compute.list.invalidate()
+      utils.notification.list.invalidate()
       setOpen((prev) => ({ ...prev, delete: false }))
       router.refresh()
     },

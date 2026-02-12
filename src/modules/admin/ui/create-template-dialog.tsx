@@ -57,6 +57,7 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
     onSuccess() {
       toast.success("VM Template created successfully")
       utils.template.list.invalidate()
+      utils.notification.list.invalidate()
       form.reset()
       setOpen(false)
     },

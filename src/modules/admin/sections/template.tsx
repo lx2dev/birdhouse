@@ -86,6 +86,7 @@ function TemplateSectionSuspense() {
     params,
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
+
   const updateTemplate = api.admin.template.update.useMutation({
     onError(error) {
       toast.error("Failed to update VM Template:", {
@@ -95,6 +96,7 @@ function TemplateSectionSuspense() {
     onSuccess() {
       toast.success("VM Template updated successfully")
       utils.template.list.invalidate()
+      utils.notification.list.invalidate()
     },
   })
 

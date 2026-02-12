@@ -308,6 +308,13 @@ export const computeRouter = createTRPCRouter({
         userId: user.id,
       })
 
+      await notification({
+        db: ctx.db,
+        message: `Compute instance "${instance.name}" has been deleted`,
+        status: "info",
+        userId: user.id,
+      })
+
       return true
     }),
 

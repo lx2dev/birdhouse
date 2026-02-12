@@ -74,6 +74,7 @@ export function CreateSSHKeyDialog(props: CreateSSHKeyDialogProps) {
       setSSHKey(data)
       form.reset()
       utils.sshKey.list.invalidate()
+      utils.notification.list.invalidate()
     },
   })
 
