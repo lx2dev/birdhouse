@@ -45,7 +45,7 @@ import {
 import type { Notification } from "@/server/db/schema"
 
 export function Notifications() {
-  const [data] = api.notification.list.useSuspenseQuery({ limit: 1 })
+  const { data } = api.notification.list.useQuery({ limit: 1 })
 
   const hasUnread = data?.items?.some((n) => !n.read) ?? false
   const length = data?.items?.filter((n) => !n.read).length || 0
