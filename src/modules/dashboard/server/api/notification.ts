@@ -38,7 +38,7 @@ export const notificationRouter = createTRPCRouter({
               : undefined,
           ),
         )
-        .orderBy(desc(notificationTable.createdAt))
+        .orderBy(desc(notificationTable.createdAt), desc(notificationTable.id))
         .limit(limit + 1)
 
       const hasMore = notifications.length > limit
