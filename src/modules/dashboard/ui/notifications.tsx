@@ -327,6 +327,17 @@ Notifications.Skeleton = ({ length }: { length: number }) => (
         </ItemGroup>
       ))}
     </TabsContent>
+
+    <div className="flex justify-end border-t px-3 py-1.5">
+      <Button
+        className="text-muted-foreground hover:text-foreground"
+        disabled
+        size="sm"
+        variant="ghost"
+      >
+        <IconArchive /> Archive all
+      </Button>
+    </div>
   </Tabs>
 )
 
