@@ -222,6 +222,7 @@ export const notificationTable = createTable(
 )
 
 export type Notification = typeof notificationTable.$inferSelect
+export type NotificationInsert = typeof notificationTable.$inferInsert
 
 export const user = createTable(
   "user",
