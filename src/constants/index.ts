@@ -1,6 +1,7 @@
 import {
   IconKey,
   IconLayoutDashboard,
+  IconLogs,
   IconPlus,
   IconServer2,
   IconUsers,
@@ -23,7 +24,8 @@ export const NAV_ITEMS = [
 export type NavItem = (typeof NAV_ITEMS)[number]
 
 export const ADMIN_NAV_ITEMS = [
-  { href: "/admin", icon: IconLayoutDashboard, label: "Admin Dashboard" },
-  { href: "/admin/users", icon: IconUsers, label: "Manage Users" },
-  { href: "/admin/instances", icon: IconServer2, label: "Manage Instances" },
+  { href: "/admin", icon: IconLayoutDashboard, label: "Overview" },
+  { href: "/admin/users", icon: IconUsers, label: "Users" },
+  { href: "/admin/instances", icon: IconServer2, label: "Instances" },
+  { href: "/admin/logs", icon: IconLogs, label: "Logs" },
 ]

@@ -1,14 +1,6 @@
 "use client"
 
-import {
-  IconLayoutDashboard,
-  IconLogout,
-  IconMenu2,
-  IconMenuDeep,
-  IconServer2,
-  IconServerCog,
-  IconUsers,
-} from "@tabler/icons-react"
+import { IconLogout, IconMenu2, IconMenuDeep } from "@tabler/icons-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -16,15 +8,9 @@ import { Hint } from "@/components/hint"
 import { Icons } from "@/components/icons"
 import { Button } from "@/components/ui/button"
 import { useSidebar } from "@/components/ui/sidebar"
+import { ADMIN_NAV_ITEMS } from "@/constants"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
-
-const NAV_ITEMS = [
-  { href: "/admin", icon: IconLayoutDashboard, label: "Admin" },
-  { href: "/admin/users", icon: IconUsers, label: "Users" },
-  { href: "/admin/vms", icon: IconServer2, label: "Virtual Machines" },
-  { href: "/admin/templates", icon: IconServerCog, label: "Templates" },
-]
 
 export function AdminHeader() {
   const pathname = usePathname()
@@ -42,7 +28,7 @@ export function AdminHeader() {
         </Link>
 
         <nav className="ml-8 hidden flex-1 items-center gap-1 md:flex">
-          {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
+          {ADMIN_NAV_ITEMS.map(({ href, icon: Icon, label }) => {
             const isActive = pathname === href
 
             return (
