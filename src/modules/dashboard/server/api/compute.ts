@@ -22,7 +22,6 @@ import {
   vm as vmTable,
   vmTemplate as vmTemplateTable,
 } from "@/server/db/schema"
-import { startProvisionRunner } from "@/server/workers/provision-runner"
 
 export const computeRouter = createTRPCRouter({
   create: protectedProcedure
@@ -123,7 +122,7 @@ export const computeRouter = createTRPCRouter({
         sshPublicKey = sshKey.publicKey
       }
 
-      // TODO: below
+      // TODO:
       // const ipv4Address = await getIPv4Address(vmid)
 
       const [compute] = await ctx.db
@@ -169,10 +168,6 @@ export const computeRouter = createTRPCRouter({
           message: "Failed to create compute instance",
         })
       }
-
-      // Proxmox provision worker
-      // runs in a separate process to avoid blocking the request
-      void startProvisionRunner()
 
       await logAndNotify({
         action: "compute:provision_requested",
