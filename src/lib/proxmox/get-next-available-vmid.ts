@@ -1,76 +1,29 @@
 import { env } from "@/env"
 import { getProxmoxClient } from "@/lib/proxmox"
 
+const USER_VMID_START = 5000
+const USER_VMID_END = 5999
+
 export async function getNextAvailableVmid(): Promise<number> {
   const proxmox = getProxmoxClient()
+  const node = env.PM_DEFAULT_NODE
 
   try {
-    const maxVmid = await getMaxVmid(proxmox)
-    return maxVmid + 1
+    const vms = await proxmox.nodes.$(node).qemu.$get()
+    const usedVmids = new Set(vms.map((vm) => vm.vmid))
+
+    // Find first available VMID in user range (5000-5999)
+    for (let vmid = USER_VMID_START; vmid <= USER_VMID_END; vmid++) {
+      if (!usedVmids.has(vmid)) {
+        return vmid
+      }
+    }
+
+    throw new Error(
+      `No available VMIDs in user range (${USER_VMID_START}-${USER_VMID_END})`,
+    )
   } catch (error) {
     console.error("Failed to get next VMID:", error)
-    return Math.floor(Math.random() * (999999 - 100 + 1)) + 100
+    throw error
   }
-}
-
-/**
- * Find the first unused VMID starting from `startFrom` by checking Proxmox.
- * Useful for retries when a collision is detected.
- */
-export async function findFirstUnusedVmid(
-  startFrom: number,
-  maxAttempts = 100,
-): Promise<number> {
-  const proxmox = getProxmoxClient()
-  const node = env.PM_DEFAULT_NODE
-
-  let candidate = startFrom
-  for (let i = 0; i < maxAttempts; i++) {
-    try {
-      const vms = await proxmox.nodes.$(node).qemu.$get()
-      const usedVmids = new Set(vms.map((vm) => vm.vmid))
-
-      while (usedVmids.has(candidate)) {
-        candidate++
-      }
-
-      return candidate
-    } catch (error) {
-      console.warn(
-        `Attempt ${i + 1}/${maxAttempts} to find unused VMID failed:`,
-        error,
-      )
-      if (i === maxAttempts - 1) throw error
-      await new Promise((r) => setTimeout(r, 500))
-    }
-  }
-
-  throw new Error("Could not find an unused VMID after max attempts")
-}
-
-async function getMaxVmid(proxmox: ReturnType<typeof getProxmoxClient>) {
-  let maxVmid = 99
-
-  try {
-    const resources = await proxmox.cluster.resources.$get({ type: "vm" })
-    for (const resource of resources) {
-      const vmid = Number(resource.vmid)
-      if (Number.isFinite(vmid) && vmid > maxVmid) maxVmid = vmid
-    }
-    return maxVmid
-  } catch (error) {
-    console.warn(
-      "Failed to fetch cluster resources, falling back to node:",
-      error,
-    )
-  }
-
-  const node = env.PM_DEFAULT_NODE
-  const vms = await proxmox.nodes.$(node).qemu.$get()
-  for (const vm of vms) {
-    const vmid = Number(vm.vmid)
-    if (Number.isFinite(vmid) && vmid > maxVmid) maxVmid = vmid
-  }
-
-  return maxVmid
 }

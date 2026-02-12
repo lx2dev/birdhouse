@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm"
 import { env } from "@/env"
 import { logAndNotify } from "@/helpers/audit/log-and-notify"
 import { getProxmoxClient } from "@/lib/proxmox"
-import { findFirstUnusedVmid } from "@/lib/proxmox/get-next-available-vmid"
+import { getNextAvailableVmid } from "@/lib/proxmox/get-next-available-vmid"
 import { waitForTask } from "@/lib/proxmox/wait-for-task"
 import { db } from "@/server/db"
 import type { VMTable } from "@/server/db/schema"
@@ -71,7 +71,7 @@ async function processOne(vm: VMTable) {
       const takenVmids = new Set(existingVms.map((vm) => vm.vmid))
 
       if (takenVmids.has(effectiveVmid)) {
-        effectiveVmid = await findFirstUnusedVmid(effectiveVmid + 1)
+        effectiveVmid = await getNextAvailableVmid()
 
         try {
           await db
