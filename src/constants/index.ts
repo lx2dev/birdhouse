@@ -1,9 +1,11 @@
 import {
+  IconDeviceDesktopCog,
   IconKey,
   IconLayoutDashboard,
   IconLogs,
   IconPlus,
   IconServer2,
+  IconTemplate,
   IconUsers,
   IconWorld,
 } from "@tabler/icons-react"
@@ -27,5 +29,7 @@ export const ADMIN_NAV_ITEMS = [
   { href: "/admin", icon: IconLayoutDashboard, label: "Overview" },
   { href: "/admin/users", icon: IconUsers, label: "Users" },
   { href: "/admin/instances", icon: IconServer2, label: "Instances" },
+  { href: "/admin/templates", icon: IconTemplate, label: "Templates" },
+  { href: "/admin/os", icon: IconDeviceDesktopCog, label: "Operating Systems" },
   { href: "/admin/logs", icon: IconLogs, label: "Logs" },
 ]

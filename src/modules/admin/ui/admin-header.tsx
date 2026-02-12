@@ -50,7 +50,7 @@ export function AdminHeader() {
           <Hint
             label="Exit Admin Panel"
             render={
-              <Link href="/">
+              <Link href="/dashboard">
                 <Button size={mobile ? "icon" : "sm"} variant="outline">
                   <IconLogout />
                   <span className="hidden md:inline">Exit Admin</span>
