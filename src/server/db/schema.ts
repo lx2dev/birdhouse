@@ -134,6 +134,7 @@ export const vm = createTable(
 )
 
 export type VMTable = typeof vm.$inferSelect
+export type InstanceInsert = typeof vm.$inferInsert
 
 export const sshKey = createTable(
   "ssh_key",
