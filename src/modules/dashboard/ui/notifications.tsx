@@ -68,7 +68,7 @@ export function Notifications() {
       <PopoverContent
         align="end"
         alignOffset={-48}
-        className="h-125 w-100 overflow-y-auto p-0"
+        className="h-125 w-100 p-0"
         sideOffset={16}
       >
         <Suspense fallback={<Notifications.Skeleton length={length} />}>
@@ -122,21 +122,19 @@ function NotificationsSuspense() {
         </Button>
       </div>
 
-      <TabsContent value="inbox">
+      <TabsContent className="overflow-y-auto" value="inbox">
         {notifications.filter((n) => !n.read).length === 0 ? (
-          <div className="flex h-full items-center justify-center">
-            <Empty>
-              <EmptyHeader>
-                <EmptyMedia className="size-12 rounded-full" variant="icon">
-                  <IconInbox className="size-6 text-muted-foreground" />
-                </EmptyMedia>
-                <EmptyTitle>No new notifications</EmptyTitle>
-              </EmptyHeader>
-            </Empty>
-          </div>
+          <Empty className="h-full">
+            <EmptyHeader>
+              <EmptyMedia className="size-12 rounded-full" variant="icon">
+                <IconInbox className="size-6 text-muted-foreground" />
+              </EmptyMedia>
+              <EmptyTitle>No new notifications</EmptyTitle>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <>
-            <ItemGroup className="gap-0 overflow-y-auto">
+            <ItemGroup className="gap-0">
               {notifications
                 .filter((n) => !n.read)
                 .map((notification) => (
@@ -154,21 +152,19 @@ function NotificationsSuspense() {
           </>
         )}
       </TabsContent>
-      <TabsContent value="archive">
+      <TabsContent className="overflow-y-auto" value="archive">
         {notifications.filter((n) => n.read).length === 0 ? (
-          <div className="flex h-full items-center justify-center">
-            <Empty>
-              <EmptyHeader>
-                <EmptyMedia className="size-12 rounded-full" variant="icon">
-                  <IconArchive className="size-6 text-muted-foreground" />
-                </EmptyMedia>
-                <EmptyTitle>No archived notifications</EmptyTitle>
-              </EmptyHeader>
-            </Empty>
-          </div>
+          <Empty className="h-full">
+            <EmptyHeader>
+              <EmptyMedia className="size-12 rounded-full" variant="icon">
+                <IconArchive className="size-6 text-muted-foreground" />
+              </EmptyMedia>
+              <EmptyTitle>No archived notifications</EmptyTitle>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <>
-            <ItemGroup className="gap-0 overflow-y-auto">
+            <ItemGroup className="gap-0">
               {notifications
                 .filter((n) => n.read)
                 .map((notification) => (
@@ -291,7 +287,7 @@ Notifications.Skeleton = ({ length }: { length: number }) => (
 
     <TabsContent value="inbox">
       {[...Array(length)].map((_, i) => (
-        <ItemGroup className="gap-0 overflow-y-auto" key={i}>
+        <ItemGroup className="gap-0" key={i}>
           <Item className="rounded-none border-x-0 border-t-0 border-b-border last:border-b-0">
             <ItemMedia>
               <Skeleton className="size-9 rounded-full" />
