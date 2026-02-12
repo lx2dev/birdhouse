@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm"
 import { env } from "@/env"
 import { logAndNotify } from "@/helpers/audit/log-and-notify"
 import { getProxmoxClient } from "@/lib/proxmox"
-import { getNextAvailableVmid } from "@/lib/proxmox/get-next-available-vmid"
+import { findFirstUnusedVmid } from "@/lib/proxmox/get-next-available-vmid"
 import { waitForTask } from "@/lib/proxmox/wait-for-task"
 import { db } from "@/server/db"
 import type { VMTable } from "@/server/db/schema"
@@ -17,33 +17,39 @@ const POLL_INTERVAL_MS = 5000
 const PM_DEFAULT_NODE = env.PM_DEFAULT_NODE
 const PM_DEFAULT_POOL = env.PM_DEFAULT_POOL
 
-async function processOne(vm: VMTable) {
-  const {
-    id,
-    vmid,
-    hostname,
-    rootPassword,
-    sshPublicKey,
-    templateId,
-    operatingSystemId,
-    name: vmName,
-    userId,
-  } = vm
+let runnerStarted = false
+const PROCESSING = new Set<string>()
 
-  if (!templateId || !operatingSystemId) {
-    console.error(
-      `VM ${id} has no templateId or operatingSystemId, cannot provision`,
-    )
-    await db
-      .update(vmTable)
-      .set({
-        status: "error",
-      })
-      .where(eq(vmTable.id, id))
-    return
-  }
+async function processOne(vm: VMTable) {
+  const vmId = vm.id
+  PROCESSING.add(vmId)
 
   try {
+    const {
+      id,
+      vmid,
+      hostname,
+      rootPassword,
+      sshPublicKey,
+      templateId,
+      operatingSystemId,
+      name: vmName,
+      userId,
+    } = vm
+
+    if (!templateId || !operatingSystemId) {
+      console.error(
+        `VM ${id} has no templateId or operatingSystemId, cannot provision`,
+      )
+      await db
+        .update(vmTable)
+        .set({
+          status: "error",
+        })
+        .where(eq(vmTable.id, id))
+      return
+    }
+
     const [operatingSystem] = await db
       .select()
       .from(operatingSystemTable)
@@ -58,9 +64,32 @@ async function processOne(vm: VMTable) {
     }
 
     let effectiveVmid = vmid
-    let cloneUpid: string | undefined
-
     const proxmox = getProxmoxClient()
+
+    try {
+      const existingVms = await proxmox.nodes.$(PM_DEFAULT_NODE).qemu.$get()
+      const takenVmids = new Set(existingVms.map((vm) => vm.vmid))
+
+      if (takenVmids.has(effectiveVmid)) {
+        effectiveVmid = await findFirstUnusedVmid(effectiveVmid + 1)
+
+        try {
+          await db
+            .update(vmTable)
+            .set({ vmid: effectiveVmid })
+            .where(eq(vmTable.id, id))
+        } catch (error) {
+          console.warn(
+            `Failed to update VMID for VM ${id} to ${effectiveVmid}:`,
+            error,
+          )
+        }
+      }
+    } catch {
+      // VMID check failed, proceed with original VMID
+    }
+
+    let cloneUpid: string | undefined
 
     try {
       cloneUpid = await proxmox.nodes
@@ -96,56 +125,18 @@ async function processOne(vm: VMTable) {
         msg.includes("config file already exists") ||
         msg.includes("unable to create VM")
       ) {
-        console.warn(
-          `VMID ${effectiveVmid} already exists on Proxmox, picking a new VMID and retrying`,
-        )
-        const newVmid = await getNextAvailableVmid()
-        effectiveVmid = newVmid
-
-        try {
-          await db
-            .update(vmTable)
-            .set({ vmid: effectiveVmid })
-            .where(eq(vmTable.id, id))
-        } catch (e) {
-          console.warn(
-            `Failed to persist new vmid ${effectiveVmid} for VM ${id}:`,
-            e,
-          )
-        }
-
-        cloneUpid = await proxmox.nodes
-          .$(PM_DEFAULT_NODE)
-          .qemu.$(operatingSystem.proxmoxTemplateId)
-          .clone.$post({
-            full: true,
-            name: hostname,
-            newid: effectiveVmid,
-            pool: PM_DEFAULT_POOL,
-          })
-
-        for await (const update of waitForTask(
-          proxmox,
-          PM_DEFAULT_NODE,
-          cloneUpid,
-          POLL_INTERVAL_MS,
-        )) {
-          if (update.logs) {
-            for (const line of update.logs)
-              console.log(`[proxmox:${cloneUpid}] ${line}`)
-          }
-        }
-      } else {
-        console.error(`Cloning VM failed for VM ${id}:`, error)
         throw error
       }
+      throw error
     }
 
+    // Configure VM
     await proxmox.nodes
       .$(PM_DEFAULT_NODE)
       .qemu.$(effectiveVmid)
       .config.$post({
         cipassword: rootPassword,
+        // Change to current user unless that causes problems
         ciuser: "root",
         cores: template.cpuCores,
         ipconfig0: "ip=dhcp",
@@ -155,17 +146,20 @@ async function processOne(vm: VMTable) {
         sshkeys: encodeURIComponent(sshPublicKey || ""),
       })
 
+    // Resize disk
     const diskSize = `${template.diskGb}G`
     await proxmox.nodes.$(PM_DEFAULT_NODE).qemu.$(effectiveVmid).resize.$put({
       disk: "scsi0",
       size: diskSize,
     })
 
+    // Start VM
     await proxmox.nodes
       .$(PM_DEFAULT_NODE)
       .qemu.$(effectiveVmid)
       .status.start.$post()
 
+    // Mark as running
     await db
       .update(vmTable)
       .set({ status: "running" })
@@ -185,10 +179,18 @@ async function processOne(vm: VMTable) {
       resourceType: "virtual_machine",
       userId,
     })
-
-    console.log(`Provisioned VM ${id} (vmid=${effectiveVmid})`)
   } catch (err) {
-    console.error(`Failed to provision VM ${id}:`, err)
+    const { id, vmid, name: vmName, userId } = vm
+
+    const [currentVm] = await db
+      .select()
+      .from(vmTable)
+      .where(eq(vmTable.id, id))
+
+    if (!currentVm || currentVm.status === "running") {
+      return
+    }
+
     await db
       .update(vmTable)
       .set({
@@ -210,6 +212,8 @@ async function processOne(vm: VMTable) {
       resourceType: "virtual_machine",
       userId,
     })
+  } finally {
+    PROCESSING.delete(vmId)
   }
 }
 
@@ -222,21 +226,17 @@ async function poll() {
       .limit(5)
 
     for (const vm of vms) {
-      // process sequentially to avoid hammering proxmox
-      // best-effort: a single runner instance should be used in production
+      if (PROCESSING.has(vm.id)) continue
       await processOne(vm)
     }
   } catch (err) {
-    console.error("Provision runner poll error:", err)
+    console.error("Provision poll failed:", err)
   }
 }
 
 async function start() {
-  console.log(
-    "Provision runner starting, polling every",
-    POLL_INTERVAL_MS,
-    "ms",
-  )
+  if (runnerStarted) return
+  runnerStarted = true
   while (true) {
     await poll()
     await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS))
