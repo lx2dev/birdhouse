@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server"
 import { count, eq } from "drizzle-orm"
 
-import { logAndNotify } from "@/helpers/audit/log-and-notify"
+import { logAndNotify, logOnly } from "@/helpers/audit/log-and-notify"
 import {
   insertOperatingSystemSchema,
   insertVMTemplateSchema,
@@ -52,8 +52,9 @@ export const adminRouter = createTRPCRouter({
             status: input.status,
           })
           .returning()
+
         if (!os) {
-          await logAndNotify({
+          await logOnly({
             action: "admin:create_operating_system",
             db: ctx.db,
             details: {
@@ -61,8 +62,6 @@ export const adminRouter = createTRPCRouter({
               proxmoxTemplateId: input.proxmoxTemplateId,
               status: input.status,
             },
-            notifyMessage: "Failed to create operating system",
-            notifyStatus: "failure",
             resourceType: "operating_system",
             userId,
           })
@@ -112,8 +111,9 @@ export const adminRouter = createTRPCRouter({
             status: input.status,
           })
           .returning()
+
         if (!template) {
-          await logAndNotify({
+          await logOnly({
             action: "admin:create_vm_template",
             db: ctx.db,
             details: {
@@ -123,8 +123,6 @@ export const adminRouter = createTRPCRouter({
               memoryMb: input.memoryMb,
               status: input.status,
             },
-            notifyMessage: "Failed to create VM template",
-            notifyStatus: "failure",
             resourceType: "vm_template",
             userId,
           })
@@ -171,15 +169,14 @@ export const adminRouter = createTRPCRouter({
           .select()
           .from(vmTemplateTable)
           .where(eq(vmTemplateTable.id, input.id))
+
         if (!existingTemplate) {
-          await logAndNotify({
+          await logOnly({
             action: "admin:update_vm_template_failed",
             db: ctx.db,
             details: {
               error: `VM Template with ID ${input.id} not found`,
             },
-            notifyMessage: `Failed to update VM Template: Not found`,
-            notifyStatus: "failure",
             resourceId: input.id,
             resourceType: "vm_template",
             userId,
@@ -205,15 +202,14 @@ export const adminRouter = createTRPCRouter({
           .set(updatedValues)
           .where(eq(vmTemplateTable.id, input.id))
           .returning()
+
         if (!updatedTemplate) {
-          await logAndNotify({
+          await logOnly({
             action: "admin:update_vm_template_failed",
             db: ctx.db,
             details: {
               error: `Failed to update VM Template with ID ${input.id}`,
             },
-            notifyMessage: "Failed to update VM Template",
-            notifyStatus: "failure",
             resourceId: input.id,
             resourceType: "vm_template",
             userId,

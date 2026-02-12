@@ -35,14 +35,12 @@ export const computeRouter = createTRPCRouter({
         .from(vmTemplateTable)
         .where(eq(vmTemplateTable.id, templateId))
       if (!template) {
-        await logAndNotify({
+        await logOnly({
           action: "compute:provision_failed",
           db: ctx.db,
           details: {
             reason: "Template not found",
           },
-          notifyMessage: `Provisioning failed: Template not found`,
-          notifyStatus: "failure",
           resourceId: templateId,
           resourceType: "virtual_machine",
           userId: user.id,
@@ -59,14 +57,12 @@ export const computeRouter = createTRPCRouter({
         .from(osTable)
         .where(eq(osTable.id, operatingSystemId))
       if (!operatingSystem) {
-        await logAndNotify({
+        await logOnly({
           action: "compute:provision_failed",
           db: ctx.db,
           details: {
             reason: "Operating System not found",
           },
-          notifyMessage: `Provisioning failed: Operating System not found`,
-          notifyStatus: "failure",
           resourceId: operatingSystemId,
           resourceType: "virtual_machine",
           userId: user.id,
@@ -101,14 +97,12 @@ export const computeRouter = createTRPCRouter({
             and(eq(sshKeyTable.id, sshKeyId), eq(sshKeyTable.userId, user.id)),
           )
         if (!sshKey) {
-          await logAndNotify({
+          await logOnly({
             action: "compute:provision_failed",
             db: ctx.db,
             details: {
               reason: "SSH Key not found",
             },
-            notifyMessage: `Provisioning failed: SSH Key not found`,
-            notifyStatus: "failure",
             resourceId: sshKeyId,
             resourceType: "virtual_machine",
             userId: user.id,
@@ -147,7 +141,7 @@ export const computeRouter = createTRPCRouter({
         })
         .returning()
       if (!compute) {
-        await logAndNotify({
+        await logOnly({
           action: "compute:provision_failed",
           db: ctx.db,
           details: {
@@ -156,8 +150,6 @@ export const computeRouter = createTRPCRouter({
             vmid,
             vmName: name,
           },
-          notifyMessage: `Provisioning failed: Failed to create compute instance`,
-          notifyStatus: "failure",
           resourceId: String(vmid),
           resourceType: "virtual_machine",
           userId: user.id,
@@ -208,14 +200,12 @@ export const computeRouter = createTRPCRouter({
         .from(vmTable)
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!instance) {
-        await logAndNotify({
+        await logOnly({
           action: "compute:deletion_failed",
           db: ctx.db,
           details: {
             reason: "Compute instance not found",
           },
-          notifyMessage: `Deletion failed: Compute instance not found`,
-          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
           userId: user.id,
@@ -299,14 +289,12 @@ export const computeRouter = createTRPCRouter({
         .innerJoin(osTable, eq(osTable.id, vmTable.operatingSystemId))
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!compute) {
-        await logAndNotify({
+        await logOnly({
           action: "compute:fetch_failed",
           db: ctx.db,
           details: {
             reason: "Compute instance not found",
           },
-          notifyMessage: `Fetch failed: Compute instance not found`,
-          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
           userId: user.id,
@@ -339,14 +327,12 @@ export const computeRouter = createTRPCRouter({
         .from(vmTable)
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!compute) {
-        await logAndNotify({
+        await logOnly({
           action: "compute:fetch_status_failed",
           db: ctx.db,
           details: {
             reason: "Compute instance not found",
           },
-          notifyMessage: `Fetch status failed: Compute instance not found`,
-          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
           userId: user.id,
@@ -430,14 +416,12 @@ export const computeRouter = createTRPCRouter({
         .from(vmTable)
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!instance) {
-        await logAndNotify({
+        await logOnly({
           action: "compute:reboot_failed",
           db: ctx.db,
           details: {
             reason: "Compute instance not found",
           },
-          notifyMessage: `Reboot failed: Compute instance not found`,
-          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
           userId: user.id,
@@ -482,13 +466,15 @@ export const computeRouter = createTRPCRouter({
         .set({ status: "running" })
         .where(eq(vmTable.id, instance.id))
 
-      await logOnly({
+      await logAndNotify({
         action: "compute:rebooted",
         db: ctx.db,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
         },
+        notifyMessage: `Compute instance "${instance.name}" has been rebooted`,
+        notifyStatus: "info",
         resourceId: instance.id,
         resourceType: "virtual_machine",
         userId: user.id,
@@ -513,14 +499,12 @@ export const computeRouter = createTRPCRouter({
         .from(vmTable)
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!instance) {
-        await logAndNotify({
+        await logOnly({
           action: "compute:shutdown_failed",
           db: ctx.db,
           details: {
             reason: "Compute instance not found",
           },
-          notifyMessage: `Shutdown failed: Compute instance not found`,
-          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
           userId: user.id,
@@ -564,13 +548,15 @@ export const computeRouter = createTRPCRouter({
         .set({ status: "stopped" })
         .where(eq(vmTable.id, instance.id))
 
-      await logOnly({
+      await logAndNotify({
         action: "compute:shutdown_initiated",
         db: ctx.db,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
         },
+        notifyMessage: `Shutdown initiated for compute instance "${instance.name}"`,
+        notifyStatus: "info",
         resourceId: instance.id,
         resourceType: "virtual_machine",
         userId: user.id,
@@ -594,14 +580,12 @@ export const computeRouter = createTRPCRouter({
         .from(vmTable)
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!instance) {
-        await logAndNotify({
+        await logOnly({
           action: "compute:start_failed",
           db: ctx.db,
           details: {
             reason: "Compute instance not found",
           },
-          notifyMessage: `Start failed: Compute instance not found`,
-          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
           userId: user.id,
@@ -641,13 +625,15 @@ export const computeRouter = createTRPCRouter({
         .set({ status: "running" })
         .where(eq(vmTable.id, instance.id))
 
-      await logOnly({
+      await logAndNotify({
         action: "compute:started",
         db: ctx.db,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
         },
+        notifyMessage: `Compute instance "${instance.name}" has been started`,
+        notifyStatus: "info",
         resourceId: instance.id,
         resourceType: "virtual_machine",
         userId: user.id,
@@ -671,14 +657,12 @@ export const computeRouter = createTRPCRouter({
         .from(vmTable)
         .where(and(eq(vmTable.id, id), eq(vmTable.userId, user.id)))
       if (!instance) {
-        await logAndNotify({
+        await logOnly({
           action: "compute:stop_failed",
           db: ctx.db,
           details: {
             reason: "Compute instance not found",
           },
-          notifyMessage: `Stop failed: Compute instance not found`,
-          notifyStatus: "failure",
           resourceId: id,
           resourceType: "virtual_machine",
           userId: user.id,
@@ -718,13 +702,15 @@ export const computeRouter = createTRPCRouter({
         .set({ status: "stopped" })
         .where(eq(vmTable.id, instance.id))
 
-      await logOnly({
+      await logAndNotify({
         action: "compute:stopped",
         db: ctx.db,
         details: {
           vmid: instance.vmid,
           vmName: instance.name,
         },
+        notifyMessage: `Compute instance "${instance.name}" has been stopped`,
+        notifyStatus: "info",
         resourceId: instance.id,
         resourceType: "virtual_machine",
         userId: user.id,

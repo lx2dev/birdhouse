@@ -175,6 +175,11 @@ export const auditActionMap = {
   // Error/generic actions
   error: failureDetails,
 
+  // notification actions
+  "notification:mark_as_read": z.object({
+    notificationId: z.string(),
+  }),
+
   // SSH key actions
   "sshkey:create": sshKeyCreatedDetails,
   "sshkey:create_failed": sshKeyFailedDetails,

@@ -4,7 +4,7 @@ import { and, desc, eq, ilike, lt, or } from "drizzle-orm"
 import forge from "node-forge"
 import z from "zod"
 
-import { logAndNotify } from "@/helpers/audit/log-and-notify"
+import { logAndNotify, logOnly } from "@/helpers/audit/log-and-notify"
 import { createSSHKeySchema } from "@/modules/dashboard/schemas"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import { sshKey as sshKeyTable } from "@/server/db/schema"
@@ -27,15 +27,13 @@ export const sshKeyRouter = createTRPCRouter({
         .from(sshKeyTable)
         .where(and(eq(sshKeyTable.name, name), eq(sshKeyTable.userId, user.id)))
       if (existingKey) {
-        await logAndNotify({
+        await logOnly({
           action: "sshkey:create_failed",
           db: ctx.db,
           details: {
             name,
             reason: "Duplicate key name",
           },
-          notifyMessage: "Failed to create SSH key: Duplicate key name",
-          notifyStatus: "failure",
           resourceType: "ssh_key",
           userId: user.id,
         })
@@ -176,15 +174,13 @@ export const sshKeyRouter = createTRPCRouter({
         .returning()
 
       if (!key) {
-        await logAndNotify({
+        await logOnly({
           action: "sshkey:delete_failed",
           db: ctx.db,
           details: {
             keyId: id,
             reason: "SSH key not found",
           },
-          notifyMessage: "Failed to delete SSH key: Key not found",
-          notifyStatus: "failure",
           resourceId: id,
           resourceType: "ssh_key",
           userId: user.id,
@@ -291,7 +287,7 @@ export const sshKeyRouter = createTRPCRouter({
         .where(and(eq(sshKeyTable.name, name), eq(sshKeyTable.userId, user.id)))
 
       if (existing && existing.id !== id) {
-        await logAndNotify({
+        await logOnly({
           action: "sshkey:update_failed",
           db: ctx.db,
           details: {
@@ -299,8 +295,6 @@ export const sshKeyRouter = createTRPCRouter({
             name,
             reason: "Duplicate key name",
           },
-          notifyMessage: "Failed to update SSH key: Duplicate key name",
-          notifyStatus: "failure",
           resourceId: id,
           resourceType: "ssh_key",
           userId: user.id,
@@ -319,7 +313,7 @@ export const sshKeyRouter = createTRPCRouter({
         .returning()
 
       if (!updated) {
-        await logAndNotify({
+        await logOnly({
           action: "sshkey:update_failed",
           db: ctx.db,
           details: {
@@ -327,8 +321,6 @@ export const sshKeyRouter = createTRPCRouter({
             name,
             reason: "SSH key not found",
           },
-          notifyMessage: "Failed to update SSH key: Key not found",
-          notifyStatus: "failure",
           resourceId: id,
           resourceType: "ssh_key",
           userId: user.id,

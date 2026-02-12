@@ -1,6 +1,7 @@
 import { and, desc, eq, lt, or } from "drizzle-orm"
 import z from "zod"
 
+import { logOnly } from "@/helpers/audit/log-and-notify"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import { notificationTable } from "@/server/db/schema"
 
@@ -66,6 +67,17 @@ export const notificationRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { user } = ctx.session
       const { id } = input
+
+      logOnly({
+        action: "notification:mark_as_read",
+        db: ctx.db,
+        details: {
+          notificationId: id,
+        },
+        resourceId: id,
+        resourceType: "notification",
+        userId: user.id,
+      })
 
       await ctx.db
         .update(notificationTable)
