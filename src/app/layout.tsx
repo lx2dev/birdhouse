@@ -19,9 +19,6 @@ const notoMono = Noto_Sans_Mono({
 
 export const metadata: Metadata = {
   description: "Birdhouse",
-  icons: {
-    icon: "/favicon.svg",
-  },
   title: "A Proxmox Virtual Compute Provisioning Platform By Lx2.dev",
 }
 
@@ -32,6 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta content="Birdhouse" name="apple-mobile-web-app-title" />
+      </head>
       <body className={cn("antialiased", notoSans.variable, notoMono.variable)}>
         <TRPCReactProvider>
           <ThemeProvider>
