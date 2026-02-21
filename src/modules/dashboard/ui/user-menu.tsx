@@ -8,7 +8,7 @@ import {
 } from "@tabler/icons-react"
 import type { UserWithRole } from "better-auth/plugins"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -30,8 +30,11 @@ interface UserMenuProps {
 
 export function UserMenu({ user }: UserMenuProps) {
   const router = useRouter()
+  const pathname = usePathname()
   const mobile = useIsMobile()
   const { resolvedTheme, setTheme } = useTheme()
+
+  const isAdminPath = pathname.startsWith("/admin")
 
   async function handleSignOut() {
     await authClient.signOut({
@@ -104,9 +107,9 @@ export function UserMenu({ user }: UserMenuProps) {
             <DropdownMenuItem
               nativeButton={false}
               render={
-                <Link href="/admin">
+                <Link href={isAdminPath ? "/dashboard" : "/admin"}>
                   <IconBadge />
-                  Admin
+                  {isAdminPath ? "Exit Admin" : "Admin Panel"}
                 </Link>
               }
             />
