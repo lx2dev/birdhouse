@@ -1,3 +1,4 @@
+import type { Icon } from "@tabler/icons-react"
 import {
   IconDeviceDesktopCog,
   IconKey,
@@ -12,20 +13,21 @@ import {
 
 export const DEFAULT_FETCH_LIMIT = 10
 
-export const NAV_ITEMS = [
+type NavItem = {
+  href: string
+  icon: Icon
+  label: string
+  disabled?: boolean
+}
+
+export const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", icon: IconServer2, label: "Dashboard" },
   { href: "/dashboard/new", icon: IconPlus, label: "Create Instance" },
   { href: "/dashboard/ssh-keys", icon: IconKey, label: "SSH Keys" },
-  {
-    disabled: true,
-    href: "/dashboard/domains",
-    icon: IconWorld,
-    label: "Domains",
-  },
+  { href: "/dashboard/domains", icon: IconWorld, label: "Domains" },
 ]
-export type NavItem = (typeof NAV_ITEMS)[number]
 
-export const ADMIN_NAV_ITEMS = [
+export const ADMIN_NAV_ITEMS: NavItem[] = [
   { href: "/admin", icon: IconLayoutDashboard, label: "Overview" },
   { href: "/admin/users", icon: IconUsers, label: "Users" },
   { href: "/admin/instances", icon: IconServer2, label: "Instances" },

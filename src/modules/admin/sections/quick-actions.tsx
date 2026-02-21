@@ -51,7 +51,10 @@ function QuickActionsSuspense() {
       </CardHeader>
       <CardContent className="grid gap-4 md:grid-cols-3">
         <Link href="/admin/users">
-          <Item className="transition-colors hover:bg-accent" variant="outline">
+          <Item
+            className="transition-colors hover:bg-secondary/50"
+            variant="outline"
+          >
             <ItemMedia
               className="size-10 rounded-lg bg-primary/10"
               variant="icon"
@@ -67,8 +70,11 @@ function QuickActionsSuspense() {
           </Item>
         </Link>
 
-        <Link href="/admin/vms">
-          <Item className="transition-colors hover:bg-accent" variant="outline">
+        <Link href="/admin/instances">
+          <Item
+            className="transition-colors hover:bg-secondary/50"
+            variant="outline"
+          >
             <ItemMedia
               className="size-10 rounded-lg bg-primary/10"
               variant="icon"
@@ -76,14 +82,17 @@ function QuickActionsSuspense() {
               <IconServer className="size-5 text-primary" />
             </ItemMedia>
             <ItemContent>
-              <ItemTitle>View All VMs</ItemTitle>
+              <ItemTitle>View All Instances</ItemTitle>
               <ItemDescription>Monitor all virtual machines</ItemDescription>
             </ItemContent>
           </Item>
         </Link>
 
         <Link href="/admin/templates">
-          <Item className="transition-colors hover:bg-accent" variant="outline">
+          <Item
+            className="transition-colors hover:bg-secondary/50"
+            variant="outline"
+          >
             <ItemMedia
               className="size-10 rounded-lg bg-primary/10"
               variant="icon"

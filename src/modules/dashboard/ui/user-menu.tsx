@@ -96,7 +96,7 @@ export function UserMenu({ user }: UserMenuProps) {
           <DropdownMenuItem
             nativeButton={false}
             render={
-              <Link href="/profile">
+              <Link href="/settings/account">
                 <IconUser />
                 Account
               </Link>
