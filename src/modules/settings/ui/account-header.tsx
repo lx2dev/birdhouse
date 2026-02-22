@@ -15,7 +15,7 @@ interface AccountHeaderProps {
 export default function AccountHeader({ user }: AccountHeaderProps) {
   const pathname = usePathname()
 
-  const title = SETTINGS_NAV_ITEMS.find(({ href }) => href === pathname)?.label
+  const title = SETTINGS_NAV_ITEMS.find(({ href }) => href === pathname)?.title
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">

@@ -20,6 +20,7 @@ type NavItem = {
   icon: Icon
   label: string
   disabled?: boolean
+  title?: string
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -39,10 +40,16 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
 ]
 
 export const SETTINGS_NAV_ITEMS: NavItem[] = [
-  { href: "/settings/account/profile", icon: IconUserCircle, label: "Profile" },
+  {
+    href: "/settings/account/profile",
+    icon: IconUserCircle,
+    label: "Profile",
+    title: "Profile details",
+  },
   {
     href: "/settings/account/security",
     icon: IconShieldCheckFilled,
     label: "Security",
+    title: "Security settings",
   },
 ]
