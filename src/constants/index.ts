@@ -6,7 +6,9 @@ import {
   IconLogs,
   IconPlus,
   IconServer2,
+  IconShieldCheckFilled,
   IconTemplate,
+  IconUserCircle,
   IconUsers,
   IconWorld,
 } from "@tabler/icons-react"
@@ -34,4 +36,13 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
   { href: "/admin/templates", icon: IconTemplate, label: "Templates" },
   { href: "/admin/os", icon: IconDeviceDesktopCog, label: "Operating Systems" },
   { href: "/admin/logs", icon: IconLogs, label: "Logs" },
+]
+
+export const SETTINGS_NAV_ITEMS: NavItem[] = [
+  { href: "/settings/account/profile", icon: IconUserCircle, label: "Profile" },
+  {
+    href: "/settings/account/security",
+    icon: IconShieldCheckFilled,
+    label: "Security",
+  },
 ]
