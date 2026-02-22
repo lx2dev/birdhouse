@@ -61,15 +61,12 @@ function BreadcrumbLink({
 
 function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
   return (
-    // biome-ignore lint/a11y/useSemanticElements: shadcn component
     <span
       aria-current="page"
       aria-disabled="true"
       className={cn("font-normal text-foreground", className)}
       data-slot="breadcrumb-page"
-      role="link"
       {...props}
-      tabIndex={0}
     />
   )
 }
