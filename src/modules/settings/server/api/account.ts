@@ -24,7 +24,14 @@ export const accountRouter = createTRPCRouter({
   }),
 
   updateProfile: protectedProcedure
-    .input(userInsertSchema.partial())
+    .input(
+      userInsertSchema
+        .pick({
+          image: true,
+          name: true,
+        })
+        .partial(),
+    )
     .mutation(async ({ ctx, input }) => {
       const { user } = ctx.session
 
