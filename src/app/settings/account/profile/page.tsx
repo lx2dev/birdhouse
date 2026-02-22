@@ -8,8 +8,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="space-y-2">
-      <h1 className="font-bold text-2xl tracking-tight">Account</h1>
-      <p className="text-muted-foreground">Profile settings are coming soon.</p>
+      <h1 className="font-semibold text-2xl tracking-tight">Profile details</h1>
     </div>
   )
 }
