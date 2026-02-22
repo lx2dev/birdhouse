@@ -3,6 +3,14 @@
 import type { UserWithRole } from "better-auth/plugins"
 import { usePathname } from "next/navigation"
 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { SETTINGS_NAV_ITEMS } from "@/constants"
@@ -25,7 +33,19 @@ export default function AccountHeader({ user }: AccountHeaderProps) {
           className="mx-2 inline-flex md:hidden"
           orientation="vertical"
         />
-        <h1 className="font-medium text-base">{title}</h1>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbLink href="/settings/account/profile">
+                Account
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="hidden md:block" />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{title}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <div className="ml-auto flex items-center gap-2">
           <UserMenu user={user} />
         </div>
