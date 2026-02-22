@@ -39,7 +39,7 @@ export function UpdateProfileModal({ profile }: UpdateProfileModalProps) {
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger render={<Button size="sm" variant="outline" />}>
+      <DialogTrigger render={<Button variant="outline" />}>
         Update Profile
       </DialogTrigger>
       <DialogContent>
