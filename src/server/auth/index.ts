@@ -76,6 +76,28 @@ export const auth = betterAuth({
       })
     },
   },
+  emailVerification: {
+    autoSignInAfterVerification: true,
+    sendOnSignUp: true,
+    // TODO: Create a template for this email
+    async sendVerificationEmail({ user, url }) {
+      const year = new Date().getFullYear()
+
+      void resend.emails.send({
+        from: "Birdhouse <no-reply@lx2.dev>",
+        subject: "Verify your email address",
+        template: {
+          id: "verify-email",
+          variables: {
+            USER_NAME: user.name,
+            VERIFICATION_URL: url,
+            YEAR: year,
+          },
+        },
+        to: user.email,
+      })
+    },
+  },
   plugins: [admin(), nextCookies()],
   rateLimit: {
     storage: "secondary-storage",
@@ -109,6 +131,27 @@ export const auth = betterAuth({
     github: {
       clientId: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
+    },
+  },
+  user: {
+    changeEmail: {
+      enabled: true,
+      async sendChangeEmailConfirmation({ user, newEmail, url }) {
+        void resend.emails.send({
+          from: "Birdhouse <no-reply@lx2.dev>",
+          subject: "Verify your new email address",
+          template: {
+            id: "verify-new-email",
+            variables: {
+              NEW_EMAIL: newEmail,
+              USER_NAME: user.name,
+              VERIFICATION_URL: url,
+            },
+          },
+          to: user.email,
+        })
+      },
+      updateEmailWithoutVerification: true,
     },
   },
 })
