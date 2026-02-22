@@ -3,8 +3,8 @@ import { redirect } from "next/navigation"
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { getSession } from "@/lib/auth/utils"
-import AccountHeader from "@/modules/settings/account/ui/account-header"
-import { AccountSidebar } from "@/modules/settings/account/ui/account-sidebar"
+import AccountHeader from "@/modules/settings/ui/account-header"
+import { AccountSidebar } from "@/modules/settings/ui/account-sidebar"
 
 export default async function AccountLayout({
   children,
