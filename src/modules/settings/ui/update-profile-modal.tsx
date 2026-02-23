@@ -20,6 +20,7 @@ import {
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
@@ -120,7 +121,7 @@ function UpdateProfileForm({ profile, setOpen }: UpdateProfileFormProps) {
           name="image"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel className="text-sm">Profile Image</FieldLabel>
+              <FieldLabel htmlFor={field.name}>Profile Image</FieldLabel>
 
               <input type="hidden" {...field} value={field.value || ""} />
 
@@ -132,6 +133,7 @@ function UpdateProfileForm({ profile, setOpen }: UpdateProfileFormProps) {
 
                 <Button
                   disabled={isLoading}
+                  id={field.name}
                   onClick={() => alert("Not implemented yet")}
                   variant="outline"
                 >
@@ -151,6 +153,7 @@ function UpdateProfileForm({ profile, setOpen }: UpdateProfileFormProps) {
               <FieldDescription className="text-xs">
                 JPG or PNG. Max file size: 5MB.
               </FieldDescription>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
@@ -162,8 +165,14 @@ function UpdateProfileForm({ profile, setOpen }: UpdateProfileFormProps) {
           name="name"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Username</FieldLabel>
-              <Input disabled={isLoading} placeholder="Your name" {...field} />
+              <FieldLabel htmlFor={field.name}>Username</FieldLabel>
+              <Input
+                {...field}
+                disabled={isLoading}
+                id={field.name}
+                placeholder="Your name"
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
