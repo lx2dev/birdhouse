@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm"
 
 import { userInsertSchema } from "@/modules/settings/schemas/account"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
+import { auth } from "@/server/auth"
 import { user as userTable } from "@/server/db/schema"
 
 export const accountRouter = createTRPCRouter({
@@ -34,6 +35,22 @@ export const accountRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { user } = ctx.session
+
+      const { ok, statusText } = await auth.api.updateUser({
+        asResponse: true,
+        body: {
+          image: input.image || undefined,
+          name: input.name || undefined,
+        },
+        headers: ctx.headers,
+      })
+
+      if (!ok) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to update user profile: ${statusText}`,
+        })
+      }
 
       const [updatedUser] = await ctx.db
         .update(userTable)
