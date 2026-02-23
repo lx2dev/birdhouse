@@ -1,7 +1,6 @@
 "use client"
 
 import { IconLogout, IconMenu2, IconMenuDeep } from "@tabler/icons-react"
-import type { UserWithRole } from "better-auth/plugins"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -15,11 +14,7 @@ import { cn } from "@/lib/utils"
 import { Notifications } from "@/modules/dashboard/ui/notifications"
 import { UserMenu } from "@/modules/dashboard/ui/user-menu"
 
-interface AdminHeaderProps {
-  user: UserWithRole
-}
-
-export function AdminHeader({ user }: AdminHeaderProps) {
+export function AdminHeader() {
   const pathname = usePathname()
   const mobile = useIsMobile()
   const { openMobile, toggleSidebar } = useSidebar()
@@ -68,7 +63,7 @@ export function AdminHeader({ user }: AdminHeaderProps) {
           />
 
           <Notifications />
-          <UserMenu user={user} />
+          <UserMenu />
 
           <div className="block md:hidden">
             <Button

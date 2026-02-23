@@ -1,7 +1,6 @@
 "use client"
 
 import { IconMenu2, IconMenuDeep } from "@tabler/icons-react"
-import type { UserWithRole } from "better-auth/plugins"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -13,11 +12,7 @@ import { cn } from "@/lib/utils"
 import { Notifications } from "@/modules/dashboard/ui/notifications"
 import { UserMenu } from "@/modules/dashboard/ui/user-menu"
 
-interface AppHeaderProps {
-  user: UserWithRole
-}
-
-export function AppHeader({ user }: AppHeaderProps) {
+export function AppHeader() {
   const pathname = usePathname()
   const { openMobile, toggleSidebar } = useSidebar()
 
@@ -59,7 +54,7 @@ export function AppHeader({ user }: AppHeaderProps) {
 
         <div className="ml-auto flex items-center gap-2">
           <Notifications />
-          <UserMenu user={user} />
+          <UserMenu />
 
           <div className="block md:hidden">
             <Button
