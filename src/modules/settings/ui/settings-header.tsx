@@ -1,5 +1,6 @@
 "use client"
 
+import { IconMenu2, IconMenuDeep } from "@tabler/icons-react"
 import type { UserWithRole } from "better-auth/plugins"
 import { usePathname } from "next/navigation"
 
@@ -11,7 +12,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { Button } from "@/components/ui/button"
+import { useSidebar } from "@/components/ui/sidebar"
 import { SETTINGS_NAV_ITEMS } from "@/constants"
+import { cn } from "@/lib/utils"
 import { Notifications } from "@/modules/dashboard/ui/notifications"
 import { UserMenu } from "@/modules/dashboard/ui/user-menu"
 
@@ -21,8 +25,9 @@ interface SettingsHeaderProps {
 
 export function SettingsHeader({ user }: SettingsHeaderProps) {
   const pathname = usePathname()
+  const { openMobile, toggleSidebar } = useSidebar()
 
-  const title = SETTINGS_NAV_ITEMS.find(({ href }) => href === pathname)?.title
+  const title = SETTINGS_NAV_ITEMS.find((item) => item.href === pathname)?.title
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
@@ -45,6 +50,28 @@ export function SettingsHeader({ user }: SettingsHeaderProps) {
         <div className="ml-auto flex items-center gap-2">
           <Notifications />
           <UserMenu user={user} />
+
+          <div className="block md:hidden">
+            <Button
+              className="relative"
+              onClick={toggleSidebar}
+              size="icon"
+              variant="ghost"
+            >
+              <IconMenu2
+                className={cn(
+                  "size-6 transition-opacity duration-200",
+                  openMobile ? "opacity-0" : "opacity-100",
+                )}
+              />
+              <IconMenuDeep
+                className={cn(
+                  "absolute size-6 transition-opacity duration-200",
+                  openMobile ? "opacity-100" : "opacity-0",
+                )}
+              />
+            </Button>
+          </div>
         </div>
       </div>
     </header>
