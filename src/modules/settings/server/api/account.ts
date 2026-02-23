@@ -7,6 +7,41 @@ import { auth } from "@/server/auth"
 import { user as userTable } from "@/server/db/schema"
 
 export const accountRouter = createTRPCRouter({
+  // TODO: Fix changeEmail
+  changeEmail: protectedProcedure
+    .input(
+      userInsertSchema.pick({
+        email: true,
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { user } = ctx.session
+
+      if (input.email === user.email) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "New email address must be different from the current one",
+        })
+      }
+
+      const { ok, status, statusText } = await auth.api.changeEmail({
+        asResponse: true,
+        body: {
+          newEmail: input.email,
+        },
+        headers: ctx.headers,
+      })
+
+      if (!ok) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to change email address: ${statusText}`,
+        })
+      }
+
+      return status
+    }),
+
   getProfile: protectedProcedure.query(async ({ ctx }) => {
     const { user } = ctx.session
 
@@ -34,9 +69,7 @@ export const accountRouter = createTRPCRouter({
         .partial(),
     )
     .mutation(async ({ ctx, input }) => {
-      const { user } = ctx.session
-
-      const { ok, statusText } = await auth.api.updateUser({
+      const { ok, status, statusText } = await auth.api.updateUser({
         asResponse: true,
         body: {
           image: input.image || undefined,
@@ -52,12 +85,6 @@ export const accountRouter = createTRPCRouter({
         })
       }
 
-      const [updatedUser] = await ctx.db
-        .update(userTable)
-        .set(input)
-        .where(eq(userTable.id, user.id))
-        .returning()
-
-      return updatedUser
+      return status
     }),
 })
