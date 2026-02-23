@@ -144,6 +144,7 @@ export const auth = betterAuth({
   user: {
     changeEmail: {
       enabled: true,
+      // TODO: make a template for this email
       async sendChangeEmailConfirmation({ user, newEmail, url }) {
         const year = new Date().getFullYear()
 
@@ -151,7 +152,7 @@ export const auth = betterAuth({
           from: "Birdhouse <no-reply@lx2.dev>",
           subject: "Verify your new email address",
           template: {
-            id: "verify-new-email",
+            id: "confirm-email-change",
             variables: {
               NEW_EMAIL: newEmail,
               SUPPORT_URL: `${env.NEXT_PUBLIC_URL}/support`,
