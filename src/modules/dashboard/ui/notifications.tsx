@@ -249,7 +249,7 @@ function NotificationItem({ notification, onClick }: NotificationItemProps) {
       className="rounded-none border-x-0 border-t-0 border-b-border last:border-b-0"
       key={id}
       onClick={onClick}
-      render={<Link href={`/settings/notifications/${id}`} />}
+      render={<Link href={`/notifications/${id}`} />}
       variant="default"
     >
       <ItemMedia
