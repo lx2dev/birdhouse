@@ -91,7 +91,10 @@ function AddEmailForm({ currentEmail, setOpen }: AddEmailFormProps) {
       })
     },
     onSuccess() {
-      toast.success("Email address changed")
+      toast.success("Email change requested", {
+        description:
+          "Please check your new email inbox and follow the instructions to verify your new email address.",
+      })
       form.reset()
       setOpen(false)
     },
