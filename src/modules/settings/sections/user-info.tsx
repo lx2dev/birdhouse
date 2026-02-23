@@ -49,7 +49,7 @@ UserInfoSection.Skeleton = () => (
       <h2 className="font-semibold text-xl tracking-tight">Profile</h2>
     </div>
     <div className="flex items-center gap-x-6">
-      <Skeleton className="size-14 rounded-full" />
+      <Skeleton className="size-14 shrink-0 rounded-full" />
       <Skeleton className="h-6 w-48" />
     </div>
     <div className="@md:ml-auto">
