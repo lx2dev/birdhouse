@@ -1,9 +1,17 @@
+import { redirect } from "next/navigation"
+
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { api, HydrateClient } from "@/lib/api/server"
+import { getSession } from "@/lib/auth/utils"
 import { SettingsHeader } from "@/modules/settings/ui/settings-header"
 import { SettingsSidebar } from "@/modules/settings/ui/settings-sidebar"
 
-export default function SettingsLayout({ children }: LayoutProps<"/settings">) {
+export default async function SettingsLayout({
+  children,
+}: LayoutProps<"/settings">) {
+  const session = await getSession()
+  if (!session) return redirect("/auth/signin")
+
   void api.account.getProfile.prefetch()
 
   return (
