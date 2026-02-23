@@ -3,12 +3,12 @@ import { redirect } from "next/navigation"
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { getSession } from "@/lib/auth/utils"
-import AccountHeader from "@/modules/settings/ui/account-header"
-import { AccountSidebar } from "@/modules/settings/ui/account-sidebar"
+import { SettingsHeader } from "@/modules/settings/ui/settings-header"
+import { SettingsSidebar } from "@/modules/settings/ui/settings-sidebar"
 
-export default async function AccountLayout({
+export default async function SettingsLayout({
   children,
-}: LayoutProps<"/settings/account">) {
+}: LayoutProps<"/settings">) {
   const session = await getSession()
   if (!session) return redirect("/auth/signin")
 
@@ -22,9 +22,9 @@ export default async function AccountLayout({
           } as React.CSSProperties
         }
       >
-        <AccountSidebar />
+        <SettingsSidebar />
         <SidebarInset>
-          <AccountHeader user={session.user as UserWithRole} />
+          <SettingsHeader user={session.user as UserWithRole} />
           <main className="size-full p-4 lg:p-8">{children}</main>
         </SidebarInset>
       </SidebarProvider>

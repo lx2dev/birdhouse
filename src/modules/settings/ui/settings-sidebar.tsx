@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sidebar"
 import { SETTINGS_NAV_ITEMS } from "@/constants"
 
-export function AccountSidebar() {
+export function SettingsSidebar() {
   const { setOpenMobile } = useSidebar()
   const pathname = usePathname()
 
