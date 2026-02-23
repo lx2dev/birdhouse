@@ -5,7 +5,7 @@ import { ErrorBoundary } from "react-error-boundary"
 
 import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/lib/api/client"
-import { AddEmailModal } from "@/modules/settings/ui/add-email-modal"
+import { ChangeEmailModal } from "@/modules/settings/ui/change-email-modal"
 
 export function EmailAddressesSection() {
   return (
@@ -36,7 +36,7 @@ function EmailAddressesSectionSuspense() {
           readOnly
           type="email"
         />
-        <AddEmailModal currentEmail={profile.email} />
+        <ChangeEmailModal currentEmail={profile.email} />
       </div>
     </div>
   )

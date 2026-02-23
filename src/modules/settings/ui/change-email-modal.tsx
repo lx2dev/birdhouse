@@ -28,11 +28,11 @@ import { useMediaQuery } from "@/hooks/use-media-query"
 import { api } from "@/lib/api/client"
 import { userInsertSchema } from "@/modules/settings/schemas/account"
 
-interface AddEmailModalProps {
+interface ChangeEmailModalProps {
   currentEmail: string
 }
 
-export function AddEmailModal({ currentEmail }: AddEmailModalProps) {
+export function ChangeEmailModal({ currentEmail }: ChangeEmailModalProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
   const [open, setOpen] = React.useState(false)
