@@ -8,6 +8,7 @@ import {
 } from "@tabler/icons-react"
 import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
+import * as React from "react"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 import { toast } from "sonner"
@@ -45,13 +46,15 @@ import {
 import type { Notification } from "@/server/db/schema"
 
 export function Notifications() {
+  const [open, setOpen] = React.useState(false)
+
   const { data } = api.notification.list.useQuery({ limit: 1 })
 
   const hasUnread = data?.items?.some((n) => !n.read) ?? false
   const length = data?.items?.filter((n) => !n.read).length || 0
 
   return (
-    <Popover>
+    <Popover onOpenChange={setOpen} open={open}>
       <PopoverTrigger
         className="relative"
         render={<Button size="icon-lg" variant="ghost" />}
@@ -73,7 +76,7 @@ export function Notifications() {
       >
         <Suspense fallback={<Notifications.Skeleton length={length} />}>
           <ErrorBoundary fallback={<Notifications.Error />}>
-            <NotificationsSuspense />
+            <NotificationsSuspense setOpen={setOpen} />
           </ErrorBoundary>
         </Suspense>
       </PopoverContent>
@@ -81,7 +84,11 @@ export function Notifications() {
   )
 }
 
-function NotificationsSuspense() {
+interface NotificationsProps {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+function NotificationsSuspense({ setOpen }: NotificationsProps) {
   const utils = api.useUtils()
 
   const [data, query] = api.notification.list.useSuspenseInfiniteQuery(
@@ -127,6 +134,7 @@ function NotificationsSuspense() {
         <Button
           className="text-muted-foreground hover:text-foreground"
           nativeButton={false}
+          onClick={() => setOpen(false)}
           render={<Link href="/settings/notifications" />}
           size="icon"
           variant="ghost"
@@ -154,6 +162,7 @@ function NotificationsSuspense() {
                   <NotificationItem
                     key={notification.id}
                     notification={notification}
+                    onClick={() => setOpen(false)}
                   />
                 ))}
             </ItemGroup>
@@ -184,6 +193,7 @@ function NotificationsSuspense() {
                   <NotificationItem
                     key={notification.id}
                     notification={notification}
+                    onClick={() => setOpen(false)}
                   />
                 ))}
             </ItemGroup>
@@ -213,7 +223,12 @@ function NotificationsSuspense() {
   )
 }
 
-function NotificationItem({ notification }: { notification: Notification }) {
+interface NotificationItemProps {
+  notification: Notification
+  onClick: () => void
+}
+
+function NotificationItem({ notification, onClick }: NotificationItemProps) {
   const { id, message, status, read } = notification
 
   const utils = api.useUtils()
@@ -233,8 +248,8 @@ function NotificationItem({ notification }: { notification: Notification }) {
     <Item
       className="rounded-none border-x-0 border-t-0 border-b-border last:border-b-0"
       key={id}
-      // TODO:
-      // render={<Link href={`/settings/notifications/${id}`} />}
+      onClick={onClick}
+      render={<Link href={`/settings/notifications/${id}`} />}
       variant="default"
     >
       <ItemMedia
