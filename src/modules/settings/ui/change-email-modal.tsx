@@ -93,7 +93,7 @@ function AddEmailForm({ currentEmail, setOpen }: AddEmailFormProps) {
     onSuccess() {
       toast.success("Email change requested", {
         description:
-          "Please check your new email inbox and follow the instructions to verify your new email address.",
+          "Please check your current email inbox to verify your new email address.",
       })
       form.reset()
       setOpen(false)
