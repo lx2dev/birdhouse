@@ -10,6 +10,11 @@ import { db } from "@/server/db"
 import { user as userTable } from "@/server/db/schema"
 
 export const auth = betterAuth({
+  account: {
+    accountLinking: {
+      allowDifferentEmails: true,
+    },
+  },
   baseURL: env.NEXT_PUBLIC_URL,
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -49,6 +54,8 @@ export const auth = betterAuth({
         template: {
           id: "after-reset-password",
           variables: {
+            SITE_URL: env.NEXT_PUBLIC_URL,
+            SUPPORT_URL: `${env.NEXT_PUBLIC_URL}/support`,
             TIME_OF_RESET: timeOfReset,
             USER_NAME: user.name,
             YEAR: year,
@@ -68,6 +75,7 @@ export const auth = betterAuth({
           id: "reset-password",
           variables: {
             RESET_URL: url,
+            SUPPORT_URL: `${env.NEXT_PUBLIC_URL}/support`,
             USER_NAME: user.name,
             YEAR: year,
           },
@@ -79,7 +87,6 @@ export const auth = betterAuth({
   emailVerification: {
     autoSignInAfterVerification: true,
     sendOnSignUp: true,
-    // TODO: Create a template for this email
     async sendVerificationEmail({ user, url }) {
       const year = new Date().getFullYear()
 
@@ -89,6 +96,7 @@ export const auth = betterAuth({
         template: {
           id: "verify-email",
           variables: {
+            SUPPORT_URL: `${env.NEXT_PUBLIC_URL}/support`,
             USER_NAME: user.name,
             VERIFICATION_URL: url,
             YEAR: year,
@@ -137,6 +145,8 @@ export const auth = betterAuth({
     changeEmail: {
       enabled: true,
       async sendChangeEmailConfirmation({ user, newEmail, url }) {
+        const year = new Date().getFullYear()
+
         void resend.emails.send({
           from: "Birdhouse <no-reply@lx2.dev>",
           subject: "Verify your new email address",
@@ -144,8 +154,10 @@ export const auth = betterAuth({
             id: "verify-new-email",
             variables: {
               NEW_EMAIL: newEmail,
+              SUPPORT_URL: `${env.NEXT_PUBLIC_URL}/support`,
               USER_NAME: user.name,
               VERIFICATION_URL: url,
+              YEAR: year,
             },
           },
           to: user.email,
