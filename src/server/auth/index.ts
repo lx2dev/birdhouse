@@ -144,20 +144,27 @@ export const auth = betterAuth({
   user: {
     changeEmail: {
       enabled: true,
-      // TODO: make a template for this email
-      async sendChangeEmailConfirmation({ user, newEmail, url }) {
+      async sendChangeEmailConfirmation({ user, newEmail }) {
         const year = new Date().getFullYear()
+        const timeOfChange = new Date().toLocaleString("en-US", {
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          month: "short",
+          second: "2-digit",
+          year: "numeric",
+        })
 
         void resend.emails.send({
           from: "Birdhouse <no-reply@lx2.dev>",
-          subject: "Verify your new email address",
+          subject: "Your email change request",
           template: {
             id: "confirm-email-change",
             variables: {
               NEW_EMAIL: newEmail,
               SUPPORT_URL: `${env.NEXT_PUBLIC_URL}/support`,
+              TIME_OF_CHANGE: timeOfChange,
               USER_NAME: user.name,
-              VERIFICATION_URL: url,
               YEAR: year,
             },
           },
