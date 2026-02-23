@@ -1,11 +1,14 @@
 "use client"
 
+import { IconArrowLeft } from "@tabler/icons-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
+import { buttonVariants } from "@/components/ui/button"
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -15,6 +18,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { SETTINGS_NAV_ITEMS } from "@/constants"
+import { cn } from "@/lib/utils"
 
 export function SettingsSidebar() {
   const { setOpenMobile } = useSidebar()
@@ -57,6 +61,32 @@ export function SettingsSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              className="text-muted-foreground data-active:bg-transparent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
+              onClick={navigate}
+              render={<Link href="/dashboard" />}
+              size="lg"
+            >
+              <IconArrowLeft />
+              <span className="font-semibold text-lg">Dashboard</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          <SidebarMenuItem className="mt-4">
+            <span className="text-muted-foreground text-sm">Need help?</span>{" "}
+            <Link
+              className={cn("p-0!", buttonVariants({ variant: "link" }))}
+              href="/support"
+            >
+              Contact support
+            </Link>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   )
 }
