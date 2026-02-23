@@ -6,7 +6,6 @@ import {
   IconSunMoon,
   IconUser,
 } from "@tabler/icons-react"
-import type { UserWithRole } from "better-auth/plugins"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
@@ -22,19 +21,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { api } from "@/lib/api/client"
 import { authClient } from "@/lib/auth/client"
 
-interface UserMenuProps {
-  user: UserWithRole
-}
-
-export function UserMenu({ user }: UserMenuProps) {
+export function UserMenu() {
   const router = useRouter()
   const pathname = usePathname()
   const mobile = useIsMobile()
   const { resolvedTheme, setTheme } = useTheme()
 
   const isAdminPath = pathname.startsWith("/admin")
+
+  const [profile] = api.account.getProfile.useSuspenseQuery()
 
   async function handleSignOut() {
     await authClient.signOut({
@@ -50,10 +48,10 @@ export function UserMenu({ user }: UserMenuProps) {
     setTheme(resolvedTheme === "light" ? "dark" : "light")
   }
 
-  const shortUserName = user.name
+  const shortUserName = profile.name
     ? mobile
-      ? user.name.split(" ")[0][0]
-      : user.name
+      ? profile.name.split(" ")[0][0]
+      : profile.name
           .split(" ")
           .map((n) => n[0])
           .join("")
@@ -65,7 +63,7 @@ export function UserMenu({ user }: UserMenuProps) {
         nativeButton={false}
         render={
           <Avatar className="size-8" suppressHydrationWarning>
-            <AvatarImage alt={user.name} src={user.image ?? ""} />
+            <AvatarImage alt={profile.name} src={profile.image ?? ""} />
             <AvatarFallback className="text-sm capitalize">
               {shortUserName}
             </AvatarFallback>
@@ -77,14 +75,14 @@ export function UserMenu({ user }: UserMenuProps) {
           <DropdownMenuLabel className="p-0 font-normal">
             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar className="size-8">
-                <AvatarImage alt={user.name} src={user.image ?? ""} />
+                <AvatarImage alt={profile.name} src={profile.image ?? ""} />
                 <AvatarFallback className="text-sm capitalize">
                   {shortUserName}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-medium">{profile.name}</span>
+                <span className="truncate text-xs">{profile.email}</span>
               </div>
             </div>
           </DropdownMenuLabel>
@@ -103,7 +101,7 @@ export function UserMenu({ user }: UserMenuProps) {
             }
           />
 
-          {user.role === "admin" && (
+          {profile.role === "admin" && (
             <DropdownMenuItem
               nativeButton={false}
               render={
