@@ -30,16 +30,16 @@ export function SettingsHeader({ user }: SettingsHeaderProps) {
   const title = SETTINGS_NAV_ITEMS.find((item) => item.href === pathname)?.title
 
   return (
-    <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
+    <header className="@container flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         <Breadcrumb>
           <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
+            <BreadcrumbItem className="@md:block hidden">
               <BreadcrumbLink href="/settings">Settings</BreadcrumbLink>
             </BreadcrumbItem>
             {title && (
               <>
-                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbSeparator className="@md:block hidden" />
                 <BreadcrumbItem>
                   <BreadcrumbPage>{title}</BreadcrumbPage>
                 </BreadcrumbItem>
