@@ -3,8 +3,8 @@
 import {
   IconBadge,
   IconLogout,
+  IconSettings,
   IconSunMoon,
-  IconUser,
 } from "@tabler/icons-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
@@ -94,9 +94,9 @@ export function UserMenu() {
           <DropdownMenuItem
             nativeButton={false}
             render={
-              <Link href="/settings/account/profile">
-                <IconUser />
-                Account
+              <Link href="/settings">
+                <IconSettings />
+                Settings
               </Link>
             }
           />
