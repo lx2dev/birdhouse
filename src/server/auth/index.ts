@@ -144,7 +144,7 @@ export const auth = betterAuth({
   user: {
     changeEmail: {
       enabled: true,
-      async sendChangeEmailConfirmation({ user, newEmail }) {
+      async sendChangeEmailConfirmation({ user, newEmail, url }) {
         const year = new Date().getFullYear()
         const timeOfChange = new Date().toLocaleString("en-US", {
           day: "2-digit",
@@ -161,6 +161,7 @@ export const auth = betterAuth({
           template: {
             id: "confirm-email-change",
             variables: {
+              CONFIRMATION_URL: url,
               NEW_EMAIL: newEmail,
               SUPPORT_URL: `${env.NEXT_PUBLIC_URL}/support`,
               TIME_OF_CHANGE: timeOfChange,
