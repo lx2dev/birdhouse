@@ -1,6 +1,6 @@
 export default async function NotificationPage({
   params,
-}: PageProps<"/settings/notifications/[id]">) {
+}: PageProps<"/notifications/[id]">) {
   const { id } = await params
 
   return (
