@@ -18,7 +18,7 @@ export default async function SettingsLayout({
         style={
           {
             "--header-height": "calc(var(--spacing) * 12)",
-            "--sidebar-width": "calc(var(--spacing) * 72)",
+            "--sidebar-width": "calc(var(--spacing) * 74)",
           } as React.CSSProperties
         }
       >

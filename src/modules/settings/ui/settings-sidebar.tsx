@@ -28,9 +28,11 @@ export function SettingsSidebar() {
     <Sidebar variant="inset">
       <SidebarHeader className="px-4 py-6">
         <span className="inline font-bold text-lg leading-tight md:text-2xl">
-          Account
+          Settings
         </span>
-        <p className="text-muted-foreground">Manage your account info.</p>
+        <p className="text-muted-foreground text-sm">
+          Manage your account and preferences.
+        </p>
       </SidebarHeader>
 
       <SidebarContent>
