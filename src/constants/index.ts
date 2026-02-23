@@ -1,5 +1,6 @@
 import type { Icon } from "@tabler/icons-react"
 import {
+  IconAdjustmentsFilled,
   IconBellFilled,
   IconDeviceDesktopCog,
   IconKey,
@@ -7,7 +8,6 @@ import {
   IconLogs,
   IconPlus,
   IconServer2,
-  IconSettingsFilled,
   IconShieldCheckFilled,
   IconTemplate,
   IconUserFilled,
@@ -44,8 +44,8 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
 export const SETTINGS_NAV_ITEMS: NavItem[] = [
   {
     href: "/settings",
-    icon: IconSettingsFilled,
-    label: "Settings",
+    icon: IconAdjustmentsFilled,
+    label: "Preferences",
     title: "User Preferences",
   },
   {
