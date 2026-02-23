@@ -1,14 +1,16 @@
 import type { Icon } from "@tabler/icons-react"
 import {
+  IconBellFilled,
   IconDeviceDesktopCog,
   IconKey,
   IconLayoutDashboard,
   IconLogs,
   IconPlus,
   IconServer2,
+  IconSettingsFilled,
   IconShieldCheckFilled,
   IconTemplate,
-  IconUserCircle,
+  IconUserFilled,
   IconUsers,
   IconWorld,
 } from "@tabler/icons-react"
@@ -41,8 +43,14 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
 
 export const SETTINGS_NAV_ITEMS: NavItem[] = [
   {
+    href: "/settings",
+    icon: IconSettingsFilled,
+    label: "Settings",
+    title: "User Preferences",
+  },
+  {
     href: "/settings/account/profile",
-    icon: IconUserCircle,
+    icon: IconUserFilled,
     label: "Profile",
     title: "Profile details",
   },
@@ -51,5 +59,11 @@ export const SETTINGS_NAV_ITEMS: NavItem[] = [
     icon: IconShieldCheckFilled,
     label: "Security",
     title: "Security settings",
+  },
+  {
+    href: "/settings/notifications",
+    icon: IconBellFilled,
+    label: "Notifications",
+    title: "Notification preferences",
   },
 ]
