@@ -112,7 +112,7 @@ function UpdateProfileForm({ profile, setOpen }: UpdateProfileFormProps) {
 
   return (
     <form
-      className="space-y-8 px-8 md:p-0"
+      className="mx-auto w-full max-w-md space-y-8 px-8 md:p-0"
       onSubmit={form.handleSubmit(onSubmit)}
     >
       <FieldGroup>
