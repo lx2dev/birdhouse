@@ -16,6 +16,13 @@ import { toast } from "sonner"
 import { InfiniteScroll } from "@/components/infinite-scroll"
 import { Button } from "@/components/ui/button"
 import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
+import {
   Empty,
   EmptyHeader,
   EmptyMedia,
@@ -37,6 +44,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import { api } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
 import {
@@ -46,6 +54,8 @@ import {
 import type { Notification } from "@/server/db/schema"
 
 export function Notifications() {
+  const isDesktop = useMediaQuery("(min-width: 768px)")
+
   const [open, setOpen] = React.useState(false)
 
   const { data } = api.notification.list.useQuery({ limit: 1 })
@@ -53,34 +63,64 @@ export function Notifications() {
   const hasUnread = data?.items?.some((n) => !n.read) ?? false
   const length = data?.items?.filter((n) => !n.read).length || 0
 
+  if (isDesktop) {
+    return (
+      <Popover onOpenChange={setOpen} open={open}>
+        <PopoverTrigger
+          className="relative"
+          render={<Button size="icon-lg" variant="ghost" />}
+        >
+          <span className="sr-only">Notifications</span>
+          <IconBell className="size-5" />
+          {hasUnread && (
+            <div className="absolute top-1.5 right-1.5 flex size-2.5 text-xs">
+              <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75" />
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75" />
+            </div>
+          )}
+        </PopoverTrigger>
+        <PopoverContent
+          align="end"
+          alignOffset={-48}
+          className="h-125 w-100 p-0"
+          sideOffset={16}
+        >
+          <Suspense fallback={<Notifications.Skeleton length={length} />}>
+            <ErrorBoundary fallback={<Notifications.Error />}>
+              <NotificationsSuspense setOpen={setOpen} />
+            </ErrorBoundary>
+          </Suspense>
+        </PopoverContent>
+      </Popover>
+    )
+  }
+
   return (
-    <Popover onOpenChange={setOpen} open={open}>
-      <PopoverTrigger
-        className="relative"
-        render={<Button size="icon-lg" variant="ghost" />}
-      >
-        <span className="sr-only">Notifications</span>
-        <IconBell className="size-5" />
-        {hasUnread && (
-          <div className="absolute top-1.5 right-1.5 flex size-2.5 text-xs">
-            <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75" />
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75" />
-          </div>
-        )}
-      </PopoverTrigger>
-      <PopoverContent
-        align="end"
-        alignOffset={-48}
-        className="h-125 w-100 p-0"
-        sideOffset={16}
-      >
+    <Drawer onOpenChange={setOpen} open={open}>
+      <DrawerTrigger asChild className="relative">
+        <Button size="icon-lg" variant="ghost">
+          <span className="sr-only">Notifications</span>
+          <IconBell className="size-5" />
+          {hasUnread && (
+            <div className="absolute top-1.5 right-1.5 flex size-2.5 text-xs">
+              <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75" />
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75" />
+            </div>
+          )}
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader hidden>
+          <DrawerTitle hidden />
+        </DrawerHeader>
+
         <Suspense fallback={<Notifications.Skeleton length={length} />}>
           <ErrorBoundary fallback={<Notifications.Error />}>
             <NotificationsSuspense setOpen={setOpen} />
           </ErrorBoundary>
         </Suspense>
-      </PopoverContent>
-    </Popover>
+      </DrawerContent>
+    </Drawer>
   )
 }
 
@@ -110,7 +150,10 @@ function NotificationsSuspense({ setOpen }: NotificationsProps) {
   })
 
   return (
-    <Tabs className="flex h-full flex-col" defaultValue="inbox">
+    <Tabs
+      className="flex h-full flex-col max-md:min-h-[calc(65svh)]"
+      defaultValue="inbox"
+    >
       <div className="flex items-center justify-between border-b px-3">
         <TabsList className="gap-4 py-0" variant="line">
           <TabsTrigger
@@ -294,7 +337,10 @@ function NotificationItem({ notification, onClick }: NotificationItemProps) {
 }
 
 Notifications.Skeleton = ({ length }: { length: number }) => (
-  <Tabs className="flex h-full flex-col" defaultValue="inbox">
+  <Tabs
+    className="flex h-full flex-col max-md:min-h-[calc(65svh)]"
+    defaultValue="inbox"
+  >
     <div className="flex items-center justify-between border-b px-3">
       <TabsList className="gap-4 py-0" variant="line">
         <TabsTrigger
