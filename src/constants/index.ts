@@ -119,7 +119,16 @@ const SETTINGS_NAV_ITEMS: NavItem[] = [
 ]
 
 export const NAV_ITEMS = {
-  admin: ADMIN_NAV_ITEMS,
-  platform: PLATFORM_ITEMS,
-  settings: SETTINGS_NAV_ITEMS,
+  admin: {
+    items: ADMIN_NAV_ITEMS,
+    key: "admin",
+  },
+  platform: {
+    items: PLATFORM_ITEMS,
+    key: "platform",
+  },
+  settings: {
+    items: SETTINGS_NAV_ITEMS,
+    key: "settings",
+  },
 } as const
