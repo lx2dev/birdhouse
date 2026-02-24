@@ -1,13 +1,8 @@
 "use client"
 
-import {
-  IconBadge,
-  IconLogout,
-  IconSettings,
-  IconSunMoon,
-} from "@tabler/icons-react"
+import { IconLogout, IconSunMoon, IconUserFilled } from "@tabler/icons-react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -26,11 +21,8 @@ import { authClient } from "@/lib/auth/client"
 
 export function UserMenu() {
   const router = useRouter()
-  const pathname = usePathname()
   const mobile = useIsMobile()
   const { resolvedTheme, setTheme } = useTheme()
-
-  const isAdminPath = pathname.startsWith("/admin")
 
   const [profile] = api.account.getProfile.useSuspenseQuery()
 
@@ -93,25 +85,11 @@ export function UserMenu() {
         <DropdownMenuGroup>
           <DropdownMenuItem
             nativeButton={false}
-            render={
-              <Link href="/settings">
-                <IconSettings />
-                Settings
-              </Link>
-            }
-          />
-
-          {profile.role === "admin" && (
-            <DropdownMenuItem
-              nativeButton={false}
-              render={
-                <Link href={isAdminPath ? "/dashboard" : "/admin"}>
-                  <IconBadge />
-                  {isAdminPath ? "Exit Admin" : "Admin Panel"}
-                </Link>
-              }
-            />
-          )}
+            render={<Link href="/settings/account/profile" />}
+          >
+            <IconUserFilled />
+            Account
+          </DropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
