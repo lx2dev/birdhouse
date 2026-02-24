@@ -42,16 +42,38 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      <div className="mx-4">
-        <SidebarSeparator className="mx-auto" />
-      </div>
-
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {NAV_ITEMS.platform.map(({ href, icon: Icon, label }) => (
+                <SidebarMenuItem key={href}>
+                  <SidebarMenuButton
+                    className="text-muted-foreground data-active:bg-transparent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
+                    isActive={pathname === href}
+                    onClick={navigate}
+                    render={<Link href={href} />}
+                    size="lg"
+                  >
+                    <Icon />
+                    <span className="font-semibold text-lg">{label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <div className="mx-4">
+          <SidebarSeparator className="mx-auto" />
+        </div>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Settings</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {NAV_ITEMS.settings.map(({ href, icon: Icon, label }) => (
                 <SidebarMenuItem key={href}>
                   <SidebarMenuButton
                     className="text-muted-foreground data-active:bg-transparent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
@@ -98,28 +120,6 @@ export function AppSidebar() {
             </SidebarGroup>
           </>
         )}
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Settings</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {NAV_ITEMS.settings.map(({ href, icon: Icon, label }) => (
-                <SidebarMenuItem key={href}>
-                  <SidebarMenuButton
-                    className="text-muted-foreground data-active:bg-transparent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
-                    isActive={pathname === href}
-                    onClick={navigate}
-                    render={<Link href={href} />}
-                    size="lg"
-                  >
-                    <Icon />
-                    <span className="font-semibold text-lg">{label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
