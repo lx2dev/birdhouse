@@ -1,8 +1,8 @@
+import { AppHeader } from "@/components/layout/app-header"
+import { AppSidebar } from "@/components/layout/app-sidebar"
 import { SiteFooter } from "@/components/layout/site-footer"
-import { AppSidebar } from "@/components/layout/site-sidebar"
-import { SidebarProvider } from "@/components/ui/sidebar"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { api, HydrateClient } from "@/lib/api/server"
-import { AdminHeader } from "@/modules/admin/ui/admin-header"
 
 export default function AdminLayout({ children }: LayoutProps<"/admin">) {
   void api.account.getProfile.prefetch()
@@ -10,10 +10,19 @@ export default function AdminLayout({ children }: LayoutProps<"/admin">) {
   return (
     <HydrateClient>
       <div className="min-h-svh">
-        <SidebarProvider className="flex flex-col" defaultOpen={false}>
-          <AdminHeader />
+        <SidebarProvider
+          style={
+            {
+              "--header-height": "calc(var(--spacing) * 12)",
+              "--sidebar-width": "calc(var(--spacing) * 74)",
+            } as React.CSSProperties
+          }
+        >
           <AppSidebar />
-          <main className="size-full p-4 lg:p-8">{children}</main>
+          <SidebarInset>
+            <AppHeader />
+            <main className="size-full p-4 lg:p-8">{children}</main>
+          </SidebarInset>
         </SidebarProvider>
         <SiteFooter />
       </div>

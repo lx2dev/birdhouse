@@ -1,9 +1,9 @@
+import { AppHeader } from "@/components/layout/app-header"
+import { AppSidebar } from "@/components/layout/app-sidebar"
 import { SiteFooter } from "@/components/layout/site-footer"
-import { AppSidebar } from "@/components/layout/site-sidebar"
-import { SidebarProvider } from "@/components/ui/sidebar"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api, HydrateClient } from "@/lib/api/server"
-import { AppHeader } from "@/modules/dashboard/ui/app-header"
 
 export default function AppLayout({ children }: LayoutProps<"/">) {
   void api.notification.list.prefetchInfinite({
@@ -14,10 +14,19 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <HydrateClient>
       <div className="min-h-svh">
-        <SidebarProvider className="flex flex-col" defaultOpen={false}>
-          <AppHeader />
+        <SidebarProvider
+          style={
+            {
+              "--header-height": "calc(var(--spacing) * 12)",
+              "--sidebar-width": "calc(var(--spacing) * 74)",
+            } as React.CSSProperties
+          }
+        >
           <AppSidebar />
-          <main className="size-full p-4 lg:p-8">{children}</main>
+          <SidebarInset>
+            <AppHeader />
+            <main className="size-full p-4 lg:p-8">{children}</main>
+          </SidebarInset>
         </SidebarProvider>
         <SiteFooter />
       </div>
