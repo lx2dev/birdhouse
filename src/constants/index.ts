@@ -25,23 +25,73 @@ type NavItem = {
   title?: string
 }
 
-export const NAV_ITEMS: NavItem[] = [
-  { href: "/dashboard", icon: IconServer2, label: "Dashboard" },
-  { href: "/dashboard/new", icon: IconPlus, label: "Create Instance" },
-  { href: "/dashboard/ssh-keys", icon: IconKey, label: "SSH Keys" },
-  { href: "/dashboard/domains", icon: IconWorld, label: "Domains" },
+const PLATFORM_ITEMS: NavItem[] = [
+  {
+    href: "/dashboard",
+    icon: IconServer2,
+    label: "Dashboard",
+    title: "Your instances",
+  },
+  {
+    href: "/dashboard/new",
+    icon: IconPlus,
+    label: "Create Instance",
+    title: "New instance",
+  },
+  {
+    href: "/dashboard/ssh-keys",
+    icon: IconKey,
+    label: "SSH Keys",
+    title: "SSH keys",
+  },
+  {
+    href: "/dashboard/domains",
+    icon: IconWorld,
+    label: "Domains",
+    title: "Domains",
+  },
 ]
 
-export const ADMIN_NAV_ITEMS: NavItem[] = [
-  { href: "/admin", icon: IconLayoutDashboard, label: "Overview" },
-  { href: "/admin/users", icon: IconUsers, label: "Users" },
-  { href: "/admin/instances", icon: IconServer2, label: "Instances" },
-  { href: "/admin/templates", icon: IconTemplate, label: "Templates" },
-  { href: "/admin/os", icon: IconDeviceDesktopCog, label: "Operating Systems" },
-  { href: "/admin/logs", icon: IconLogs, label: "Logs" },
+const ADMIN_NAV_ITEMS: NavItem[] = [
+  {
+    href: "/admin",
+    icon: IconLayoutDashboard,
+    label: "Overview",
+    title: "Overview",
+  },
+  {
+    href: "/admin/users",
+    icon: IconUsers,
+    label: "Users",
+    title: "Manage users",
+  },
+  {
+    href: "/admin/instances",
+    icon: IconServer2,
+    label: "Instances",
+    title: "Manage instances",
+  },
+  {
+    href: "/admin/templates",
+    icon: IconTemplate,
+    label: "Templates",
+    title: "Manage templates",
+  },
+  {
+    href: "/admin/os",
+    icon: IconDeviceDesktopCog,
+    label: "Operating Systems",
+    title: "Manage operating systems",
+  },
+  {
+    href: "/admin/logs",
+    icon: IconLogs,
+    label: "Logs",
+    title: "System logs",
+  },
 ]
 
-export const SETTINGS_NAV_ITEMS: NavItem[] = [
+const SETTINGS_NAV_ITEMS: NavItem[] = [
   {
     href: "/settings",
     icon: IconAdjustmentsFilled,
@@ -67,3 +117,9 @@ export const SETTINGS_NAV_ITEMS: NavItem[] = [
     title: "Notification preferences",
   },
 ]
+
+export const NAV_ITEMS = {
+  admin: ADMIN_NAV_ITEMS,
+  platform: PLATFORM_ITEMS,
+  settings: SETTINGS_NAV_ITEMS,
+} as const
