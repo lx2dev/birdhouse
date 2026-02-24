@@ -35,7 +35,7 @@ export function AppSidebar() {
     setOpenMobile(false)
   }
 
-  if (!session) return <AppSidebar.Skeleton />
+  if (!session) return <AppSidebar.Skeleton isAdmin={isAdmin} />
 
   return (
     <Sidebar variant="inset">
@@ -93,7 +93,7 @@ export function AppSidebar() {
   )
 }
 
-AppSidebar.Skeleton = () => (
+AppSidebar.Skeleton = ({ isAdmin }: { isAdmin: boolean }) => (
   <Sidebar variant="inset">
     <SidebarHeader className="mx-4 px-0 py-0">
       <div className="flex items-center gap-2">
@@ -106,6 +106,8 @@ AppSidebar.Skeleton = () => (
 
     <SidebarContent>
       {navOrder.map((key) => {
+        if (key === "admin" && !isAdmin) return null
+
         const items = NAV_ITEMS[key]?.items
         if (!items) return null
 
