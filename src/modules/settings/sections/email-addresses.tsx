@@ -11,7 +11,6 @@ export function EmailAddressesSection() {
   return (
     <Suspense fallback={<EmailAddressesSection.Skeleton />}>
       <ErrorBoundary fallback={<EmailAddressesSection.Error />}>
-        {/* <EmailAddressesSection.Skeleton /> */}
         <EmailAddressesSectionSuspense />
       </ErrorBoundary>
     </Suspense>
