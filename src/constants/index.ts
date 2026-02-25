@@ -1,16 +1,16 @@
 import type { Icon } from "@tabler/icons-react"
 import {
-  IconAdjustmentsFilled,
-  IconBellFilled,
+  IconAdjustments,
+  IconBell,
   IconDeviceDesktopCog,
   IconKey,
   IconLayoutDashboard,
   IconLogs,
   IconPlus,
   IconServer2,
-  IconShieldCheckFilled,
+  IconShieldCheck,
   IconTemplate,
-  IconUserFilled,
+  IconUser,
   IconUsers,
   IconWorld,
 } from "@tabler/icons-react"
@@ -52,6 +52,33 @@ const PLATFORM_ITEMS: NavItem[] = [
   },
 ]
 
+const SETTINGS_NAV_ITEMS: NavItem[] = [
+  {
+    href: "/settings",
+    icon: IconAdjustments,
+    label: "Preferences",
+    title: "User Preferences",
+  },
+  {
+    href: "/settings/account/profile",
+    icon: IconUser,
+    label: "Profile",
+    title: "Profile details",
+  },
+  {
+    href: "/settings/account/security",
+    icon: IconShieldCheck,
+    label: "Security",
+    title: "Security settings",
+  },
+  {
+    href: "/settings/notifications",
+    icon: IconBell,
+    label: "Notifications",
+    title: "Notification preferences",
+  },
+]
+
 const ADMIN_NAV_ITEMS: NavItem[] = [
   {
     href: "/admin",
@@ -88,33 +115,6 @@ const ADMIN_NAV_ITEMS: NavItem[] = [
     icon: IconLogs,
     label: "Logs",
     title: "System logs",
-  },
-]
-
-const SETTINGS_NAV_ITEMS: NavItem[] = [
-  {
-    href: "/settings",
-    icon: IconAdjustmentsFilled,
-    label: "Preferences",
-    title: "User Preferences",
-  },
-  {
-    href: "/settings/account/profile",
-    icon: IconUserFilled,
-    label: "Profile",
-    title: "Profile details",
-  },
-  {
-    href: "/settings/account/security",
-    icon: IconShieldCheckFilled,
-    label: "Security",
-    title: "Security settings",
-  },
-  {
-    href: "/settings/notifications",
-    icon: IconBellFilled,
-    label: "Notifications",
-    title: "Notification preferences",
   },
 ]
 
