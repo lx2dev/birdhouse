@@ -88,7 +88,6 @@ export function SignInForm() {
           },
           onSuccess() {
             form.reset()
-            toast.success("Successfully signed in!")
             router.push("/dashboard")
           },
         },

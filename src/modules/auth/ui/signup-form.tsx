@@ -91,7 +91,6 @@ export function SignUpForm() {
           },
           onSuccess() {
             form.reset()
-            toast.success("Account created successfully!")
             router.push("/dashboard")
           },
         },
