@@ -23,8 +23,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { NAV_ITEMS } from "@/constants"
 import { useSession } from "@/lib/auth/client"
 
-const navOrder = ["platform", "settings", "admin"] as const
-
 export function AppSidebar() {
   const pathname = usePathname()
   const { setOpenMobile } = useSidebar()
@@ -49,44 +47,45 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {navOrder.map((key) => {
-          if (key === "admin" && !isAdmin) return null
+        {Object.entries(NAV_ITEMS)
+          .filter(([key]) => key !== "admin" || isAdmin)
+          .map(([key, { items }]) => {
+            if (!items) return null
 
-          const items = NAV_ITEMS[key]?.items
-          if (!items) return null
+            return (
+              <React.Fragment key={key}>
+                <SidebarGroup>
+                  <SidebarGroupLabel className="capitalize">
+                    {NAV_ITEMS[key as keyof typeof NAV_ITEMS]?.key}
+                  </SidebarGroupLabel>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {items.map(({ href, icon: Icon, label }) => (
+                        <SidebarMenuItem key={href}>
+                          <SidebarMenuButton
+                            className="text-muted-foreground data-active:bg-transparent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
+                            isActive={pathname === href}
+                            onClick={navigate}
+                            render={<Link href={href} />}
+                            size="lg"
+                          >
+                            <Icon />
+                            <span className="font-semibold text-lg">
+                              {label}
+                            </span>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
 
-          return (
-            <React.Fragment key={key}>
-              <SidebarGroup>
-                <SidebarGroupLabel className="capitalize">
-                  {NAV_ITEMS[key]?.key}
-                </SidebarGroupLabel>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {items.map(({ href, icon: Icon, label }) => (
-                      <SidebarMenuItem key={href}>
-                        <SidebarMenuButton
-                          className="text-muted-foreground data-active:bg-transparent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
-                          isActive={pathname === href}
-                          onClick={navigate}
-                          render={<Link href={href} />}
-                          size="lg"
-                        >
-                          <Icon />
-                          <span className="font-semibold text-lg">{label}</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-
-              <div className="mx-4 last:hidden">
-                <SidebarSeparator className="mx-auto" />
-              </div>
-            </React.Fragment>
-          )
-        })}
+                <div className="mx-4 last:hidden">
+                  <SidebarSeparator className="mx-auto" />
+                </div>
+              </React.Fragment>
+            )
+          })}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
@@ -105,41 +104,40 @@ AppSidebar.Skeleton = ({ isAdmin }: { isAdmin: boolean }) => (
     </SidebarHeader>
 
     <SidebarContent>
-      {navOrder.map((key) => {
-        if (key === "admin" && !isAdmin) return null
+      {Object.entries(NAV_ITEMS)
+        .filter(([key]) => key !== "admin" || isAdmin)
+        .map(([key, { items }]) => {
+          if (!items) return null
 
-        const items = NAV_ITEMS[key]?.items
-        if (!items) return null
+          return (
+            <React.Fragment key={key}>
+              <SidebarGroup>
+                <SidebarGroupLabel>
+                  <Skeleton className="h-4 w-16" />
+                </SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {Array.from({ length: items.length }).map((_, itemIdx) => (
+                      <SidebarMenuItem key={itemIdx}>
+                        <SidebarMenuButton
+                          className="text-muted-foreground data-active:bg-transparent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
+                          size="lg"
+                        >
+                          <Skeleton className="size-6" />
+                          <Skeleton className="h-4 w-20" />
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
 
-        return (
-          <React.Fragment key={key}>
-            <SidebarGroup>
-              <SidebarGroupLabel>
-                <Skeleton className="h-4 w-16" />
-              </SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {Array.from({ length: items.length }).map((_, itemIdx) => (
-                    <SidebarMenuItem key={itemIdx}>
-                      <SidebarMenuButton
-                        className="text-muted-foreground data-active:bg-transparent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
-                        size="lg"
-                      >
-                        <Skeleton className="size-6" />
-                        <Skeleton className="h-4 w-20" />
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            <div className="mx-4 last:hidden">
-              <SidebarSeparator className="mx-auto" />
-            </div>
-          </React.Fragment>
-        )
-      })}
+              <div className="mx-4 last:hidden">
+                <SidebarSeparator className="mx-auto" />
+              </div>
+            </React.Fragment>
+          )
+        })}
     </SidebarContent>
     <SidebarRail />
   </Sidebar>

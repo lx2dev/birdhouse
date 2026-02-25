@@ -118,17 +118,30 @@ const ADMIN_NAV_ITEMS: NavItem[] = [
   },
 ]
 
-export const NAV_ITEMS = {
-  admin: {
-    items: ADMIN_NAV_ITEMS,
-    key: "admin",
-  },
-  platform: {
+type NavSection = {
+  key: string
+  items: NavItem[]
+  order: number
+}
+
+export const NAV_SECTIONS = [
+  {
     items: PLATFORM_ITEMS,
     key: "platform",
   },
-  settings: {
+  {
     items: SETTINGS_NAV_ITEMS,
     key: "settings",
   },
-} as const
+  {
+    items: ADMIN_NAV_ITEMS,
+    key: "admin",
+  },
+] as const
+
+export const NAV_ITEMS: Record<string, NavSection> = Object.fromEntries(
+  NAV_SECTIONS.map((section, index) => [
+    section.key,
+    { ...section, order: index },
+  ]),
+)
