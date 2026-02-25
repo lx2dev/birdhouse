@@ -38,12 +38,12 @@ export function AppSidebar() {
   return (
     <Sidebar variant="inset">
       <SidebarHeader className="mx-4 px-0 py-0">
-        <div className="flex items-center gap-2">
+        <Link className="flex items-center gap-2" href="/dashboard">
           <Icons.logo className="size-12 text-primary md:size-16" />
           <span className="inline font-semibold text-lg md:text-2xl">
             Birdhouse
           </span>
-        </div>
+        </Link>
       </SidebarHeader>
 
       <SidebarContent>
