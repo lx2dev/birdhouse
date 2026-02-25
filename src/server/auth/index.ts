@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { nextCookies } from "better-auth/next-js"
-import { admin } from "better-auth/plugins"
+import { admin, lastLoginMethod } from "better-auth/plugins"
 
 import { env } from "@/env"
 import { getRedisClient } from "@/lib/redis"
@@ -106,7 +106,7 @@ export const auth = betterAuth({
       })
     },
   },
-  plugins: [admin(), nextCookies()],
+  plugins: [admin(), lastLoginMethod(), nextCookies()],
   rateLimit: {
     storage: "secondary-storage",
   },
