@@ -41,11 +41,13 @@ export function SignInForm() {
   const router = useRouter()
 
   const [isLoading, setIsLoading] = React.useState<{
+    email: boolean
     discord: boolean
     github: boolean
     resetPassword: boolean
   }>({
     discord: false,
+    email: false,
     github: false,
     resetPassword: false,
   })
@@ -59,12 +61,19 @@ export function SignInForm() {
     resolver: zodResolver(SignInSchema),
   })
 
-  const { isSubmitting } = form.formState
   const isPending =
-    isLoading.discord || isLoading.github || isLoading.resetPassword
+    isLoading.email ||
+    isLoading.discord ||
+    isLoading.github ||
+    isLoading.resetPassword
 
   async function onSubmit(data: z.infer<typeof SignInSchema>) {
     try {
+      setIsLoading((prev) => ({
+        ...prev,
+        email: true,
+      }))
+
       await authClient.signIn.email({
         ...data,
         fetchOptions: {
@@ -72,6 +81,10 @@ export function SignInForm() {
             toast.error("Something went wrong:", {
               description: error.message,
             })
+            setIsLoading((prev) => ({
+              ...prev,
+              email: false,
+            }))
           },
           onSuccess() {
             form.reset()
@@ -94,6 +107,7 @@ export function SignInForm() {
         ...prev,
         [provider]: true,
       }))
+
       await authClient.signIn.social({
         callbackURL: "/dashboard",
         fetchOptions: {
@@ -102,6 +116,10 @@ export function SignInForm() {
             toast.error("Something went wrong:", {
               description: error.message,
             })
+            setIsLoading((prev) => ({
+              ...prev,
+              [provider]: false,
+            }))
           },
         },
         provider,
@@ -111,11 +129,6 @@ export function SignInForm() {
       toast.error("Something went wrong:", {
         description: "See console for details.",
       })
-    } finally {
-      setIsLoading((prev) => ({
-        ...prev,
-        [provider]: false,
-      }))
     }
   }
 
@@ -163,7 +176,7 @@ export function SignInForm() {
       <FieldGroup>
         <Field>
           <Button
-            disabled={isPending || isSubmitting}
+            disabled={isPending}
             onClick={() => handleOAuth("discord")}
             type="button"
             variant="outline"
@@ -172,7 +185,7 @@ export function SignInForm() {
             Sign in with Discord
           </Button>
           <Button
-            disabled={isPending || isSubmitting}
+            disabled={isPending}
             onClick={() => handleOAuth("github")}
             type="button"
             variant="outline"
@@ -197,7 +210,7 @@ export function SignInForm() {
               <Input
                 {...field}
                 aria-invalid={fieldState.invalid}
-                disabled={isPending || isSubmitting}
+                disabled={isPending}
                 id="email"
                 placeholder="you@example.com"
                 type="email"
@@ -218,7 +231,7 @@ export function SignInForm() {
                 </FieldLabel>
                 <Button
                   className="ml-auto h-auto p-0"
-                  disabled={isPending || isSubmitting}
+                  disabled={isPending}
                   onClick={handleForgotPassword}
                   size="xs"
                   tabIndex={-1}
@@ -232,14 +245,14 @@ export function SignInForm() {
                 <InputGroupInput
                   {...field}
                   aria-invalid={fieldState.invalid}
-                  disabled={isPending || isSubmitting}
+                  disabled={isPending}
                   id="password"
                   placeholder="********"
                   type={showPassword ? "text" : "password"}
                 />
                 <InputGroupAddon align="inline-end">
                   <InputGroupButton
-                    disabled={isPending || isSubmitting}
+                    disabled={isPending}
                     onClick={() => setShowPassword(!showPassword)}
                     size="icon-xs"
                     tabIndex={-1}
@@ -255,8 +268,8 @@ export function SignInForm() {
         />
 
         <Field>
-          <Button disabled={isPending || isSubmitting} type="submit">
-            {isSubmitting ? <Spinner /> : <IconLogin2 />}
+          <Button disabled={isPending} type="submit">
+            {isLoading.email ? <Spinner /> : <IconLogin2 />}
             Login
           </Button>
           <FieldDescription className="text-center">

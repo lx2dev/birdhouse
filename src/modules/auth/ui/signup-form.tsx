@@ -41,10 +41,12 @@ export function SignUpForm() {
   const router = useRouter()
 
   const [isLoading, setIsLoading] = React.useState<{
+    email: boolean
     discord: boolean
     github: boolean
   }>({
     discord: false,
+    email: false,
     github: false,
   })
   const [showPassword, setShowPassword] = React.useState<{
@@ -65,10 +67,14 @@ export function SignUpForm() {
     resolver: zodResolver(SignUpSchema),
   })
 
-  const { isSubmitting } = form.formState
-  const isPending = isLoading.discord || isLoading.github
+  const isPending = isLoading.email || isLoading.discord || isLoading.github
 
   async function onSubmit(data: z.infer<typeof SignUpSchema>) {
+    setIsLoading((prev) => ({
+      ...prev,
+      email: true,
+    }))
+
     try {
       await authClient.signUp.email({
         ...data,
@@ -78,6 +84,10 @@ export function SignUpForm() {
             toast.error("Something went wrong:", {
               description: error.message,
             })
+            setIsLoading((prev) => ({
+              ...prev,
+              email: false,
+            }))
           },
           onSuccess() {
             form.reset()
@@ -100,6 +110,7 @@ export function SignUpForm() {
         ...prev,
         [provider]: true,
       }))
+
       await authClient.signIn.social({
         callbackURL: "/dashboard",
         fetchOptions: {
@@ -108,6 +119,10 @@ export function SignUpForm() {
             toast.error("Something went wrong:", {
               description: error.message,
             })
+            setIsLoading((prev) => ({
+              ...prev,
+              [provider]: false,
+            }))
           },
         },
         provider,
@@ -117,11 +132,6 @@ export function SignUpForm() {
       toast.error("Something went wrong:", {
         description: (error as Error).message,
       })
-    } finally {
-      setIsLoading((prev) => ({
-        ...prev,
-        [provider]: false,
-      }))
     }
   }
 
@@ -130,7 +140,7 @@ export function SignUpForm() {
       <FieldGroup>
         <Field>
           <Button
-            disabled={isPending || isSubmitting}
+            disabled={isPending}
             onClick={() => handleOAuth("discord")}
             type="button"
             variant="outline"
@@ -139,7 +149,7 @@ export function SignUpForm() {
             Sign in with Discord
           </Button>
           <Button
-            disabled={isPending || isSubmitting}
+            disabled={isPending}
             onClick={() => handleOAuth("github")}
             type="button"
             variant="outline"
@@ -164,7 +174,7 @@ export function SignUpForm() {
               <Input
                 {...field}
                 aria-invalid={fieldState.invalid}
-                disabled={isPending || isSubmitting}
+                disabled={isPending}
                 id="username"
                 placeholder="Jarls Burg"
                 type="text"
@@ -185,7 +195,7 @@ export function SignUpForm() {
               <Input
                 {...field}
                 aria-invalid={fieldState.invalid}
-                disabled={isPending || isSubmitting}
+                disabled={isPending}
                 id="email"
                 placeholder="jburg@example.com"
                 type="email"
@@ -208,7 +218,7 @@ export function SignUpForm() {
                   <InputGroupInput
                     {...field}
                     aria-invalid={fieldState.invalid}
-                    disabled={isPending || isSubmitting}
+                    disabled={isPending}
                     id="password"
                     placeholder="********"
                     type={showPassword.password ? "text" : "password"}
@@ -248,7 +258,7 @@ export function SignUpForm() {
                   <InputGroupInput
                     {...field}
                     aria-invalid={fieldState.invalid}
-                    disabled={isPending || isSubmitting}
+                    disabled={isPending}
                     id="passwordConfirmation"
                     placeholder="********"
                     type={
@@ -257,7 +267,7 @@ export function SignUpForm() {
                   />
                   <InputGroupAddon align="inline-end">
                     <InputGroupButton
-                      disabled={isPending || isSubmitting}
+                      disabled={isPending}
                       onClick={() => {
                         setShowPassword({
                           ...showPassword,
@@ -286,8 +296,8 @@ export function SignUpForm() {
         </div>
 
         <Field>
-          <Button disabled={isPending || isSubmitting} type="submit">
-            {isSubmitting ? <Spinner /> : <IconLogin2 />}
+          <Button disabled={isPending} type="submit">
+            {isLoading.email ? <Spinner /> : <IconLogin2 />}
             Sign Up
           </Button>
           <FieldDescription className="text-center">
