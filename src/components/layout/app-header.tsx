@@ -1,6 +1,6 @@
 "use client"
 
-import { IconMenu2, IconMenuDeep } from "@tabler/icons-react"
+import { IconBox, IconMenu2, IconMenuDeep } from "@tabler/icons-react"
 import { usePathname } from "next/navigation"
 
 import {
@@ -45,12 +45,15 @@ export function AppHeader() {
         />
         <Breadcrumb>
           <BreadcrumbList>
-            <BreadcrumbItem className="@md:block hidden">
-              <BreadcrumbLink href={parentHref}>{parent}</BreadcrumbLink>
+            <BreadcrumbItem>
+              <BreadcrumbLink href={parentHref}>
+                <IconBox className="block @sm:hidden size-4" />
+                <span className="@sm:block hidden">{parent}</span>
+              </BreadcrumbLink>
             </BreadcrumbItem>
             {title && (
               <>
-                <BreadcrumbSeparator className="@md:block hidden" />
+                <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbPage>{title}</BreadcrumbPage>
                 </BreadcrumbItem>
