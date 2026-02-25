@@ -16,6 +16,7 @@ import { toast } from "sonner"
 import type z from "zod"
 
 import { Icons } from "@/components/icons"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Field,
@@ -170,11 +171,20 @@ export function SignInForm() {
     })
   }
 
+  const lastMethod = authClient.getLastUsedLoginMethod()
+
+  const LastUsedBadge = () => (
+    <Badge className="absolute -top-2 -right-2 ml-2 h-4 px-1 text-xs">
+      Last used
+    </Badge>
+  )
+
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
         <Field>
           <Button
+            className="relative"
             disabled={isPending}
             onClick={() => handleOAuth("discord")}
             type="button"
@@ -182,8 +192,10 @@ export function SignInForm() {
           >
             {isLoading.discord ? <Spinner /> : <Icons.discord />}
             Sign in with Discord
+            {lastMethod === "discord" && <LastUsedBadge />}
           </Button>
           <Button
+            className="relative"
             disabled={isPending}
             onClick={() => handleOAuth("github")}
             type="button"
@@ -191,6 +203,7 @@ export function SignInForm() {
           >
             {isLoading.github ? <Spinner /> : <Icons.github />}
             Sign in with GitHub
+            {lastMethod === "github" && <LastUsedBadge />}
           </Button>
         </Field>
 
@@ -267,9 +280,15 @@ export function SignInForm() {
         />
 
         <Field>
-          <Button disabled={isPending} type="submit">
+          <Button
+            className="relative bg-foreground text-background hover:bg-foreground/80"
+            disabled={isPending}
+            type="submit"
+            variant="secondary"
+          >
             {isLoading.email ? <Spinner /> : <IconLogin2 />}
             Login
+            {lastMethod === "email" && <LastUsedBadge />}
           </Button>
           <FieldDescription className="text-center">
             Don&apos;t have an account? <Link href="/auth/signup">Sign up</Link>

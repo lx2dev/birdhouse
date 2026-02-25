@@ -295,7 +295,11 @@ export function SignUpForm() {
         </div>
 
         <Field>
-          <Button disabled={isPending} type="submit">
+          <Button
+            className="bg-foreground text-background hover:bg-foreground/80"
+            disabled={isPending}
+            type="submit"
+          >
             {isLoading.email ? <Spinner /> : <IconLogin2 />}
             Sign Up
           </Button>
