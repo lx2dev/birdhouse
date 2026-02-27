@@ -1,6 +1,6 @@
 import { Separator } from "@/components/ui/separator"
+import { ConnectedAccountsSection } from "@/modules/settings/sections/connected-accounts"
 import { EmailAddressesSection } from "@/modules/settings/sections/email-addresses"
-import { PhoneNumberSection } from "@/modules/settings/sections/phone-number"
 import { UserInfoSection } from "@/modules/settings/sections/user-info"
 
 export function ProfileView() {
@@ -10,13 +10,7 @@ export function ProfileView() {
       <Separator className="my-8" />
       <EmailAddressesSection />
       <Separator className="my-8" />
-      <PhoneNumberSection />
-      <Separator className="my-8" />
-
-      {/* 
-        TODO: Add more sections here:
-        - Connected accounts
-      */}
+      <ConnectedAccountsSection />
     </div>
   )
 }
