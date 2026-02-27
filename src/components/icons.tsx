@@ -1,4 +1,8 @@
+import { IconBox } from "@tabler/icons-react"
 import type * as React from "react"
+
+import type { TRUSTED_PROVIDERS } from "@/constants"
+import { cn } from "@/lib/utils"
 
 type IconProps = React.HTMLAttributes<SVGElement>
 
@@ -54,4 +58,18 @@ export const Icons = {
       <path d="M268.3,540.11c2.37-6.57,4.4-13.28,7.17-19.68,11.15-25.79,28.76-46.85,48.82-66.11,23-22.08,49.23-39.9,75.53-57.63,.34-.23,.79-.31,1.73,0-.89,.93-1.67,1.99-2.69,2.76-32.43,24.4-58.63,54.56-81.81,87.62-12.81,18.26-27.02,35.43-43.65,50.43-1.27,1.14-2.6,2.21-3.89,3.32-.4-.23-.81-.47-1.21-.7Z" />
     </svg>
   ),
+}
+
+export function getIconForProvider(
+  provider: (typeof TRUSTED_PROVIDERS)[number],
+  className?: string,
+) {
+  switch (provider) {
+    case "discord":
+      return <Icons.discord className={cn("fill-foreground", className)} />
+    case "github":
+      return <Icons.github className={cn("fill-foreground", className)} />
+    default:
+      return <IconBox className={cn("stroke-foreground", className)} />
+  }
 }
