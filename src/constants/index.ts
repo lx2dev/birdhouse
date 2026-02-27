@@ -14,6 +14,7 @@ import {
   IconUsers,
   IconWorld,
 } from "@tabler/icons-react"
+import type { SocialProvider } from "better-auth"
 
 export const DEFAULT_FETCH_LIMIT = 10
 
@@ -145,3 +146,8 @@ export const NAV_ITEMS: Record<string, NavSection> = Object.fromEntries(
     { ...section, order: index },
   ]),
 )
+
+export const TRUSTED_PROVIDERS: SocialProvider[] = [
+  "discord",
+  "github",
+] as const
