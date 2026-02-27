@@ -1,13 +1,20 @@
 import { TRPCError } from "@trpc/server"
 import { eq } from "drizzle-orm"
 
-import { userInsertSchema } from "@/modules/settings/schemas/account"
+import {
+  accountInsertSchema,
+  userInsertSchema,
+} from "@/modules/settings/schemas/account"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import { auth } from "@/server/auth"
-import { user as userTable } from "@/server/db/schema"
+import { account as accoutTable, user as userTable } from "@/server/db/schema"
 
 export const accountRouter = createTRPCRouter({
-  // TODO: Fix changeEmail
+  /**
+   * TODO: Fix changeEmail
+   *
+   * ? I don't remember what is wrong here
+   */
   changeEmail: protectedProcedure
     .input(
       userInsertSchema.pick({
@@ -42,12 +49,47 @@ export const accountRouter = createTRPCRouter({
       return status
     }),
 
+  disconnect: protectedProcedure
+    .input(
+      accountInsertSchema.pick({
+        providerId: true,
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      console.log(input)
+
+      const { ok, status, statusText } = await auth.api.unlinkAccount({
+        asResponse: true,
+        body: {
+          providerId: input.providerId,
+        },
+        headers: ctx.headers,
+      })
+
+      if (!ok) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to disconnect account: ${statusText}`,
+        })
+      }
+
+      return status
+    }),
+
   getProfile: protectedProcedure.query(async ({ ctx }) => {
     const { user } = ctx.session
 
-    const profile = await ctx.db.query.user.findFirst({
-      where: eq(userTable.id, user.id),
-    })
+    const rows = await ctx.db
+      .select({
+        account: accoutTable,
+        profile: userTable,
+      })
+      .from(userTable)
+      .leftJoin(accoutTable, eq(accoutTable.userId, userTable.id))
+      .where(eq(userTable.id, user.id))
+
+    const profile = rows[0]?.profile
+    const accounts = rows.flatMap((row) => (row.account ? [row.account] : []))
 
     if (!profile) {
       throw new TRPCError({
@@ -56,7 +98,17 @@ export const accountRouter = createTRPCRouter({
       })
     }
 
-    return profile
+    if (!accounts) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to load connected accounts",
+      })
+    }
+
+    return {
+      ...profile,
+      accounts,
+    }
   }),
 
   updateProfile: protectedProcedure
