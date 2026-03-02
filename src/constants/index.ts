@@ -150,4 +150,5 @@ export const NAV_ITEMS: Record<string, NavSection> = Object.fromEntries(
 export const TRUSTED_PROVIDERS: SocialProvider[] = [
   "discord",
   "github",
+  "google",
 ] as const

@@ -135,14 +135,18 @@ export const auth = betterAuth({
     },
   },
   socialProviders: {
-    discord: {
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
-    },
-    github: {
-      clientId: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
-    },
+    ...Object.fromEntries(
+      TRUSTED_PROVIDERS.map((provider) => [
+        provider,
+        {
+          clientId:
+            env[`${provider.toUpperCase()}_CLIENT_ID` as keyof typeof env],
+          clientSecret:
+            env[`${provider.toUpperCase()}_CLIENT_SECRET` as keyof typeof env],
+          enabled: true,
+        },
+      ]),
+    ),
   },
   user: {
     changeEmail: {
