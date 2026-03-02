@@ -4,8 +4,6 @@ export function formatProviderName(
   provider: (typeof TRUSTED_PROVIDERS)[number],
 ) {
   switch (provider) {
-    case "discord":
-      return "Discord"
     case "github":
       return "GitHub"
     default:
