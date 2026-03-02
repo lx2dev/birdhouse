@@ -56,13 +56,13 @@ function ConnectedAccountsSuspense() {
           Connected Accounts
         </h2>
       </div>
-      <div className="col-span-2 flex flex-col items-start gap-y-8 rounded-md border bg-muted p-4 dark:bg-popover/50">
+      <div className="col-span-2">
         {TRUSTED_PROVIDERS.map((provider) => {
           const account = accounts.find((acc) => acc.providerId === provider)
 
           return (
             <div
-              className="col-end-1 grid w-full @md:grid-cols-3 items-center @md:gap-0 gap-4"
+              className="col-end-1 grid w-full @md:grid-cols-3 items-center @md:gap-0 gap-4 rounded-md p-4 even:bg-muted/50 dark:even:bg-popover/50"
               key={provider}
             >
               <div className="flex items-center gap-2">
