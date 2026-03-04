@@ -10,7 +10,7 @@ import { getIconForProvider } from "@/components/icons"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { TRUSTED_PROVIDERS } from "@/constants"
+import { TRUSTED_SOCIAL_PROVIDERS } from "@/constants"
 import { api } from "@/lib/api/client"
 import { authClient } from "@/lib/auth/client"
 import { formatProviderName } from "@/modules/settings/lib/utils"
@@ -57,7 +57,7 @@ function ConnectedAccountsSuspense() {
         </h2>
       </div>
       <div className="col-span-2">
-        {TRUSTED_PROVIDERS.map((provider) => {
+        {TRUSTED_SOCIAL_PROVIDERS.map((provider) => {
           const account = accounts.find((acc) => acc.providerId === provider)
 
           return (
@@ -114,7 +114,7 @@ ConnectedAccountsSection.Skeleton = function ConnectedAccountsSkeleton() {
         </h2>
       </div>
       <div className="col-span-2 flex flex-col items-start gap-y-8 rounded-md border bg-muted p-4 dark:bg-popover/50">
-        {TRUSTED_PROVIDERS.map((provider) => (
+        {TRUSTED_SOCIAL_PROVIDERS.map((provider) => (
           <div
             className="col-end-1 grid w-full @md:grid-cols-3 items-center @md:gap-0 gap-4"
             key={provider}

@@ -3,7 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { nextCookies } from "better-auth/next-js"
 import { admin, lastLoginMethod } from "better-auth/plugins"
 
-import { TRUSTED_PROVIDERS } from "@/constants"
+import { TRUSTED_SOCIAL_PROVIDERS } from "@/constants"
 import { env } from "@/env"
 import { getRedisClient } from "@/lib/redis"
 import { resend } from "@/lib/resend"
@@ -15,7 +15,7 @@ export const auth = betterAuth({
     accountLinking: {
       allowDifferentEmails: true,
       enabled: true,
-      trustedProviders: TRUSTED_PROVIDERS,
+      trustedProviders: [...TRUSTED_SOCIAL_PROVIDERS],
     },
   },
   baseURL: env.NEXT_PUBLIC_URL,

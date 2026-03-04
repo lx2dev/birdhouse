@@ -1,7 +1,7 @@
-import type { TRUSTED_PROVIDERS } from "@/constants"
+import type { TRUSTED_SOCIAL_PROVIDERS } from "@/constants"
 
 export function formatProviderName(
-  provider: (typeof TRUSTED_PROVIDERS)[number],
+  provider: (typeof TRUSTED_SOCIAL_PROVIDERS)[number],
 ) {
   switch (provider) {
     case "github":

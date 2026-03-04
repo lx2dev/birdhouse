@@ -147,8 +147,9 @@ export const NAV_ITEMS: Record<string, NavSection> = Object.fromEntries(
   ]),
 )
 
-export const TRUSTED_PROVIDERS: SocialProvider[] = [
+export const TRUSTED_SOCIAL_PROVIDERS = [
   "discord",
   "github",
   "google",
-] as const
+] as const satisfies readonly SocialProvider[]
+export type TrustedProvider = (typeof TRUSTED_SOCIAL_PROVIDERS)[number]
