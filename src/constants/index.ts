@@ -152,4 +152,4 @@ export const TRUSTED_SOCIAL_PROVIDERS = [
   "github",
   "google",
 ] as const satisfies readonly SocialProvider[]
-export type TrustedProvider = (typeof TRUSTED_SOCIAL_PROVIDERS)[number]
+export type TrustedSocialProvider = (typeof TRUSTED_SOCIAL_PROVIDERS)[number]

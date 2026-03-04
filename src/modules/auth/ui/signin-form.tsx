@@ -34,13 +34,13 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
-import type { TrustedProvider } from "@/constants"
+import type { TrustedSocialProvider } from "@/constants"
 import { TRUSTED_SOCIAL_PROVIDERS } from "@/constants"
 import { env } from "@/env"
 import { authClient } from "@/lib/auth/client"
 import { SignInSchema } from "@/modules/auth/schemas/auth"
 
-type LoadingState = Record<TrustedProvider, boolean> & {
+type LoadingState = Record<TrustedSocialProvider, boolean> & {
   email: boolean
   resetPassword: boolean
 }
@@ -50,7 +50,7 @@ export function SignInForm() {
 
   const providerLoadingState = Object.fromEntries(
     TRUSTED_SOCIAL_PROVIDERS.map((provider) => [provider, false]),
-  ) as Record<TrustedProvider, boolean>
+  ) as Record<TrustedSocialProvider, boolean>
 
   const [isLoading, setIsLoading] = React.useState<LoadingState>({
     ...providerLoadingState,

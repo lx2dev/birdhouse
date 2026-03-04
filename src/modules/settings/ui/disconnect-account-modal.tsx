@@ -18,6 +18,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 import { Spinner } from "@/components/ui/spinner"
+import type { TrustedSocialProvider } from "@/constants"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { api } from "@/lib/api/client"
 import { formatProviderName } from "@/modules/settings/lib/utils"
@@ -103,7 +104,9 @@ function DisconnectAccountConfirmationForm({
     <div className="space-y-4">
       <p className="text-muted-foreground text-sm">
         Are you sure you want to disconnect your{" "}
-        <span className="font-semibold">{formatProviderName(providerId)}</span>{" "}
+        <span className="font-semibold">
+          {formatProviderName(providerId as TrustedSocialProvider)}
+        </span>{" "}
         account? This action cannot be undone.
       </p>
 
