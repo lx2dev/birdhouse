@@ -15,7 +15,7 @@ import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type z from "zod"
 
-import { Icons } from "@/components/icons"
+import { getIconForProvider } from "@/components/icons"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -34,22 +34,27 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
+import type { TrustedProvider } from "@/constants"
+import { TRUSTED_SOCIAL_PROVIDERS } from "@/constants"
 import { env } from "@/env"
 import { authClient } from "@/lib/auth/client"
 import { SignInSchema } from "@/modules/auth/schemas/auth"
 
+type LoadingState = Record<TrustedProvider, boolean> & {
+  email: boolean
+  resetPassword: boolean
+}
+
 export function SignInForm() {
   const router = useRouter()
 
-  const [isLoading, setIsLoading] = React.useState<{
-    email: boolean
-    discord: boolean
-    github: boolean
-    resetPassword: boolean
-  }>({
-    discord: false,
+  const providerLoadingState = Object.fromEntries(
+    TRUSTED_SOCIAL_PROVIDERS.map((provider) => [provider, false]),
+  ) as Record<TrustedProvider, boolean>
+
+  const [isLoading, setIsLoading] = React.useState<LoadingState>({
+    ...providerLoadingState,
     email: false,
-    github: false,
     resetPassword: false,
   })
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
@@ -62,11 +67,7 @@ export function SignInForm() {
     resolver: zodResolver(SignInSchema),
   })
 
-  const isPending =
-    isLoading.email ||
-    isLoading.discord ||
-    isLoading.github ||
-    isLoading.resetPassword
+  const isPending = Object.values(isLoading).some(Boolean)
 
   async function onSubmit(data: z.infer<typeof SignInSchema>) {
     try {
@@ -101,7 +102,9 @@ export function SignInForm() {
     }
   }
 
-  async function handleOAuth(provider: "discord" | "github") {
+  async function handleOAuth(
+    provider: (typeof TRUSTED_SOCIAL_PROVIDERS)[number],
+  ) {
     try {
       setIsLoading((prev) => ({
         ...prev,
@@ -182,29 +185,20 @@ export function SignInForm() {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
-        <Field>
-          <Button
-            className="relative"
-            disabled={isPending}
-            onClick={() => handleOAuth("discord")}
-            type="button"
-            variant="outline"
-          >
-            {isLoading.discord ? <Spinner /> : <Icons.discord />}
-            Sign in with Discord
-            {lastMethod === "discord" && <LastUsedBadge />}
-          </Button>
-          <Button
-            className="relative"
-            disabled={isPending}
-            onClick={() => handleOAuth("github")}
-            type="button"
-            variant="outline"
-          >
-            {isLoading.github ? <Spinner /> : <Icons.github />}
-            Sign in with GitHub
-            {lastMethod === "github" && <LastUsedBadge />}
-          </Button>
+        <Field className={`grid grid-cols-${TRUSTED_SOCIAL_PROVIDERS.length}`}>
+          {Object.entries(TRUSTED_SOCIAL_PROVIDERS).map(([_, provider]) => (
+            <Button
+              className="relative"
+              disabled={isPending}
+              key={provider}
+              onClick={() => handleOAuth(provider)}
+              type="button"
+              variant="outline"
+            >
+              {isLoading[provider] ? <Spinner /> : getIconForProvider(provider)}
+              {lastMethod === provider && <LastUsedBadge />}
+            </Button>
+          ))}
         </Field>
 
         <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
