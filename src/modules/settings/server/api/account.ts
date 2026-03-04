@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server"
 import { eq } from "drizzle-orm"
+import z from "zod"
 
 import {
   accountInsertSchema,
@@ -43,6 +44,51 @@ export const accountRouter = createTRPCRouter({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: `Failed to change email address: ${statusText}`,
+        })
+      }
+
+      return status
+    }),
+
+  changePassword: protectedProcedure
+    .input(
+      z.object({
+        currentPassword: accountInsertSchema.shape.password,
+        newPassword: accountInsertSchema.shape.password,
+        revokeOtherSessions: z.boolean().default(true),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { currentPassword, newPassword, revokeOtherSessions } = input
+
+      if (!currentPassword || !newPassword) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Current password and new password are required",
+        })
+      }
+
+      if (currentPassword === newPassword) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "New password must be different from the current one",
+        })
+      }
+
+      const { ok, status, statusText } = await auth.api.changePassword({
+        asResponse: true,
+        body: {
+          currentPassword,
+          newPassword,
+          revokeOtherSessions,
+        },
+        headers: ctx.headers,
+      })
+
+      if (!ok) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to change password: ${statusText}`,
         })
       }
 
