@@ -43,6 +43,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     autoSignIn: true,
     enabled: true,
+    minPasswordLength: 12,
     async onPasswordReset({ user }) {
       const year = new Date().getFullYear()
       const timeOfReset = new Date().toLocaleString("en-US", {
