@@ -17,7 +17,9 @@ export const auth = betterAuth({
       enabled: true,
       trustedProviders: [...TRUSTED_SOCIAL_PROVIDERS],
     },
+    encryptOAuthTokens: true,
   },
+  appName: "Birdhouse",
   baseURL: env.NEXT_PUBLIC_URL,
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -39,6 +41,7 @@ export const auth = betterAuth({
     },
   },
   emailAndPassword: {
+    autoSignIn: true,
     enabled: true,
     async onPasswordReset({ user }) {
       const year = new Date().getFullYear()
@@ -67,7 +70,9 @@ export const auth = betterAuth({
         to: user.email,
       })
     },
+    requireEmailVerification: true,
     resetPasswordTokenExpiresIn: 60 * 10,
+    revokeSessionsOnPasswordReset: true,
     async sendResetPassword({ url, user }) {
       const year = new Date().getFullYear()
 
@@ -89,6 +94,7 @@ export const auth = betterAuth({
   },
   emailVerification: {
     autoSignInAfterVerification: true,
+    sendOnSignIn: true,
     sendOnSignUp: true,
     async sendVerificationEmail({ user, url }) {
       const year = new Date().getFullYear()
@@ -134,9 +140,10 @@ export const auth = betterAuth({
       else await redis.set(key, value)
     },
   },
+  secret: env.BETTER_AUTH_SECRET,
   socialProviders: {
     ...Object.fromEntries(
-      TRUSTED_PROVIDERS.map((provider) => [
+      TRUSTED_SOCIAL_PROVIDERS.map((provider) => [
         provider,
         {
           clientId:
