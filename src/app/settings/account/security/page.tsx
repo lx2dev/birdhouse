@@ -1,16 +1,18 @@
 import { redirect } from "next/navigation"
 
+import { api, HydrateClient } from "@/lib/api/server"
 import { getSession } from "@/lib/auth/utils"
+import { SecurityView } from "@/modules/settings/views/security"
 
 export default async function SecurityPage() {
   const session = await getSession()
   if (!session) return redirect("/auth/signin")
 
+  void api.account.getProfile.prefetch()
+
   return (
-    <div className="space-y-2">
-      <h1 className="font-semibold text-2xl tracking-tight">
-        Security settings
-      </h1>
-    </div>
+    <HydrateClient>
+      <SecurityView />
+    </HydrateClient>
   )
 }
