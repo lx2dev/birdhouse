@@ -188,5 +188,62 @@ export const auth = betterAuth({
       },
       updateEmailWithoutVerification: true,
     },
+    deleteUser: {
+      async afterDelete(user) {
+        const year = new Date().getFullYear()
+        const timeOfChange = new Date().toLocaleString("en-US", {
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          month: "short",
+          second: "2-digit",
+          year: "numeric",
+        })
+
+        void resend.emails.send({
+          from: "Birdhouse <no-reply@lx2.dev>",
+          subject: "Your account has been deleted",
+          template: {
+            id: "after-account-deletion",
+            variables: {
+              SUPPORT_URL: `${env.NEXT_PUBLIC_URL}/support`,
+              TIME_OF_CHANGE: timeOfChange,
+              USER_NAME: user.name,
+              YEAR: year,
+            },
+          },
+          to: user.email,
+        })
+      },
+      deleteTokenExpiresIn: 60 * 10,
+      enabled: false,
+      async sendDeleteAccountVerification({ user, url }) {
+        const year = new Date().getFullYear()
+        const timeOfChange = new Date().toLocaleString("en-US", {
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          month: "short",
+          second: "2-digit",
+          year: "numeric",
+        })
+
+        void resend.emails.send({
+          from: "Birdhouse <no-reply@lx2.dev>",
+          subject: "Confirm your account deletion",
+          template: {
+            id: "confirm-account-deletion",
+            variables: {
+              CONFIRMATION_URL: url,
+              SUPPORT_URL: `${env.NEXT_PUBLIC_URL}/support`,
+              TIME_OF_CHANGE: timeOfChange,
+              USER_NAME: user.name,
+              YEAR: year,
+            },
+          },
+          to: user.email,
+        })
+      },
+    },
   },
 })
