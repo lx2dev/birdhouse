@@ -7,6 +7,10 @@ export default async function NotificationSettingsPage() {
   if (!session) return redirect("/auth/signin")
 
   return (
+    /**
+     * - Notifications
+     *  - Email
+     */
     <div className="space-y-2">
       <h1 className="font-bold text-2xl tracking-tight">
         Notification Settings

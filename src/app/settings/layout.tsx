@@ -28,7 +28,12 @@ export default async function SettingsLayout({
           <AppSidebar />
           <SidebarInset>
             <AppHeader />
-            <main className="size-full p-4 lg:p-8">{children}</main>
+            <main className="size-full p-4 lg:p-8">
+              {/* 
+                - Billing View (Maybe)
+              */}
+              {children}
+            </main>
           </SidebarInset>
         </SidebarProvider>
       </div>

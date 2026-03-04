@@ -13,15 +13,6 @@ export default async function ProfilePage() {
   return (
     <HydrateClient>
       <ProfileView />
-      {/* 
-        TODO: Add more views here:
-        - Security
-          - Password
-          - 2Fa
-          - Sessions
-        - Notifications (This requires an adjustment of the current settings layout)
-        - Billing (Maybe)
-      */}
     </HydrateClient>
   )
 }
