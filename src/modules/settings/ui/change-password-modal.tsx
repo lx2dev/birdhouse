@@ -1,12 +1,11 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { IconCheck, IconKey, IconRefresh } from "@tabler/icons-react"
+import { IconKey, IconRefresh } from "@tabler/icons-react"
 import * as React from "react"
-import type { ControllerRenderProps } from "react-hook-form"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
-import z from "zod"
+import type z from "zod"
 
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
@@ -29,6 +28,8 @@ import { Spinner } from "@/components/ui/spinner"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { api } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
+import { passwordFormSchema } from "@/modules/settings/schemas/account"
+import { PasswordRequirements } from "@/modules/settings/ui/password-requirements"
 
 interface ChangePasswordModalProps {
   hasPassword: boolean
@@ -75,28 +76,15 @@ interface ChangePasswordFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const formSchema = z
-  .object({
-    confirmNewPassword: z.string().min(12, "Please confirm your new password"),
-    currentPassword: z.string().min(12, "Current password is required"),
-    newPassword: z
-      .string()
-      .min(12, "New password must be at least 12 characters long"),
-    revokeOtherSessions: z.boolean(),
-  })
-  .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: "New password and confirmation do not match",
-  })
-
 function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<z.infer<typeof passwordFormSchema>>({
     defaultValues: {
       confirmNewPassword: "",
       currentPassword: "",
       newPassword: "",
       revokeOtherSessions: true,
     },
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(passwordFormSchema),
   })
 
   const changePassword = api.account.changePassword.useMutation({
@@ -107,7 +95,7 @@ function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof passwordFormSchema>) {
     if (values.newPassword !== values.confirmNewPassword) {
       toast.error("New password and confirmation do not match")
       return
@@ -168,9 +156,9 @@ function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
                 type="password"
               />
               <FieldDescription>
-                <DynamicPasswordRequirements field={field} />
+                {/* @ts-expect-error - mismatched types */}
+                <PasswordRequirements field={field} />
               </FieldDescription>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
@@ -192,6 +180,19 @@ function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
                 placeholder="Confirm your new password"
                 type="password"
               />
+              <FieldDescription
+                className={cn(
+                  "text-sm",
+                  field.value === form.getValues("newPassword")
+                    ? "text-green-500"
+                    : "text-destructive",
+                )}
+              >
+                {field.value.length > 0 &&
+                  (field.value === form.getValues("newPassword")
+                    ? "Passwords match"
+                    : "Passwords do not match")}
+              </FieldDescription>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -216,45 +217,5 @@ function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
         </Button>
       </div>
     </form>
-  )
-}
-
-interface PasswordRequirementsProps {
-  field: ControllerRenderProps<z.infer<typeof formSchema>, "newPassword">
-}
-
-function DynamicPasswordRequirements({ field }: PasswordRequirementsProps) {
-  const { value } = field
-
-  const requirements = [
-    {
-      isValid: value.length >= 12,
-      label: "At least 12 characters",
-    },
-    {
-      isValid: /[A-Z]/.test(value),
-      label: "At least one uppercase letter",
-    },
-    {
-      isValid: /[!@#$%^&*(),.?":{}|<>]/.test(value),
-      label: "At least one special character",
-    },
-  ]
-
-  return (
-    <ul className="space-y-1">
-      {requirements.map((requirement, index) => (
-        <li
-          className={cn(
-            "flex items-center gap-2 text-sm",
-            requirement.isValid ? "text-green-500" : "text-muted-foreground",
-          )}
-          key={index}
-        >
-          <IconCheck className="inline-block size-4 shrink-0" />
-          {requirement.label}
-        </li>
-      ))}
-    </ul>
   )
 }
