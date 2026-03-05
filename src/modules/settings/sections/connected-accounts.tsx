@@ -62,7 +62,7 @@ function ConnectedAccountsSuspense() {
 
           return (
             <div
-              className="col-end-1 grid w-full @md:grid-cols-3 items-center @md:gap-0 gap-4 rounded-md p-4 even:bg-muted/50 dark:even:bg-popover/50"
+              className="col-end-1 grid w-full @md:grid-cols-3 items-center @md:gap-0 gap-4 rounded-md p-4 odd:bg-muted/50 dark:odd:bg-popover/50"
               key={provider}
             >
               <div className="flex items-center gap-2">
