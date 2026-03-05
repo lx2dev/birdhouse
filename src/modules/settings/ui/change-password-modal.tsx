@@ -43,9 +43,7 @@ export function ChangePasswordModal({ hasPassword }: ChangePasswordModalProps) {
     return (
       <Dialog onOpenChange={setOpen} open={open}>
         <DialogTrigger
-          render={
-            <Button className="-ml-3" disabled={!hasPassword} variant="ghost" />
-          }
+          render={<Button disabled={!hasPassword} variant="outline" />}
         >
           <IconKey /> Change password
         </DialogTrigger>
@@ -59,7 +57,7 @@ export function ChangePasswordModal({ hasPassword }: ChangePasswordModalProps) {
   return (
     <Drawer onOpenChange={setOpen} open={open}>
       <DrawerTrigger asChild>
-        <Button className="-ml-3" disabled={!hasPassword} variant="ghost">
+        <Button disabled={!hasPassword} variant="outline">
           <IconKey /> Change password
         </Button>
       </DrawerTrigger>
