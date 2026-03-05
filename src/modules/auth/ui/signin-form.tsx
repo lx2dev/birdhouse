@@ -102,9 +102,7 @@ export function SignInForm() {
     }
   }
 
-  async function handleOAuth(
-    provider: (typeof TRUSTED_SOCIAL_PROVIDERS)[number],
-  ) {
+  async function handleOAuth(provider: TrustedSocialProvider) {
     try {
       setIsLoading((prev) => ({
         ...prev,

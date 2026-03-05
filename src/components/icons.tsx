@@ -1,7 +1,7 @@
 import { IconBox } from "@tabler/icons-react"
 import type * as React from "react"
 
-import type { TRUSTED_SOCIAL_PROVIDERS } from "@/constants"
+import type { TrustedSocialProvider } from "@/constants"
 import { cn } from "@/lib/utils"
 
 type IconProps = React.HTMLAttributes<SVGElement>
@@ -304,7 +304,7 @@ export const Icons = {
 }
 
 export function getIconForProvider(
-  provider: (typeof TRUSTED_SOCIAL_PROVIDERS)[number],
+  provider: TrustedSocialProvider,
   className?: string,
 ) {
   switch (provider) {
