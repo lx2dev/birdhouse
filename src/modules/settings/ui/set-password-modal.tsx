@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { IconKey, IconRefresh } from "@tabler/icons-react"
+import { IconKey } from "@tabler/icons-react"
 import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -195,7 +195,7 @@ function SetPasswordForm({ setOpen }: SetPasswordFormProps) {
           Cancel
         </Button>
         <Button disabled={isLoading} type="submit">
-          {isLoading ? <Spinner /> : <IconRefresh />}
+          {isLoading ? <Spinner /> : <IconKey />}
           Set password
         </Button>
       </div>
