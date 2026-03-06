@@ -12,9 +12,7 @@ export function SignInView() {
     <Card>
       <CardHeader className="text-center">
         <CardTitle className="text-xl">Welcome back</CardTitle>
-        <CardDescription>
-          Login with your Discord or GitHub account
-        </CardDescription>
+        <CardDescription>Login to access your dashboard.</CardDescription>
       </CardHeader>
       <CardContent>
         <SignInForm />
