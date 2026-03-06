@@ -16,7 +16,8 @@ import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type z from "zod"
 
-import { Icons } from "@/components/icons"
+import { getIconForProvider } from "@/components/icons"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Field,
@@ -34,20 +35,27 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
+import type { TrustedSocialProvider } from "@/constants"
+import { TRUSTED_SOCIAL_PROVIDERS } from "@/constants"
 import { authClient } from "@/lib/auth/client"
 import { SignUpSchema } from "@/modules/auth/schemas/auth"
+
+type LoadingState = Record<TrustedSocialProvider, boolean> & {
+  email: boolean
+  resetPassword: boolean
+}
 
 export function SignUpForm() {
   const router = useRouter()
 
-  const [isLoading, setIsLoading] = React.useState<{
-    email: boolean
-    discord: boolean
-    github: boolean
-  }>({
-    discord: false,
+  const providerLoadingState = Object.fromEntries(
+    TRUSTED_SOCIAL_PROVIDERS.map((provider) => [provider, false]),
+  ) as Record<TrustedSocialProvider, boolean>
+
+  const [isLoading, setIsLoading] = React.useState<LoadingState>({
+    ...providerLoadingState,
     email: false,
-    github: false,
+    resetPassword: false,
   })
   const [showPassword, setShowPassword] = React.useState<{
     password: boolean
@@ -67,7 +75,7 @@ export function SignUpForm() {
     resolver: zodResolver(SignUpSchema),
   })
 
-  const isPending = isLoading.email || isLoading.discord || isLoading.github
+  const isPending = Object.values(isLoading).some(Boolean)
 
   async function onSubmit(data: z.infer<typeof SignUpSchema>) {
     setIsLoading((prev) => ({
@@ -103,7 +111,7 @@ export function SignUpForm() {
     }
   }
 
-  async function handleOAuth(provider: "discord" | "github") {
+  async function handleOAuth(provider: TrustedSocialProvider) {
     try {
       setIsLoading((prev) => ({
         ...prev,
@@ -129,33 +137,36 @@ export function SignUpForm() {
     } catch (error) {
       console.error(error)
       toast.error("Something went wrong:", {
-        description: (error as Error).message,
+        description: (error as Error).message || "See console for details.",
       })
     }
   }
 
+  const lastMethod = authClient.getLastUsedLoginMethod()
+
+  const LastUsedBadge = () => (
+    <Badge className="absolute -top-2 -right-2 ml-2 h-4 px-1 text-xs">
+      Last used
+    </Badge>
+  )
+
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
-        <Field>
-          <Button
-            disabled={isPending}
-            onClick={() => handleOAuth("discord")}
-            type="button"
-            variant="outline"
-          >
-            {isLoading.discord ? <Spinner /> : <Icons.discord />}
-            Sign in with Discord
-          </Button>
-          <Button
-            disabled={isPending}
-            onClick={() => handleOAuth("github")}
-            type="button"
-            variant="outline"
-          >
-            {isLoading.github ? <Spinner /> : <Icons.github />}
-            Sign in with GitHub
-          </Button>
+        <Field className={`grid grid-cols-${TRUSTED_SOCIAL_PROVIDERS.length}`}>
+          {Object.entries(TRUSTED_SOCIAL_PROVIDERS).map(([_, provider]) => (
+            <Button
+              className="relative"
+              disabled={isPending}
+              key={provider}
+              onClick={() => handleOAuth(provider)}
+              type="button"
+              variant="outline"
+            >
+              {isLoading[provider] ? <Spinner /> : getIconForProvider(provider)}
+              {lastMethod === provider && <LastUsedBadge />}
+            </Button>
+          ))}
         </Field>
 
         <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
@@ -296,12 +307,13 @@ export function SignUpForm() {
 
         <Field>
           <Button
-            className="bg-foreground text-background hover:bg-foreground/80"
+            className="relative bg-foreground text-background hover:bg-foreground/80"
             disabled={isPending}
             type="submit"
           >
             {isLoading.email ? <Spinner /> : <IconLogin2 />}
             Sign Up
+            {lastMethod === "email" && <LastUsedBadge />}
           </Button>
           <FieldDescription className="text-center">
             Already have an account? <Link href="/auth/signin">Sign in</Link>
