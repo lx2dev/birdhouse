@@ -1,14 +1,14 @@
 import { TRPCError } from "@trpc/server"
 import { eq } from "drizzle-orm"
-import z from "zod"
 
 import {
   accountInsertSchema,
+  passwordFormSchema,
   userInsertSchema,
 } from "@/modules/settings/schemas/account"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
 import { auth } from "@/server/auth"
-import { account as accoutTable, user as userTable } from "@/server/db/schema"
+import { account as accountTable, user as userTable } from "@/server/db/schema"
 
 export const accountRouter = createTRPCRouter({
   /**
@@ -52,10 +52,8 @@ export const accountRouter = createTRPCRouter({
 
   changePassword: protectedProcedure
     .input(
-      z.object({
-        currentPassword: accountInsertSchema.shape.password,
-        newPassword: accountInsertSchema.shape.password,
-        revokeOtherSessions: z.boolean().default(true),
+      passwordFormSchema.omit({
+        confirmNewPassword: true,
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -125,17 +123,16 @@ export const accountRouter = createTRPCRouter({
   getProfile: protectedProcedure.query(async ({ ctx }) => {
     const { user } = ctx.session
 
-    const rows = await ctx.db
-      .select({
-        account: accoutTable,
-        profile: userTable,
-      })
+    const [profile] = await ctx.db
+      .select()
       .from(userTable)
-      .leftJoin(accoutTable, eq(accoutTable.userId, userTable.id))
       .where(eq(userTable.id, user.id))
+      .limit(1)
 
-    const profile = rows[0]?.profile
-    const accounts = rows.flatMap((row) => (row.account ? [row.account] : []))
+    const accounts = await ctx.db
+      .select()
+      .from(accountTable)
+      .where(eq(accountTable.userId, user.id))
 
     if (!profile) {
       throw new TRPCError({
@@ -144,18 +141,45 @@ export const accountRouter = createTRPCRouter({
       })
     }
 
-    if (!accounts) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to load connected accounts",
-      })
-    }
-
     return {
       ...profile,
       accounts,
     }
   }),
+
+  setPassword: protectedProcedure
+    .input(
+      passwordFormSchema.pick({
+        newPassword: true,
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { newPassword } = input
+
+      if (!newPassword) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "New password is required",
+        })
+      }
+
+      const { ok, status, statusText } = await auth.api.setPassword({
+        asResponse: true,
+        body: {
+          newPassword,
+        },
+        headers: ctx.headers,
+      })
+
+      if (!ok) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to set password: ${statusText}`,
+        })
+      }
+
+      return status
+    }),
 
   updateProfile: protectedProcedure
     .input(
