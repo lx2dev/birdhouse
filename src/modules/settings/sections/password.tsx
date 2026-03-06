@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/lib/api/client"
 import { ChangePasswordModal } from "@/modules/settings/ui/change-password-modal"
+import { SetPasswordModal } from "@/modules/settings/ui/set-password-modal"
 
 export function PasswordSection() {
   return (
@@ -23,7 +24,7 @@ function PasswordSectionSuspense() {
   const [profile] = api.account.getProfile.useSuspenseQuery()
 
   const hasPassword = profile.accounts.some(
-    (acc) => acc.providerId === "credentials",
+    (account) => account.providerId === "credential",
   )
 
   return (
@@ -31,20 +32,25 @@ function PasswordSectionSuspense() {
       <div className="self-start">
         <h2 className="font-semibold text-xl tracking-tight">Password</h2>
       </div>
-      <div className="flex items-center gap-x-6">
+      <div className="flex items-center gap-x-2">
+        <IconKey className="size-4" />
         <input
-          className="w-full max-w-xs text-foreground/75 focus-within:outline-0"
-          defaultValue={
+          className="w-full max-w-sm text-base text-foreground/75 focus-within:outline-0"
+          readOnly
+          type={hasPassword ? "password" : "text"}
+          value={
             hasPassword
               ? "************"
               : "You are currently signed in with a third-party."
           }
-          readOnly
-          type={hasPassword ? "password" : "text"}
         />
       </div>
       <div className="@md:ml-auto">
-        <ChangePasswordModal hasPassword={hasPassword} />
+        {hasPassword ? (
+          <ChangePasswordModal hasPassword={hasPassword} />
+        ) : (
+          <SetPasswordModal hasPassword={hasPassword} />
+        )}
       </div>
     </div>
   )
@@ -59,8 +65,8 @@ PasswordSection.Skeleton = () => (
       <Skeleton className="h-5 w-48" />
     </div>
     <div className="@md:ml-auto">
-      <Button className="-ml-3" disabled variant="ghost">
-        <IconKey /> Change password
+      <Button disabled variant="outline">
+        <IconKey /> Set password
       </Button>
     </div>
   </div>
