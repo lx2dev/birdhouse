@@ -128,7 +128,7 @@ export function SignInForm() {
     } catch (error) {
       console.error(error)
       toast.error("Something went wrong:", {
-        description: "See console for details.",
+        description: (error as Error).message || "See console for details.",
       })
     }
   }
