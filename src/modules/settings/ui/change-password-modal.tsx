@@ -2,12 +2,14 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { IconKey, IconRefresh } from "@tabler/icons-react"
+import { useRouter } from "next/navigation"
 import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type z from "zod"
 
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import {
   Drawer,
@@ -18,8 +20,10 @@ import {
 } from "@/components/ui/drawer"
 import {
   Field,
+  FieldContent,
   FieldDescription,
   FieldError,
+  FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -77,6 +81,9 @@ interface ChangePasswordFormProps {
 }
 
 function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
+  const router = useRouter()
+  const utils = api.useUtils()
+
   const form = useForm<z.infer<typeof passwordFormSchema>>({
     defaultValues: {
       confirmNewPassword: "",
@@ -92,6 +99,13 @@ function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
       toast.error("Something went wrong", {
         description: error.message,
       })
+    },
+    onSuccess() {
+      toast.success("Password changed successfully")
+      form.reset()
+      utils.account.getProfile.invalidate()
+      router.refresh()
+      setOpen(false)
     },
   })
 
@@ -198,6 +212,36 @@ function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
           )}
         />
       </div>
+
+      <Controller
+        control={form.control}
+        name="revokeOtherSessions"
+        render={({ field, fieldState }) => (
+          <FieldGroup>
+            <Field data-invalid={fieldState.invalid} orientation="horizontal">
+              <Checkbox
+                aria-invalid={fieldState.invalid}
+                checked={field.value}
+                id={field.name}
+                name={field.name}
+                onCheckedChange={(checked) => field.onChange(checked)}
+              />
+              <FieldContent>
+                <FieldLabel htmlFor={field.name}>
+                  Revoke other sessions
+                </FieldLabel>
+                {fieldState.invalid ? (
+                  <FieldError errors={[fieldState.error]} />
+                ) : (
+                  <FieldDescription>
+                    Sign out of all other sessions when changing your password.
+                  </FieldDescription>
+                )}
+              </FieldContent>
+            </Field>
+          </FieldGroup>
+        )}
+      />
 
       <div className="flex items-center justify-end gap-2">
         <Button
