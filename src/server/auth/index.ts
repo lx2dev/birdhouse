@@ -222,7 +222,7 @@ export const auth = betterAuth({
         })
       },
       async beforeDelete(user) {
-        if (user.email === env.NEXT_PUBLIC_ADMIN_EMAIL) {
+        if (user.email === env.ADMIN_EMAIL) {
           throw new APIError("BAD_REQUEST", {
             message: "The admin account cannot be deleted",
           })
