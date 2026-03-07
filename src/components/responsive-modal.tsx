@@ -2,6 +2,11 @@
 
 import type * as React from "react"
 
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import {
@@ -21,6 +26,7 @@ interface ResponsiveModalProps {
   trigger?: React.ComponentProps<typeof Button>
   children: React.ReactNode
   className?: string
+  alert?: boolean
 }
 
 const defaultTrigger: React.ComponentProps<typeof Button> = {
@@ -35,26 +41,50 @@ export function ResponsiveModal({
   trigger = defaultTrigger,
   children,
   className,
+  alert = false,
 }: ResponsiveModalProps) {
   const isDesktop = useMediaQuery(mediaQuery)
 
   const triggerProps = { ...defaultTrigger, ...trigger }
 
   if (isDesktop) {
-    return (
-      <Dialog onOpenChange={onOpenChange} open={open}>
-        <DialogTrigger
-          render={
-            <Button {...triggerProps} className={cn(triggerProps.className)} />
-          }
-        >
-          {triggerProps.children}
-        </DialogTrigger>
-        <DialogContent className={cn("md:max-w-lg", className)}>
-          {children}
-        </DialogContent>
-      </Dialog>
-    )
+    if (!alert) {
+      return (
+        <Dialog onOpenChange={onOpenChange} open={open}>
+          <DialogTrigger
+            render={
+              <Button
+                {...triggerProps}
+                className={cn(triggerProps.className)}
+              />
+            }
+          >
+            {triggerProps.children}
+          </DialogTrigger>
+          <DialogContent className={cn("md:max-w-lg", className)}>
+            {children}
+          </DialogContent>
+        </Dialog>
+      )
+    } else if (isDesktop && alert) {
+      return (
+        <AlertDialog onOpenChange={onOpenChange} open={open}>
+          <AlertDialogTrigger
+            render={
+              <Button
+                {...triggerProps}
+                className={cn(triggerProps.className)}
+              />
+            }
+          >
+            {triggerProps.children}
+          </AlertDialogTrigger>
+          <AlertDialogContent className={cn("md:max-w-lg", className)}>
+            {children}
+          </AlertDialogContent>
+        </AlertDialog>
+      )
+    }
   }
 
   return (
