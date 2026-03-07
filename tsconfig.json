@@ -3,7 +3,7 @@
     "allowJs": true,
     /* Path Aliases */
     "baseUrl": ".",
-    "checkJs": true,
+    "checkJs": false,
     /* Base Options: */
     "esModuleInterop": true,
     "incremental": true,
