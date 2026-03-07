@@ -3,6 +3,7 @@ import { z } from "zod"
 
 export const env = createEnv({
   client: {
+    NEXT_PUBLIC_ADMIN_EMAIL: z.email(),
     NEXT_PUBLIC_URL: z.url(),
   },
   emptyStringAsUndefined: true,
@@ -15,6 +16,7 @@ export const env = createEnv({
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    NEXT_PUBLIC_ADMIN_EMAIL: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     NODE_ENV: process.env.NODE_ENV,
     PM_DEFAULT_NODE: process.env.PM_DEFAULT_NODE,
