@@ -1,4 +1,4 @@
-import { betterAuth } from "better-auth"
+import { APIError, betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { nextCookies } from "better-auth/next-js"
 import { admin, lastLoginMethod } from "better-auth/plugins"
@@ -216,8 +216,15 @@ export const auth = betterAuth({
           to: user.email,
         })
       },
+      async beforeDelete(user) {
+        if (user.email === env.NEXT_PUBLIC_ADMIN_EMAIL) {
+          throw new APIError("BAD_REQUEST", {
+            message: "The admin account cannot be deleted",
+          })
+        }
+      },
       deleteTokenExpiresIn: 60 * 10,
-      enabled: false,
+      enabled: true,
       async sendDeleteAccountVerification({ user, url }) {
         const year = new Date().getFullYear()
         const timeOfChange = new Date().toLocaleString("en-US", {
