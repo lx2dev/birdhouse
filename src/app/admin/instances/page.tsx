@@ -1,10 +1,13 @@
 import { redirect } from "next/navigation"
 
+import { isUserAdmin } from "@/helpers/is-user-admin"
 import { getSession } from "@/lib/auth/utils"
 
 export default async function AdminInstancesPage() {
   const session = await getSession()
-  if (!session || session.user.role !== "admin") return redirect("/auth/signin")
+  const isAdmin = isUserAdmin(session)
+
+  if (!session || !isAdmin) return redirect("/auth/signin")
 
   return (
     <div className="space-y-2">

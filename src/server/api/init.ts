@@ -2,6 +2,7 @@ import { initTRPC, TRPCError } from "@trpc/server"
 import superjson from "superjson"
 import { ZodError } from "zod"
 
+import { isUserAdmin } from "@/helpers/is-user-admin"
 import { auth } from "@/server/auth"
 import { db } from "@/server/db"
 
@@ -71,7 +72,7 @@ export const adminProcedure = t.procedure
     if (!ctx.session?.user) {
       throw new TRPCError({ code: "UNAUTHORIZED" })
     }
-    if (ctx.session.user.role !== "admin") {
+    if (!isUserAdmin(ctx.session)) {
       throw new TRPCError({
         code: "FORBIDDEN",
         message: "Admin access required",
