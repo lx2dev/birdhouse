@@ -1,7 +1,7 @@
 import { APIError, betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { nextCookies } from "better-auth/next-js"
-import { admin, lastLoginMethod } from "better-auth/plugins"
+import { admin, lastLoginMethod, twoFactor } from "better-auth/plugins"
 
 import { TRUSTED_SOCIAL_PROVIDERS } from "@/constants"
 import { env } from "@/env"
@@ -116,7 +116,7 @@ export const auth = betterAuth({
       })
     },
   },
-  plugins: [admin(), lastLoginMethod(), nextCookies()],
+  plugins: [admin(), lastLoginMethod(), twoFactor(), nextCookies()],
   rateLimit: {
     storage: "secondary-storage",
   },

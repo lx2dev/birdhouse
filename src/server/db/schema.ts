@@ -254,6 +254,7 @@ export const user = createTable(
     image: d.text(),
     name: d.text().notNull(),
     role: d.text("role"),
+    twoFactorEnabled: d.boolean("two_factor_enabled").default(false),
     updatedAt: d
       .timestamp("updated_at", { withTimezone: true })
       .$onUpdate(() => /* @__PURE__ */ new Date()),
@@ -293,6 +294,23 @@ export const account = createTable(
   (t) => [index("account_userId_idx").on(t.userId)],
 )
 
+export const twoFactor = createTable(
+  "two_factor",
+  (d) => ({
+    backupCodes: d.text("backup_codes").notNull(),
+    id: d.text("id").primaryKey(),
+    secret: d.text("secret").notNull(),
+    userId: d
+      .text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+  }),
+  (t) => [
+    index("twoFactor_secret_idx").on(t.secret),
+    index("twoFactor_userId_idx").on(t.userId),
+  ],
+)
+
 export const verification = createTable(
   "verification",
   (d) => ({
@@ -313,11 +331,19 @@ export const verification = createTable(
 
 export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
+  twoFactors: many(twoFactor),
 }))
 
 export const accountRelations = relations(account, ({ one }) => ({
   user: one(user, {
     fields: [account.userId],
+    references: [user.id],
+  }),
+}))
+
+export const twoFactorRelations = relations(twoFactor, ({ one }) => ({
+  user: one(user, {
+    fields: [twoFactor.userId],
     references: [user.id],
   }),
 }))
