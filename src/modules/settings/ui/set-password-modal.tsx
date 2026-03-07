@@ -7,15 +7,8 @@ import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type z from "zod"
 
+import { ResponsiveModal } from "@/components/responsive-modal"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
 import {
   Field,
   FieldDescription,
@@ -24,7 +17,6 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
-import { useMediaQuery } from "@/hooks/use-media-query"
 import { api } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
 import { passwordFormSchema } from "@/modules/settings/schemas/account"
@@ -35,39 +27,24 @@ interface SetPasswordModalProps {
 }
 
 export function SetPasswordModal({ hasPassword }: SetPasswordModalProps) {
-  const isDesktop = useMediaQuery("(min-width: 768px)")
-
   const [open, setOpen] = React.useState(false)
 
-  if (isDesktop) {
-    return (
-      <Dialog onOpenChange={setOpen} open={open}>
-        <DialogTrigger
-          render={<Button disabled={hasPassword} variant="outline" />}
-        >
-          <IconKey /> Set password
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-lg">
-          <SetPasswordForm setOpen={setOpen} />
-        </DialogContent>
-      </Dialog>
-    )
-  }
-
   return (
-    <Drawer onOpenChange={setOpen} open={open}>
-      <DrawerTrigger asChild>
-        <Button disabled={hasPassword} variant="outline">
-          <IconKey /> Set password
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent className="min-h-[50svh]">
-        <DrawerHeader>
-          <DrawerTitle hidden />
-        </DrawerHeader>
-        <SetPasswordForm setOpen={setOpen} />
-      </DrawerContent>
-    </Drawer>
+    <ResponsiveModal
+      className="max-md:min-h-full"
+      onOpenChange={setOpen}
+      open={open}
+      trigger={{
+        children: (
+          <>
+            <IconKey /> Set password
+          </>
+        ),
+        disabled: hasPassword,
+      }}
+    >
+      <SetPasswordForm setOpen={setOpen} />
+    </ResponsiveModal>
   )
 }
 
@@ -119,10 +96,10 @@ function SetPasswordForm({ setOpen }: SetPasswordFormProps) {
 
   return (
     <form
-      className="mx-auto w-full max-w-md space-y-4 px-8 md:p-0"
+      className="space-y-4 px-8 md:p-0"
       onSubmit={form.handleSubmit(onSubmit)}
     >
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Controller
           control={form.control}
           name="newPassword"

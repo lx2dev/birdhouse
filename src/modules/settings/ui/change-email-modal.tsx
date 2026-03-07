@@ -7,15 +7,8 @@ import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type z from "zod"
 
+import { ResponsiveModal } from "@/components/responsive-modal"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
 import {
   Field,
   FieldDescription,
@@ -24,7 +17,6 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
-import { useMediaQuery } from "@/hooks/use-media-query"
 import { api } from "@/lib/api/client"
 import { userInsertSchema } from "@/modules/settings/schemas/account"
 
@@ -33,37 +25,24 @@ interface ChangeEmailModalProps {
 }
 
 export function ChangeEmailModal({ currentEmail }: ChangeEmailModalProps) {
-  const isDesktop = useMediaQuery("(min-width: 768px)")
-
   const [open, setOpen] = React.useState(false)
 
-  if (isDesktop) {
-    return (
-      <Dialog onOpenChange={setOpen} open={open}>
-        <DialogTrigger render={<Button className="-ml-3" variant="ghost" />}>
-          <IconRefresh /> Change email address
-        </DialogTrigger>
-        <DialogContent>
-          <AddEmailForm currentEmail={currentEmail} setOpen={setOpen} />
-        </DialogContent>
-      </Dialog>
-    )
-  }
-
   return (
-    <Drawer onOpenChange={setOpen} open={open}>
-      <DrawerTrigger asChild>
-        <Button className="-ml-3" variant="ghost">
-          <IconRefresh /> Change email address
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent className="min-h-[50svh]">
-        <DrawerHeader>
-          <DrawerTitle hidden />
-        </DrawerHeader>
-        <AddEmailForm currentEmail={currentEmail} setOpen={setOpen} />
-      </DrawerContent>
-    </Drawer>
+    <ResponsiveModal
+      onOpenChange={setOpen}
+      open={open}
+      trigger={{
+        children: (
+          <>
+            <IconRefresh /> Change email address
+          </>
+        ),
+        className: "-ml-3",
+        variant: "ghost",
+      }}
+    >
+      <AddEmailForm currentEmail={currentEmail} setOpen={setOpen} />
+    </ResponsiveModal>
   )
 }
 

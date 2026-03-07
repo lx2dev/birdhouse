@@ -8,16 +8,9 @@ import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type z from "zod"
 
+import { ResponsiveModal } from "@/components/responsive-modal"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
 import {
   Field,
   FieldContent,
@@ -29,7 +22,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
-import { useMediaQuery } from "@/hooks/use-media-query"
 import { api } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
 import { passwordFormSchema } from "@/modules/settings/schemas/account"
@@ -40,39 +32,24 @@ interface ChangePasswordModalProps {
 }
 
 export function ChangePasswordModal({ hasPassword }: ChangePasswordModalProps) {
-  const isDesktop = useMediaQuery("(min-width: 768px)")
-
   const [open, setOpen] = React.useState(false)
 
-  if (isDesktop) {
-    return (
-      <Dialog onOpenChange={setOpen} open={open}>
-        <DialogTrigger
-          render={<Button disabled={!hasPassword} variant="outline" />}
-        >
-          <IconKey /> Change password
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-lg">
-          <ChangePasswordForm setOpen={setOpen} />
-        </DialogContent>
-      </Dialog>
-    )
-  }
-
   return (
-    <Drawer onOpenChange={setOpen} open={open}>
-      <DrawerTrigger asChild>
-        <Button disabled={!hasPassword} variant="outline">
-          <IconKey /> Change password
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent className="min-h-[50svh]">
-        <DrawerHeader>
-          <DrawerTitle hidden />
-        </DrawerHeader>
-        <ChangePasswordForm setOpen={setOpen} />
-      </DrawerContent>
-    </Drawer>
+    <ResponsiveModal
+      className="max-md:min-h-full"
+      onOpenChange={setOpen}
+      open={open}
+      trigger={{
+        children: (
+          <>
+            <IconKey /> Change password
+          </>
+        ),
+        disabled: !hasPassword,
+      }}
+    >
+      <ChangePasswordForm setOpen={setOpen} />
+    </ResponsiveModal>
   )
 }
 
@@ -128,7 +105,7 @@ function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
 
   return (
     <form
-      className="mx-auto w-full max-w-md space-y-4 px-8 md:p-0"
+      className="space-y-4 px-8 md:p-0"
       onSubmit={form.handleSubmit(onSubmit)}
     >
       <Controller
@@ -153,7 +130,7 @@ function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
 
       <Separator className="my-4" />
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Controller
           control={form.control}
           name="newPassword"
