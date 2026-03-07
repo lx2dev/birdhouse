@@ -3,9 +3,9 @@ import type { ControllerRenderProps } from "react-hook-form"
 import type z from "zod"
 
 import { cn } from "@/lib/utils"
-import { passwordFormSchema } from "@/modules/settings/schemas/account"
+import { passwordFormBaseSchema } from "@/modules/settings/schemas/account"
 
-const formSchema = passwordFormSchema.pick({
+const formSchema = passwordFormBaseSchema.pick({
   newPassword: true,
 })
 

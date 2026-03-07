@@ -3,8 +3,9 @@ import { eq } from "drizzle-orm"
 
 import {
   accountInsertSchema,
+  changePasswordSchema,
   deleteAccountSchema,
-  passwordFormSchema,
+  setPasswordSchema,
   userInsertSchema,
 } from "@/modules/settings/schemas/account"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
@@ -52,11 +53,7 @@ export const accountRouter = createTRPCRouter({
     }),
 
   changePassword: protectedProcedure
-    .input(
-      passwordFormSchema.omit({
-        confirmNewPassword: true,
-      }),
-    )
+    .input(changePasswordSchema)
     .mutation(async ({ ctx, input }) => {
       const { currentPassword, newPassword, revokeOtherSessions } = input
 
@@ -161,7 +158,14 @@ export const accountRouter = createTRPCRouter({
       .limit(1)
 
     const accounts = await ctx.db
-      .select()
+      .select({
+        accountId: accountTable.accountId,
+        createdAt: accountTable.createdAt,
+        id: accountTable.id,
+        providerId: accountTable.providerId,
+        updatedAt: accountTable.updatedAt,
+        userId: accountTable.userId,
+      })
       .from(accountTable)
       .where(eq(accountTable.userId, user.id))
 
@@ -179,11 +183,7 @@ export const accountRouter = createTRPCRouter({
   }),
 
   setPassword: protectedProcedure
-    .input(
-      passwordFormSchema.pick({
-        newPassword: true,
-      }),
-    )
+    .input(setPasswordSchema)
     .mutation(async ({ ctx, input }) => {
       const { newPassword } = input
 

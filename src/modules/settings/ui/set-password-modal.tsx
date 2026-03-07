@@ -52,20 +52,15 @@ interface SetPasswordFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const formSchema = passwordFormSchema.omit({
-  currentPassword: true,
-  revokeOtherSessions: true,
-})
-
 function SetPasswordForm({ setOpen }: SetPasswordFormProps) {
   const utils = api.useUtils()
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<z.infer<typeof passwordFormSchema>>({
     defaultValues: {
       confirmNewPassword: "",
       newPassword: "",
     },
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(passwordFormSchema),
   })
 
   const setPassword = api.account.setPassword.useMutation({
@@ -82,7 +77,7 @@ function SetPasswordForm({ setOpen }: SetPasswordFormProps) {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof passwordFormSchema>) {
     if (values.newPassword !== values.confirmNewPassword) {
       toast.error("New password and confirmation do not match")
       return
