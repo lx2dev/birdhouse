@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 
 import { Button } from "@/components/ui/button"
+import { APP_NAME } from "@/constants"
 
 type LogEntry = {
   id: string
@@ -60,7 +61,7 @@ export default function DemoPage() {
         </Button>
       </Link>
 
-      <h1 className="font-semibold text-lg">Birdhouse</h1>
+      <h1 className="font-semibold text-lg">{APP_NAME}</h1>
 
       <Button disabled={isRunning} onClick={startVmCreation} size="lg">
         {isRunning ? "Creating VM..." : "Create VM"}

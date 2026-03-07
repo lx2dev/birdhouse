@@ -20,7 +20,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
-import { NAV_ITEMS } from "@/constants"
+import { APP_NAME, NAV_ITEMS } from "@/constants"
 import { useSession } from "@/lib/auth/client"
 
 export function AppSidebar() {
@@ -41,7 +41,7 @@ export function AppSidebar() {
         <Link className="flex items-center gap-2" href="/dashboard">
           <Icons.logo className="size-12 text-primary md:size-16" />
           <span className="inline font-semibold text-lg md:text-2xl">
-            Birdhouse
+            {APP_NAME}
           </span>
         </Link>
       </SidebarHeader>
@@ -98,7 +98,7 @@ AppSidebar.Skeleton = () => (
       <div className="flex items-center gap-2">
         <Icons.logo className="size-12 text-primary md:size-16" />
         <span className="inline font-semibold text-lg md:text-2xl">
-          Birdhouse
+          {APP_NAME}
         </span>
       </div>
     </SidebarHeader>

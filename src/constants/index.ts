@@ -16,6 +16,8 @@ import {
 } from "@tabler/icons-react"
 import type { SocialProvider } from "better-auth"
 
+export const APP_NAME = "Birdhouse"
+
 export const DEFAULT_FETCH_LIMIT = 10
 
 type NavItem = {

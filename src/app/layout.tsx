@@ -4,6 +4,7 @@ import { Noto_Sans, Noto_Sans_Mono } from "next/font/google"
 import { ThemeProvider } from "@/components/providers/theme"
 import { Toaster } from "@/components/ui/sonner"
 import { VersionChecker } from "@/components/version-checker"
+import { APP_NAME } from "@/constants"
 import { TRPCReactProvider } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
 
@@ -18,8 +19,8 @@ const notoMono = Noto_Sans_Mono({
 })
 
 export const metadata: Metadata = {
-  description: "Birdhouse",
-  title: "A Proxmox Virtual Compute Provisioning Platform By Lx2.dev",
+  description: APP_NAME,
+  title: "A Virtual Compute Platform By Lx2.dev",
 }
 
 export default function RootLayout({
@@ -30,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta content="Birdhouse" name="apple-mobile-web-app-title" />
+        <meta content={APP_NAME} name="apple-mobile-web-app-title" />
       </head>
       <body className={cn("antialiased", notoSans.variable, notoMono.variable)}>
         <TRPCReactProvider>

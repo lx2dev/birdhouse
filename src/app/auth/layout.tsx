@@ -3,6 +3,7 @@ import Link from "next/link"
 import { DotGrid } from "@/components/backgrounds/dot-grid"
 import { Icons } from "@/components/icons"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { APP_NAME } from "@/constants"
 
 export default function AuthLayout({ children }: LayoutProps<"/auth">) {
   return (
@@ -27,7 +28,7 @@ export default function AuthLayout({ children }: LayoutProps<"/auth">) {
           href="/"
         >
           <Icons.logo className="size-16 text-primary" />
-          Birdhouse
+          {APP_NAME}
         </Link>
 
         <Alert variant="warning">

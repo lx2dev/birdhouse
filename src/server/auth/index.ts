@@ -3,7 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { nextCookies } from "better-auth/next-js"
 import { admin, lastLoginMethod, twoFactor } from "better-auth/plugins"
 
-import { TRUSTED_SOCIAL_PROVIDERS } from "@/constants"
+import { APP_NAME, TRUSTED_SOCIAL_PROVIDERS } from "@/constants"
 import { env } from "@/env"
 import { getRedisClient } from "@/lib/redis"
 import { resend } from "@/lib/resend"
@@ -19,7 +19,7 @@ export const auth = betterAuth({
     },
     encryptOAuthTokens: true,
   },
-  appName: "Birdhouse",
+  appName: APP_NAME,
   baseURL: env.NEXT_PUBLIC_URL,
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -56,7 +56,7 @@ export const auth = betterAuth({
       })
 
       void resend.emails.send({
-        from: "Birdhouse <no-reply@lx2.dev>",
+        from: `${APP_NAME} <no-reply@lx2.dev>`,
         subject: "Your password has been reset",
         template: {
           id: "after-reset-password",
@@ -78,7 +78,7 @@ export const auth = betterAuth({
       const year = new Date().getFullYear()
 
       void resend.emails.send({
-        from: "Birdhouse <no-reply@lx2.dev>",
+        from: `${APP_NAME} <no-reply@lx2.dev>`,
         subject: "Reset your password",
         template: {
           id: "reset-password",
@@ -101,7 +101,7 @@ export const auth = betterAuth({
       const year = new Date().getFullYear()
 
       void resend.emails.send({
-        from: "Birdhouse <no-reply@lx2.dev>",
+        from: `${APP_NAME} <no-reply@lx2.dev>`,
         subject: "Verify your email address",
         template: {
           id: "verify-email",
@@ -171,7 +171,7 @@ export const auth = betterAuth({
         })
 
         void resend.emails.send({
-          from: "Birdhouse <no-reply@lx2.dev>",
+          from: `${APP_NAME} <no-reply@lx2.dev>`,
           subject: "Your email change request",
           template: {
             id: "confirm-email-change",
@@ -207,7 +207,7 @@ export const auth = betterAuth({
         })
 
         void resend.emails.send({
-          from: "Birdhouse <no-reply@lx2.dev>",
+          from: `${APP_NAME} <no-reply@lx2.dev>`,
           subject: "Your account has been deleted",
           template: {
             id: "after-account-deletion",
@@ -247,7 +247,7 @@ export const auth = betterAuth({
         })
 
         void resend.emails.send({
-          from: "Birdhouse <no-reply@lx2.dev>",
+          from: `${APP_NAME} <no-reply@lx2.dev>`,
           subject: "Confirm your account deletion",
           template: {
             id: "confirm-account-deletion",
