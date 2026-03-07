@@ -19,3 +19,9 @@ export const passwordFormSchema = z
   .refine((data) => data.newPassword === data.confirmNewPassword, {
     message: "New password and confirmation do not match",
   })
+
+export const deleteAccountSchema = z.object({
+  confirmation: z.literal("DELETE", {
+    error: 'You must type "DELETE" to confirm',
+  }),
+})

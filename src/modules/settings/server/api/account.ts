@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm"
 
 import {
   accountInsertSchema,
+  deleteAccountSchema,
   passwordFormSchema,
   userInsertSchema,
 } from "@/modules/settings/schemas/account"
@@ -87,6 +88,36 @@ export const accountRouter = createTRPCRouter({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: `Failed to change password: ${statusText}`,
+        })
+      }
+
+      return status
+    }),
+
+  deleteAccount: protectedProcedure
+    .input(deleteAccountSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { confirmation } = input
+
+      if (confirmation !== "DELETE") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: 'You must type "DELETE" to confirm account deletion',
+        })
+      }
+
+      const { ok, status, statusText } = await auth.api.deleteUser({
+        asResponse: true,
+        body: {
+          callbackURL: "/goodbye",
+        },
+        headers: ctx.headers,
+      })
+
+      if (!ok) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to delete account: ${statusText}`,
         })
       }
 
