@@ -109,20 +109,20 @@
   --shadow-2xs: 0px 1px 3px 0px oklch(0.2255 0.0107 260.6812 / 0.04);
   --shadow-xs: 0px 1px 3px 0px oklch(0.2255 0.0107 260.6812 / 0.04);
   --shadow-sm:
-    0px 1px 3px 0px oklch(0.2255 0.0107 260.6812 / 0.08), 0px 1px 2px -1px
-    oklch(0.2255 0.0107 260.6812 / 0.08);
+    0px 1px 3px 0px oklch(0.2255 0.0107 260.6812 / 0.08),
+    0px 1px 2px -1px oklch(0.2255 0.0107 260.6812 / 0.08);
   --shadow:
-    0px 1px 3px 0px oklch(0.2255 0.0107 260.6812 / 0.08), 0px 1px 2px -1px
-    oklch(0.2255 0.0107 260.6812 / 0.08);
+    0px 1px 3px 0px oklch(0.2255 0.0107 260.6812 / 0.08),
+    0px 1px 2px -1px oklch(0.2255 0.0107 260.6812 / 0.08);
   --shadow-md:
-    0px 1px 3px 0px oklch(0.2255 0.0107 260.6812 / 0.08), 0px 2px 4px -1px
-    oklch(0.2255 0.0107 260.6812 / 0.08);
+    0px 1px 3px 0px oklch(0.2255 0.0107 260.6812 / 0.08),
+    0px 2px 4px -1px oklch(0.2255 0.0107 260.6812 / 0.08);
   --shadow-lg:
-    0px 1px 3px 0px oklch(0.2255 0.0107 260.6812 / 0.08), 0px 4px 6px -1px
-    oklch(0.2255 0.0107 260.6812 / 0.08);
+    0px 1px 3px 0px oklch(0.2255 0.0107 260.6812 / 0.08),
+    0px 4px 6px -1px oklch(0.2255 0.0107 260.6812 / 0.08);
   --shadow-xl:
-    0px 1px 3px 0px oklch(0.2255 0.0107 260.6812 / 0.08), 0px 8px 10px -1px
-    oklch(0.2255 0.0107 260.6812 / 0.08);
+    0px 1px 3px 0px oklch(0.2255 0.0107 260.6812 / 0.08),
+    0px 8px 10px -1px oklch(0.2255 0.0107 260.6812 / 0.08);
   --shadow-2xl: 0px 1px 3px 0px oklch(0.2255 0.0107 260.6812 / 0.2);
 }
 
@@ -197,5 +197,20 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@keyframes progress-shimmer {
+  0% {
+    transform: translateX(-140%);
+  }
+  100% {
+    transform: translateX(260%);
+  }
+}
+
+@layer utilities {
+  .animate-progress-shimmer {
+    animation: progress-shimmer 2s linear infinite;
   }
 }

@@ -5,6 +5,7 @@ import { Icons } from "@/components/icons"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/auth/utils"
+import { cn } from "@/lib/utils"
 
 export default async function HomePage() {
   const session = await getSession()
@@ -31,12 +32,24 @@ export default async function HomePage() {
         </p>
       </div>
 
-      <section className="mx-auto mt-8 grid w-full max-w-7xl gap-8 lg:min-h-[calc(100svh-11.5rem)] lg:grid-cols-[0.95fr_1.2fr] lg:gap-12">
-        <div className="flex h-full flex-col justify-center">
+      <section className="mx-auto grid w-full max-w-7xl gap-8 lg:min-h-[calc(100svh-11.5rem)] lg:grid-cols-[0.95fr_1.2fr] lg:gap-12">
+        <div className="@container flex h-full flex-col justify-center">
           <p className="font-semibold text-muted-foreground text-xs uppercase tracking-[0.16em]">
             Control plane
           </p>
-          <h1 className="mt-3 max-w-xl text-balance font-semibold text-3xl tracking-tight md:text-4xl lg:text-[2.75rem] xl:text-[3.7rem]">
+          <h1
+            className={cn(
+              "mt-3 max-w-xl text-balance font-semibold tracking-tight",
+              // default
+              "text-(--tw-leading,var(--text-3xl--line-height)) text-[1.85rem]",
+              // sm
+              "@sm:text-4xl",
+              // md
+              "@md:text-(--tw-leading,var(--text-5xl--line-height)) @md:text-[3rem]",
+              // lg
+              "@lg:text-(--tw-leading,var(--text-6xl--line-height)) @lg:text-[3.73rem]",
+            )}
+          >
             Your infrastructure.
             <br />
             One clear workspace.
@@ -68,7 +81,7 @@ export default async function HomePage() {
             </Button>
           </div>
 
-          <div className="mt-8 w-full max-w-xl rounded-2xl border bg-background/90 p-4">
+          <div className="mt-8 w-full rounded-2xl border bg-background/90 p-4">
             <p className="font-semibold text-muted-foreground text-xs uppercase tracking-[0.12em]">
               Workflow
             </p>
@@ -93,7 +106,9 @@ export default async function HomePage() {
             </div>
 
             <div className="mt-3 h-1 w-full rounded-full bg-muted">
-              <div className="h-full w-2/3 rounded-full bg-primary/70" />
+              <div className="relative h-full w-2/3 overflow-hidden rounded-full bg-primary/70">
+                <span className="absolute inset-y-0 w-1/3 animate-progress-shimmer bg-[linear-gradient(90deg,transparent,var(--primary),transparent)] opacity-80" />
+              </div>
             </div>
           </div>
         </div>
