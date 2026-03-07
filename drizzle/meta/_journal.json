@@ -15,6 +15,13 @@
       "when": 1770864447783,
       "tag": "0001_empty_paibok",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1772875719087,
+      "tag": "0003_certain_kinsey_walden",
+      "breakpoints": true
     }
   ]
 }
