@@ -20,6 +20,9 @@
 # production
 /build
 
+# dev
+compose.yaml
+
 # misc
 .DS_Store
 *.pem
