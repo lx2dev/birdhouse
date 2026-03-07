@@ -191,6 +191,11 @@ export const auth = betterAuth({
     },
     deleteUser: {
       async afterDelete(user) {
+        /**
+         * TODO: Perform additional cleanup after account deletion
+         * ? e.g. delete owned resources, transfer ownership?, etc.
+         */
+
         const year = new Date().getFullYear()
         const timeOfChange = new Date().toLocaleString("en-US", {
           day: "2-digit",
@@ -222,6 +227,11 @@ export const auth = betterAuth({
             message: "The admin account cannot be deleted",
           })
         }
+
+        /**
+         * TODO: Perform additional checks
+         * ? e.g. if the user has pending actions, owns resources, etc. and either prevent deletion or perform cleanup.
+         */
       },
       deleteTokenExpiresIn: 60 * 10,
       enabled: true,
