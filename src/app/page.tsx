@@ -72,7 +72,7 @@ export default async function HomePage() {
             <Button
               className="h-12 w-full px-6 text-base sm:w-auto"
               nativeButton={false}
-              render={<Link href="/docs" />}
+              render={<Link href="/docs" target="_blank" />}
               size="lg"
               variant="outline"
             >
