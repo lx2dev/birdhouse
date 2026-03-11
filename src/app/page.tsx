@@ -28,7 +28,7 @@ export default async function HomePage() {
           </p>
         </div>
         <p className="hidden text-muted-foreground text-xs md:block">
-          Proxmox management platform
+          Compute management platform
         </p>
       </div>
 
