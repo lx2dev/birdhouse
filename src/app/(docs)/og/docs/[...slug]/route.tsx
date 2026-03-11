@@ -1,6 +1,6 @@
-import { ImageResponse } from "@takumi-rs/image-response"
-import { generate as DefaultImage } from "fumadocs-ui/og/takumi"
+import { generate as DefaultImage } from "fumadocs-ui/og"
 import { notFound } from "next/navigation"
+import { ImageResponse } from "next/og"
 
 import { APP_NAME } from "@/constants"
 import { getPageImage, source } from "@/lib/source"
@@ -23,7 +23,6 @@ export async function GET(
       title={page.data.title}
     />,
     {
-      format: "webp",
       height: 630,
       width: 1200,
     },
