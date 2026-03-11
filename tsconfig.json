@@ -15,6 +15,7 @@
     "moduleResolution": "bundler",
     "noEmit": true,
     "paths": {
+      "@/.source/*": [".source/*"],
       "@/*": ["./src/*"]
     },
     "plugins": [
