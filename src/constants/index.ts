@@ -26,6 +26,7 @@ type NavItem = {
   label: string
   disabled?: boolean
   title?: string
+  target?: string
 }
 
 const PLATFORM_ITEMS: NavItem[] = [

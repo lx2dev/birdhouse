@@ -1,5 +1,6 @@
 "use client"
 
+import { IconArrowUpRight } from "@tabler/icons-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
@@ -60,18 +61,21 @@ export function AppSidebar() {
                   </SidebarGroupLabel>
                   <SidebarGroupContent>
                     <SidebarMenu>
-                      {items.map(({ href, icon: Icon, label }) => (
+                      {items.map(({ href, icon: Icon, label, target }) => (
                         <SidebarMenuItem key={href}>
                           <SidebarMenuButton
-                            className="text-muted-foreground data-active:bg-transparent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
+                            className="group/target text-muted-foreground data-active:bg-transparent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
                             isActive={pathname === href}
                             onClick={navigate}
-                            render={<Link href={href} />}
+                            render={<Link href={href} target={target} />}
                             size="lg"
                           >
                             <Icon />
-                            <span className="font-semibold text-lg">
+                            <span className="flex items-center gap-0.5 font-semibold text-lg">
                               {label}
+                              {target === "_blank" && (
+                                <IconArrowUpRight className="-mt-1 size-4! opacity-0 group-hover/target:opacity-100" />
+                              )}
                             </span>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
