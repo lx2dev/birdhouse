@@ -10,10 +10,12 @@ export function baseOptions(): BaseLayoutProps {
     githubUrl: REPO_URL,
     links: [
       {
+        external: true,
+        on: "nav",
         text: (
           <span
             className={cn(
-              "hidden hover:bg-secondary! lg:flex",
+              "hover:bg-border! dark:hover:bg-secondary!",
               buttonVariants({
                 size: "icon",
                 variant: "ghost",
