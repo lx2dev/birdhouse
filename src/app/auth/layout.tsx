@@ -1,6 +1,5 @@
 import Link from "next/link"
 
-import { DotGrid } from "@/components/backgrounds/dot-grid"
 import { Icons } from "@/components/icons"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { APP_NAME } from "@/constants"
@@ -8,19 +7,8 @@ import { APP_NAME } from "@/constants"
 export default function AuthLayout({ children }: LayoutProps<"/auth">) {
   return (
     <div className="relative flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
-      <div className="absolute inset-0">
-        <DotGrid
-          activeColor="#5227FF"
-          baseColor="#271E37"
-          dotSize={5}
-          gap={15}
-          proximity={120}
-          resistance={750}
-          returnDuration={1.5}
-          shockRadius={250}
-          shockStrength={5}
-        />
-      </div>
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,var(--muted)_0%,transparent_20%,transparent_80%,var(--muted)_100%)] opacity-35" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-size-[42px_42px] opacity-45" />
 
       <div className="z-10 flex w-full max-w-sm flex-col gap-2 md:gap-6">
         <Link
