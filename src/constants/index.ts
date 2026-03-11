@@ -2,6 +2,7 @@ import type { Icon } from "@tabler/icons-react"
 import {
   IconAdjustments,
   IconBell,
+  IconBook2,
   IconDeviceDesktopCog,
   IconKey,
   IconLayoutDashboard,
@@ -53,6 +54,13 @@ const PLATFORM_ITEMS: NavItem[] = [
     icon: IconWorld,
     label: "Domains",
     title: "Domains",
+  },
+  {
+    href: "/docs",
+    icon: IconBook2,
+    label: "Documentation",
+    target: "_blank",
+    title: "Documentation",
   },
 ]
 
@@ -156,3 +164,5 @@ export const TRUSTED_SOCIAL_PROVIDERS = [
   "google",
 ] as const satisfies readonly SocialProvider[]
 export type TrustedSocialProvider = (typeof TRUSTED_SOCIAL_PROVIDERS)[number]
+
+export const REPO_URL = "https://github.com/lx2dev/birdhouse"
