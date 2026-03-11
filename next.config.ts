@@ -1,9 +1,14 @@
+import { createMDX } from "fumadocs-mdx/next"
 import type { NextConfig } from "next"
 
 import "./src/env"
 
 const nextConfig: NextConfig = {
-  // typedRoutes: true,
+  reactStrictMode: true,
 }
 
-export default nextConfig
+const withMDX = createMDX({
+  // MDX config
+})
+
+export default withMDX(nextConfig)
