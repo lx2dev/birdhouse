@@ -2,7 +2,6 @@ import type { Icon } from "@tabler/icons-react"
 import {
   IconAdjustments,
   IconBell,
-  IconBook2,
   IconDeviceDesktopCog,
   IconKey,
   IconLayoutDashboard,
@@ -54,13 +53,6 @@ const PLATFORM_ITEMS: NavItem[] = [
     icon: IconWorld,
     label: "Domains",
     title: "Domains",
-  },
-  {
-    href: "/docs",
-    icon: IconBook2,
-    label: "Documentation",
-    target: "_blank",
-    title: "Documentation",
   },
 ]
 

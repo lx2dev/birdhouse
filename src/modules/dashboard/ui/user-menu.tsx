@@ -1,6 +1,12 @@
 "use client"
 
-import { IconLogout, IconSunMoon, IconUserFilled } from "@tabler/icons-react"
+import {
+  IconArrowUpRight,
+  IconFileSettings,
+  IconLogout,
+  IconSunMoon,
+  IconUserFilled,
+} from "@tabler/icons-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
@@ -89,6 +95,14 @@ export function UserMenu() {
           >
             <IconUserFilled />
             Account
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            nativeButton={false}
+            render={<Link href="/docs" target="_blank" />}
+          >
+            <IconFileSettings />
+            Docs
+            <IconArrowUpRight className="-mt-1 -ml-1 size-3" />
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
