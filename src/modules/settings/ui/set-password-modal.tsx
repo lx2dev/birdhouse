@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { api } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
-import { passwordFormSchema } from "@/modules/settings/schemas/account"
+import { setPasswordSchema } from "@/modules/settings/schemas/account"
 import { PasswordRequirements } from "@/modules/settings/ui/password-requirements"
 
 interface SetPasswordModalProps {
@@ -55,12 +55,12 @@ interface SetPasswordFormProps {
 function SetPasswordForm({ setOpen }: SetPasswordFormProps) {
   const utils = api.useUtils()
 
-  const form = useForm<z.infer<typeof passwordFormSchema>>({
+  const form = useForm<z.infer<typeof setPasswordSchema>>({
     defaultValues: {
       confirmNewPassword: "",
       newPassword: "",
     },
-    resolver: zodResolver(passwordFormSchema),
+    resolver: zodResolver(setPasswordSchema),
   })
 
   const setPassword = api.account.setPassword.useMutation({
@@ -77,7 +77,7 @@ function SetPasswordForm({ setOpen }: SetPasswordFormProps) {
     },
   })
 
-  function onSubmit(values: z.infer<typeof passwordFormSchema>) {
+  function onSubmit(values: z.infer<typeof setPasswordSchema>) {
     if (values.newPassword !== values.confirmNewPassword) {
       toast.error("New password and confirmation do not match")
       return

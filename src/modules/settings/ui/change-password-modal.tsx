@@ -24,7 +24,7 @@ import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 import { api } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
-import { passwordFormSchema } from "@/modules/settings/schemas/account"
+import { changePasswordSchema } from "@/modules/settings/schemas/account"
 import { PasswordRequirements } from "@/modules/settings/ui/password-requirements"
 
 interface ChangePasswordModalProps {
@@ -61,14 +61,14 @@ function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
   const router = useRouter()
   const utils = api.useUtils()
 
-  const form = useForm<z.infer<typeof passwordFormSchema>>({
+  const form = useForm<z.infer<typeof changePasswordSchema>>({
     defaultValues: {
       confirmNewPassword: "",
       currentPassword: "",
       newPassword: "",
       revokeOtherSessions: true,
     },
-    resolver: zodResolver(passwordFormSchema),
+    resolver: zodResolver(changePasswordSchema),
   })
 
   const changePassword = api.account.changePassword.useMutation({
@@ -86,7 +86,7 @@ function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
     },
   })
 
-  function onSubmit(values: z.infer<typeof passwordFormSchema>) {
+  function onSubmit(values: z.infer<typeof changePasswordSchema>) {
     if (values.newPassword !== values.confirmNewPassword) {
       toast.error("New password and confirmation do not match")
       return
@@ -94,6 +94,12 @@ function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
 
     if (values.currentPassword === values.newPassword) {
       toast.error("New password must be different from the current one")
+      form.setError("newPassword", {
+        message: "New password must be different from the current one",
+      })
+      form.setError("confirmNewPassword", {
+        message: "New password must be different from the current one",
+      })
       return
     }
 
@@ -147,8 +153,12 @@ function ChangePasswordForm({ setOpen }: ChangePasswordFormProps) {
                 type="password"
               />
               <FieldDescription>
-                {/* @ts-expect-error - mismatched types */}
-                <PasswordRequirements field={field} />
+                {fieldState.error ? (
+                  <FieldError errors={[fieldState.error]} />
+                ) : (
+                  // @ts-expect-error - mismatched types
+                  <PasswordRequirements field={field} />
+                )}
               </FieldDescription>
             </Field>
           )}

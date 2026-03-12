@@ -16,22 +16,13 @@ export const passwordFormBaseSchema = z.object({
   revokeOtherSessions: z.boolean(),
 })
 
-export const passwordFormSchema = passwordFormBaseSchema.refine(
-  (data) => data.newPassword === data.confirmNewPassword,
+export const changePasswordSchema = passwordFormBaseSchema.refine(
+  (data) => data.currentPassword !== data.newPassword,
   {
-    message: "New password and confirmation do not match",
-    path: ["confirmNewPassword"],
-  },
-)
-
-export const changePasswordSchema = passwordFormBaseSchema
-  .omit({
-    confirmNewPassword: true,
-  })
-  .refine((data) => data.currentPassword !== data.newPassword, {
     message: "New password must be different from the current one",
     path: ["newPassword"],
-  })
+  },
+)
 
 export const setPasswordSchema = passwordFormBaseSchema
   .omit({
@@ -42,6 +33,24 @@ export const setPasswordSchema = passwordFormBaseSchema
     message: "New password and confirmation do not match",
     path: ["confirmNewPassword"],
   })
+
+export const revokeSessionSchema = z.object({
+  token: z.string().min(1, "Session token is required"),
+})
+
+export const twoFactorEnableSchema = z.object({
+  issuer: z.string().trim().optional(),
+  password: z.string().min(12, "Password is required"),
+})
+
+export const twoFactorDisableSchema = z.object({
+  password: z.string().min(12, "Password is required"),
+})
+
+export const twoFactorVerifySchema = z.object({
+  code: z.string().trim().min(6, "Authenticator code is required"),
+  trustDevice: z.boolean().optional(),
+})
 
 export const deleteAccountSchema = z.object({
   confirmation: z.literal("DELETE", {
