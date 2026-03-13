@@ -9,6 +9,8 @@ export default async function SecurityPage() {
   if (!session) return redirect("/auth/signin")
 
   void api.account.getProfile.prefetch()
+  void api.account.getSecurityStatus.prefetch()
+  void api.account.listSessions.prefetch()
 
   return (
     <HydrateClient>
