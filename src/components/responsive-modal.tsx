@@ -88,7 +88,7 @@ export function ResponsiveModal({
   }
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
+    <Drawer dismissible={!alert} onOpenChange={onOpenChange} open={open}>
       <DrawerTrigger asChild>
         <Button {...triggerProps} className={cn(triggerProps.className)}>
           {triggerProps.children}
