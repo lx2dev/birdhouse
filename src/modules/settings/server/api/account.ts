@@ -6,6 +6,8 @@ import {
   changePasswordSchema,
   deleteAccountSchema,
   setPasswordSchema,
+  twoFactorSchema,
+  twoFactorVerifySchema,
   userInsertSchema,
 } from "@/modules/settings/schemas/account"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/init"
@@ -121,6 +123,42 @@ export const accountRouter = createTRPCRouter({
       return status
     }),
 
+  disableTwoFactor: protectedProcedure
+    .input(twoFactorSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { password } = input
+
+      const { status } = await auth.api.verifyPassword({
+        body: {
+          password: password,
+        },
+        headers: ctx.headers,
+      })
+
+      if (!status) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid password",
+        })
+      }
+
+      const res = await auth.api.disableTwoFactor({
+        body: {
+          password: password,
+        },
+        headers: ctx.headers,
+      })
+
+      if (!res) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to disable two-factor authentication",
+        })
+      }
+
+      return res
+    }),
+
   disconnect: protectedProcedure
     .input(
       accountInsertSchema.pick({
@@ -128,8 +166,6 @@ export const accountRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      console.log(input)
-
       const { ok, status, statusText } = await auth.api.unlinkAccount({
         asResponse: true,
         body: {
@@ -146,6 +182,42 @@ export const accountRouter = createTRPCRouter({
       }
 
       return status
+    }),
+
+  enableTwoFactor: protectedProcedure
+    .input(twoFactorSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { password } = input
+
+      const { status } = await auth.api.verifyPassword({
+        body: {
+          password: password,
+        },
+        headers: ctx.headers,
+      })
+
+      if (!status) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid password",
+        })
+      }
+
+      const res = await auth.api.enableTwoFactor({
+        body: {
+          password: password,
+        },
+        headers: ctx.headers,
+      })
+
+      if (!res) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to enable two-factor authentication",
+        })
+      }
+
+      return res
     }),
 
   getProfile: protectedProcedure.query(async ({ ctx }) => {
@@ -179,6 +251,17 @@ export const accountRouter = createTRPCRouter({
     return {
       ...profile,
       accounts,
+    }
+  }),
+
+  getSecurityStatus: protectedProcedure.query(async ({ ctx }) => {
+    const twoFactorEnabled = Boolean(
+      (ctx.session.user as { twoFactorEnabled?: boolean } | undefined)
+        ?.twoFactorEnabled,
+    )
+
+    return {
+      twoFactorEnabled,
     }
   }),
 
@@ -239,5 +322,29 @@ export const accountRouter = createTRPCRouter({
       }
 
       return status
+    }),
+
+  verifyTwoFactor: protectedProcedure
+    .input(twoFactorVerifySchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const result = await auth.api.verifyTOTP({
+          body: {
+            code: input.code,
+            trustDevice: input.trustDevice,
+          },
+          headers: ctx.headers,
+        })
+
+        return result
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to verify two-factor code",
+        })
+      }
     }),
 })
