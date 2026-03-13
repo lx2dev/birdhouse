@@ -32,6 +32,7 @@
     "react-dom": "^19.2.3",
     "react-error-boundary": "^6.0.0",
     "react-hook-form": "^7.69.0",
+    "react-qr-code": "^2.0.18",
     "redis": "^5.10.0",
     "resend": "^6.6.0",
     "server-only": "^0.0.1",
