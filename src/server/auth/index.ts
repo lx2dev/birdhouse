@@ -116,7 +116,14 @@ export const auth = betterAuth({
       })
     },
   },
-  plugins: [admin(), lastLoginMethod(), twoFactor(), nextCookies()],
+  plugins: [
+    admin(),
+    lastLoginMethod(),
+    twoFactor({
+      issuer: APP_NAME,
+    }),
+    nextCookies(),
+  ],
   rateLimit: {
     storage: "secondary-storage",
   },
