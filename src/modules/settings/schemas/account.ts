@@ -38,12 +38,7 @@ export const revokeSessionSchema = z.object({
   token: z.string().min(1, "Session token is required"),
 })
 
-export const twoFactorEnableSchema = z.object({
-  issuer: z.string().trim().optional(),
-  password: z.string().min(12, "Password is required"),
-})
-
-export const twoFactorDisableSchema = z.object({
+export const twoFactorSchema = z.object({
   password: z.string().min(12, "Password is required"),
 })
 
