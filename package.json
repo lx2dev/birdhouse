@@ -71,7 +71,7 @@
     "db:reset": "bun ./src/scripts/reset-db.ts",
     "db:seed": "bun ./src/scripts/seed-db.ts",
     "db:studio": "drizzle-kit studio",
-    "dev": "next dev",
+    "dev": "docker compose up -d && next dev",
     "format": "biome format --write .",
     "lint": "biome check .",
     "lint:unsafe": "biome check --write --unsafe .",

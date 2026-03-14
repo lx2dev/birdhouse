@@ -21,9 +21,6 @@
 /build
 /.source
 
-# dev
-compose.yaml
-
 # misc
 .DS_Store
 *.pem
