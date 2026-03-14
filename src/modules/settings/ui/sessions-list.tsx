@@ -1,11 +1,8 @@
-// TODO: Replace SessionGroup with shadcn's Accordion component
-
 "use client"
 
 import {
   IconCalendar,
   IconCheck,
-  IconChevronDown,
   IconClock,
   IconCopy,
   IconGlobe,
@@ -19,6 +16,12 @@ import { formatDistanceToNow } from "date-fns"
 import * as React from "react"
 import { toast } from "sonner"
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
@@ -63,7 +66,7 @@ export function SessionsList({ sessions, currentSession }: SessionsListProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      {sessions.length > 0 && (
+      {sessions.length > 1 && (
         <Button
           className="ml-auto"
           disabled={revokeOtherSessions.isPending}
@@ -77,38 +80,15 @@ export function SessionsList({ sessions, currentSession }: SessionsListProps) {
         </Button>
       )}
 
-      <div className="flex flex-col gap-2">
-        <SessionGroup defaultOpen>
-          {activeSessions.map((session) => (
-            <SessionCard
-              isCurrentSession={session.token === currentSessionToken}
-              key={session.token}
-              session={session}
-            />
-          ))}
-        </SessionGroup>
-      </div>
-    </div>
-  )
-}
-
-interface SessionGroupProps {
-  defaultOpen?: boolean
-  children: React.ReactNode
-}
-
-function SessionGroup({ children }: SessionGroupProps) {
-  return (
-    <div>
-      <ul className="flex max-h-90 flex-col gap-2 overflow-y-auto py-2">
-        {Array.isArray(children) ? (
-          (children as React.ReactNode[]).map((child, idx) => (
-            <li key={idx}>{child}</li>
-          ))
-        ) : (
-          <li>{children}</li>
-        )}
-      </ul>
+      <Accordion defaultValue={[currentSessionToken]}>
+        {activeSessions.map((session) => (
+          <SessionCard
+            isCurrentSession={session.token === currentSessionToken}
+            key={session.token}
+            session={session}
+          />
+        ))}
+      </Accordion>
     </div>
   )
 }
@@ -121,7 +101,6 @@ interface SessionCardProps {
 function SessionCard({ session, isCurrentSession = false }: SessionCardProps) {
   const utils = api.useUtils()
 
-  const [open, setOpen] = React.useState(isCurrentSession)
   const [copied, setCopied] = React.useState(false)
 
   const revokeSession = api.account.revokeSession.useMutation({
@@ -177,7 +156,7 @@ function SessionCard({ session, isCurrentSession = false }: SessionCardProps) {
   ) : null
 
   return (
-    <div
+    <AccordionItem
       className={cn(
         "rounded-lg border transition-all duration-200",
         isCurrentSession
@@ -187,13 +166,11 @@ function SessionCard({ session, isCurrentSession = false }: SessionCardProps) {
             )
           : "hover:bg-muted-foreground/10",
       )}
+      value={session.token}
     >
-      <button
+      <AccordionTrigger
         aria-controls={`session-details-${session.token}`}
-        aria-expanded={open}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left"
-        onClick={() => setOpen((v) => !v)}
-        type="button"
+        className="flex items-center gap-3 px-4 hover:no-underline **:data-[slot=accordion-trigger-icon]:size-5 **:data-[slot=accordion-trigger-icon]:text-foreground/70"
       >
         <span
           aria-hidden="true"
@@ -225,105 +202,98 @@ function SessionCard({ session, isCurrentSession = false }: SessionCardProps) {
             Expires {formatDistanceToNow(session.expiresAt)}
           </p>
         </div>
+      </AccordionTrigger>
 
-        <span
-          aria-hidden="true"
-          className="ml-2 shrink-0 text-foreground/70 transition-transform"
-        >
-          <IconChevronDown
-            className={cn(
-              "size-5 transition-transform",
-              open ? "rotate-180" : "rotate-0",
-            )}
+      <AccordionContent
+        className="border-t px-4 pt-3 pb-4"
+        id={`session-details-${session.token}`}
+      >
+        <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <DetailRow
+            icon={<IconGlobe className="size-3.5" />}
+            label="IP Address"
+            value={
+              session.ipAddress === "0000:0000:0000:0000:0000:0000:0000:0000"
+                ? "Localhost / Internal"
+                : session.ipAddress || "Unknown"
+            }
           />
-        </span>
-      </button>
+          <DetailRow
+            icon={<IconShield className="size-3.5" />}
+            label="User Agent"
+            truncate
+            value={session.userAgent || "Unknown device"}
+          />
+          <DetailRow
+            icon={<IconCalendar className="size-3.5" />}
+            label="Created"
+            value={formatDistanceToNow(session.createdAt, {
+              addSuffix: true,
+            })}
+          />
+          <DetailRow
+            icon={<IconRefresh className="size-3.5" />}
+            label="Last Updated"
+            value={formatDistanceToNow(session.updatedAt, {
+              addSuffix: true,
+            })}
+          />
+          <DetailRow
+            highlight={expiringSoon ? "warn" : undefined}
+            icon={<IconClock className="size-3.5" />}
+            label="Expires"
+            value={formatDistanceToNow(session.expiresAt, {
+              addSuffix: true,
+            })}
+          />
+        </dl>
 
-      {open && (
         <div
-          className="border-t px-4 pt-3 pb-4"
-          id={`session-details-${session.token}`}
-        >
-          <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <DetailRow
-              icon={<IconGlobe className="size-3.5" />}
-              label="IP Address"
-              value={
-                session.ipAddress === "0000:0000:0000:0000:0000:0000:0000:0000"
-                  ? "Localhost / Internal"
-                  : session.ipAddress || "Unknown"
-              }
-            />
-            <DetailRow
-              icon={<IconShield className="size-3.5" />}
-              label="User Agent"
-              truncate
-              value={session.userAgent || "Unknown device"}
-            />
-            <DetailRow
-              icon={<IconCalendar className="size-3.5" />}
-              label="Created"
-              value={formatDistanceToNow(session.createdAt, {
-                addSuffix: true,
-              })}
-            />
-            <DetailRow
-              icon={<IconRefresh className="size-3.5" />}
-              label="Last Updated"
-              value={formatDistanceToNow(session.updatedAt, {
-                addSuffix: true,
-              })}
-            />
-            <DetailRow
-              highlight={expiringSoon ? "warn" : undefined}
-              icon={<IconClock className="size-3.5" />}
-              label="Expires"
-              value={formatDistanceToNow(session.expiresAt, {
-                addSuffix: true,
-              })}
-            />
-          </dl>
-
-          <div className="mt-4 rounded-md bg-green-600/10 px-3 pt-2 pb-4 dark:bg-green-400/10">
-            <div className="mb-1 flex items-center justify-between">
-              <span className="font-medium text-foreground/70 text-xs">
-                Session Token
-              </span>
-              <Button
-                aria-label="Copy session token"
-                onClick={handleCopyToken}
-                variant="ghost"
-              >
-                {copied ? <IconCheck /> : <IconCopy />}
-              </Button>
-            </div>
-            <code className="block break-all font-mono text-foreground/80 text-xs">
-              {session.token}
-            </code>
-          </div>
-
-          {!isCurrentSession && (
-            <div className="mt-4 flex justify-end">
-              <Button
-                aria-label={`Revoke session for ${browser} on ${os}`}
-                className="gap-1.5"
-                disabled={revokeSession.isPending || isCurrentSession}
-                onClick={() => {
-                  revokeSession.mutate({
-                    token: session.token,
-                  })
-                }}
-                size="sm"
-                variant="destructive"
-              >
-                {revokeSession.isPending ? <Spinner /> : <IconTrash />}
-                Revoke session
-              </Button>
-            </div>
+          className={cn(
+            "mt-4 rounded-md px-3 pt-2 pb-4",
+            isCurrentSession
+              ? "bg-green-600/10 dark:bg-green-400/10"
+              : "bg-muted-foreground/10",
           )}
+        >
+          <div className="mb-1 flex items-center justify-between">
+            <span className="font-medium text-foreground/70 text-xs">
+              Session Token
+            </span>
+            <Button
+              aria-label="Copy session token"
+              onClick={handleCopyToken}
+              variant="ghost"
+            >
+              {copied ? <IconCheck /> : <IconCopy />}
+            </Button>
+          </div>
+          <code className="block break-all font-mono text-foreground/80 text-xs">
+            {session.token}
+          </code>
         </div>
-      )}
-    </div>
+
+        {!isCurrentSession && (
+          <div className="mt-4 flex justify-end">
+            <Button
+              aria-label={`Revoke session for ${browser} on ${os}`}
+              className="gap-1.5"
+              disabled={revokeSession.isPending || isCurrentSession}
+              onClick={() => {
+                revokeSession.mutate({
+                  token: session.token,
+                })
+              }}
+              size="sm"
+              variant="destructive"
+            >
+              {revokeSession.isPending ? <Spinner /> : <IconTrash />}
+              Revoke session
+            </Button>
+          </div>
+        )}
+      </AccordionContent>
+    </AccordionItem>
   )
 }
 
