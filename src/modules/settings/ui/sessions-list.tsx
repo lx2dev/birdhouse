@@ -150,18 +150,25 @@ function SessionCard({ session, isCurrentSession = false }: SessionCardProps) {
 
   const DeviceIcon = getDeviceIcon(device)
 
-  // TODO: Increase color contrast in light mode
   const statusBadge = isCurrentSession ? (
     <Badge
-      className="gap-1 border-green-500 bg-green-500/10 font-medium text-green-500 text-xs"
+      className={cn(
+        "gap-1 font-medium text-xs",
+        "dark:border-green-400 dark:bg-green-400/10 dark:text-green-400",
+        "border-green-600 bg-green-600/10 text-green-600",
+      )}
       variant="outline"
     >
-      <span className="inline-block size-1.5 rounded-full bg-green-500" />
+      <span className="inline-block size-1.5 rounded-full bg-green-600 dark:bg-green-400" />
       Current session
     </Badge>
   ) : expiringSoon ? (
     <Badge
-      className="gap-1 border-amber-500 bg-amber-500/10 font-medium text-amber-500 text-xs"
+      className={cn(
+        "gap-1 font-medium text-xs",
+        "dark:border-amber-400 dark:bg-amber-400/10 dark:text-amber-400",
+        "border-amber-600 bg-amber-600/10 text-amber-600",
+      )}
       variant="outline"
     >
       <IconClock className="size-3" />
@@ -174,7 +181,10 @@ function SessionCard({ session, isCurrentSession = false }: SessionCardProps) {
       className={cn(
         "rounded-lg border transition-all duration-200",
         isCurrentSession
-          ? "border-green-500/50 bg-green-500/10 hover:bg-green-500/20"
+          ? cn(
+              "border-green-600/50 bg-green-600/10 hover:bg-green-600/20",
+              "dark:border-green-400/50 dark:bg-green-400/10 dark:hover:bg-green-400/20",
+            )
           : "hover:bg-muted-foreground/10",
       )}
     >
@@ -190,7 +200,10 @@ function SessionCard({ session, isCurrentSession = false }: SessionCardProps) {
           className={cn(
             "flex size-9 shrink-0 items-center justify-center rounded-md",
             isCurrentSession
-              ? "bg-green-500/10 text-green-500"
+              ? cn(
+                  "bg-green-600/10 text-green-600",
+                  "dark:bg-green-400/10 dark:text-green-400",
+                )
               : "bg-muted-foreground/10 text-muted-foreground",
           )}
         >
@@ -271,7 +284,7 @@ function SessionCard({ session, isCurrentSession = false }: SessionCardProps) {
             />
           </dl>
 
-          <div className="mt-4 rounded-md bg-green-500/10 px-3 pt-2 pb-4">
+          <div className="mt-4 rounded-md bg-green-600/10 px-3 pt-2 pb-4 dark:bg-green-400/10">
             <div className="mb-1 flex items-center justify-between">
               <span className="font-medium text-foreground/70 text-xs">
                 Session Token
@@ -339,7 +352,7 @@ function DetailRow({
         className={cn(
           "text-foreground text-xs",
           truncate && "truncate",
-          highlight === "warn" && "text-amber-500",
+          highlight === "warn" && "text-amber-600 dark:text-amber-400",
           highlight === "error" && "text-destructive",
         )}
         title={truncate ? value : undefined}
