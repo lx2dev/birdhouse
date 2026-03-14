@@ -1,9 +1,7 @@
 import { env } from "@/env"
-import type { auth } from "@/server/auth"
+import type { Session } from "@/lib/auth/utils"
 
-export function isUserAdmin(
-  session: typeof auth.$Infer.Session | null,
-): boolean {
+export function isUserAdmin(session: Session | null): boolean {
   if (!session?.user) return false
 
   const adminEmail = env.ADMIN_EMAIL

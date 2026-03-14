@@ -20,21 +20,25 @@ import {
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Skeleton } from "@/components/ui/skeleton"
+// import { Skeleton } from "@/components/ui/skeleton"
 import { APP_NAME, NAV_ITEMS } from "@/constants"
-import { useSession } from "@/lib/auth/client"
+import type { Session } from "@/lib/auth/utils"
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  session: Session
+}
+
+export function AppSidebar({ session }: AppSidebarProps) {
   const pathname = usePathname()
   const { setOpenMobile } = useSidebar()
-  const { data: session } = useSession()
   const isAdmin = session?.user.role === "admin"
 
   function navigate() {
     setOpenMobile(false)
   }
 
-  if (!session) return <AppSidebar.Skeleton />
+  // TODO: Reimplement loading state for sidebar if the user has a custom layout or nav items
+  // if (!session) return <AppSidebar.Skeleton />
 
   return (
     <Sidebar variant="inset">
@@ -96,53 +100,53 @@ export function AppSidebar() {
   )
 }
 
-AppSidebar.Skeleton = () => (
-  <Sidebar variant="inset">
-    <SidebarHeader className="mx-4 px-0 py-0">
-      <div className="flex items-center gap-2">
-        <Icons.logo className="size-12 text-primary md:size-16" />
-        <span className="inline font-semibold text-lg md:text-2xl">
-          {APP_NAME}
-        </span>
-      </div>
-    </SidebarHeader>
+// AppSidebar.Skeleton = () => (
+//   <Sidebar variant="inset">
+//     <SidebarHeader className="mx-4 px-0 py-0">
+//       <div className="flex items-center gap-2">
+//         <Icons.logo className="size-12 text-primary md:size-16" />
+//         <span className="inline font-semibold text-lg md:text-2xl">
+//           {APP_NAME}
+//         </span>
+//       </div>
+//     </SidebarHeader>
 
-    <SidebarContent>
-      {Object.entries(NAV_ITEMS)
-        .filter(([key]) => key !== "admin")
-        .map(([key, { items }]) => {
-          if (!items) return null
+//     <SidebarContent>
+//       {Object.entries(NAV_ITEMS)
+//         .filter(([key]) => key !== "admin")
+//         .map(([key, { items }]) => {
+//           if (!items) return null
 
-          return (
-            <React.Fragment key={key}>
-              <SidebarGroup>
-                <SidebarGroupLabel>
-                  <Skeleton className="h-4 w-16" />
-                </SidebarGroupLabel>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {Array.from({ length: items.length }).map((_, itemIdx) => (
-                      <SidebarMenuItem key={itemIdx}>
-                        <SidebarMenuButton
-                          className="text-muted-foreground data-active:bg-transparent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
-                          size="lg"
-                        >
-                          <Skeleton className="size-6" />
-                          <Skeleton className="h-4 w-20" />
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
+//           return (
+//             <React.Fragment key={key}>
+//               <SidebarGroup>
+//                 <SidebarGroupLabel>
+//                   <Skeleton className="h-4 w-16" />
+//                 </SidebarGroupLabel>
+//                 <SidebarGroupContent>
+//                   <SidebarMenu>
+//                     {Array.from({ length: items.length }).map((_, itemIdx) => (
+//                       <SidebarMenuItem key={itemIdx}>
+//                         <SidebarMenuButton
+//                           className="text-muted-foreground data-active:bg-transparent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
+//                           size="lg"
+//                         >
+//                           <Skeleton className="size-6" />
+//                           <Skeleton className="h-4 w-20" />
+//                         </SidebarMenuButton>
+//                       </SidebarMenuItem>
+//                     ))}
+//                   </SidebarMenu>
+//                 </SidebarGroupContent>
+//               </SidebarGroup>
 
-              <div className="mx-4 last:hidden">
-                <SidebarSeparator className="mx-auto" />
-              </div>
-            </React.Fragment>
-          )
-        })}
-    </SidebarContent>
-    <SidebarRail />
-  </Sidebar>
-)
+//               <div className="mx-4 last:hidden">
+//                 <SidebarSeparator className="mx-auto" />
+//               </div>
+//             </React.Fragment>
+//           )
+//         })}
+//     </SidebarContent>
+//     <SidebarRail />
+//   </Sidebar>
+// )

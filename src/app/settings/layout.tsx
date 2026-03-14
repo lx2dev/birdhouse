@@ -25,7 +25,7 @@ export default async function SettingsLayout({
             } as React.CSSProperties
           }
         >
-          <AppSidebar />
+          <AppSidebar session={session} />
           <SidebarInset>
             <AppHeader />
             <main className="size-full p-4 lg:p-8">{children}</main>

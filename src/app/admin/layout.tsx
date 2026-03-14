@@ -1,10 +1,16 @@
+import { notFound } from "next/navigation"
+
 import { AppHeader } from "@/components/layout/app-header"
 import { AppSidebar } from "@/components/layout/app-sidebar"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { api, HydrateClient } from "@/lib/api/server"
+import { getSession } from "@/lib/auth/utils"
 
-export default function AdminLayout({ children }: LayoutProps<"/admin">) {
+export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
+  const session = await getSession()
+  if (!session) return notFound()
+
   void api.account.getProfile.prefetch()
 
   return (
@@ -18,7 +24,7 @@ export default function AdminLayout({ children }: LayoutProps<"/admin">) {
             } as React.CSSProperties
           }
         >
-          <AppSidebar />
+          <AppSidebar session={session} />
           <SidebarInset>
             <AppHeader />
             <main className="size-full p-4 lg:p-8">{children}</main>
