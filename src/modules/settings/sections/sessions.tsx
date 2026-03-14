@@ -47,18 +47,16 @@ function SessionsSectionSuspense({
   sessions,
 }: SessionsSectionSuspenseProps) {
   return (
-    <div>
-      <div className="grid @md:grid-cols-3 grid-cols-1 items-center gap-4">
-        <div className="self-start">
-          <h2 className="font-semibold text-xl tracking-tight">
-            Sessions{" "}
-            <span className="text-muted-foreground">({sessionCount})</span>
-          </h2>
-        </div>
+    <div className="grid @md:grid-cols-3 grid-cols-1 items-center gap-4">
+      <div className="self-start">
+        <h2 className="font-semibold text-xl tracking-tight">
+          Sessions{" "}
+          <span className="text-muted-foreground">({sessionCount})</span>
+        </h2>
+      </div>
 
-        <div className="@md:col-span-2 col-span-1">
-          <SessionsList currentSession={currentSession} sessions={sessions} />
-        </div>
+      <div className="@md:col-span-2 col-span-1">
+        <SessionsList currentSession={currentSession} sessions={sessions} />
       </div>
     </div>
   )
