@@ -1,6 +1,6 @@
 "use client"
 
-import { IconKey, IconLockCheck, IconLockOpen2 } from "@tabler/icons-react"
+import { IconKey, IconLockCog, IconLockOpen2 } from "@tabler/icons-react"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 
@@ -38,18 +38,21 @@ function TwoFactorSectionSuspense() {
       </div>
 
       <div className="flex items-center gap-x-3">
-        {enabled ? (
-          <IconLockCheck className="size-4 shrink-0" />
-        ) : (
-          <IconLockOpen2 className="size-4 shrink-0" />
-        )}
-        <p className="text-base text-foreground/75">
-          {enabled
-            ? "Your account is protected with two-factor authentication."
-            : hasPassword
-              ? "Protect your account with an authenticator app."
-              : "Set a password to enable two-factor authentication."}
-        </p>
+        {!enabled ? (
+          <>
+            <IconLockCog className="size-4 shrink-0" />
+            <p className="text-base text-foreground/75">
+              Two-factor authentication is currently disabled.
+            </p>
+          </>
+        ) : !hasPassword ? (
+          <>
+            <IconLockOpen2 className="size-4 shrink-0" />
+            <p className="text-base text-foreground/75">
+              Set a password to enable two-factor authentication.
+            </p>
+          </>
+        ) : null}
       </div>
 
       <div className="@md:ml-auto">
