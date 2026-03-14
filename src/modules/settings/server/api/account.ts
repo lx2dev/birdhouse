@@ -5,6 +5,7 @@ import {
   accountInsertSchema,
   changePasswordSchema,
   deleteAccountSchema,
+  revokeSessionSchema,
   setPasswordSchema,
   twoFactorSchema,
   twoFactorVerifySchema,
@@ -264,6 +265,62 @@ export const accountRouter = createTRPCRouter({
       twoFactorEnabled,
     }
   }),
+
+  listSessions: protectedProcedure.query(async ({ ctx }) => {
+    const sessions = await auth.api.listSessions({
+      headers: ctx.headers,
+    })
+
+    if (!sessions) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to list sessions",
+      })
+    }
+
+    return sessions
+  }),
+
+  revokeOtherSessions: protectedProcedure.mutation(async ({ ctx }) => {
+    const { ok, statusText } = await auth.api.revokeOtherSessions({
+      asResponse: true,
+      headers: ctx.headers,
+    })
+
+    if (!ok) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to revoke other sessions: ${statusText}`,
+      })
+    }
+
+    return {
+      status: true,
+    }
+  }),
+
+  revokeSession: protectedProcedure
+    .input(revokeSessionSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { ok, statusText } = await auth.api.revokeSession({
+        asResponse: true,
+        body: {
+          token: input.token,
+        },
+        headers: ctx.headers,
+      })
+
+      if (!ok) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to revoke session: ${statusText}`,
+        })
+      }
+
+      return {
+        status: true,
+      }
+    }),
 
   setPassword: protectedProcedure
     .input(setPasswordSchema)
