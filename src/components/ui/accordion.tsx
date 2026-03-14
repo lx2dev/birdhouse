@@ -1,7 +1,7 @@
 "use client"
 
 import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion"
-import { IconChevronDown, IconChevronUp } from "@tabler/icons-react"
+import { IconChevronDown } from "@tabler/icons-react"
 
 import { cn } from "@/lib/utils"
 
@@ -42,11 +42,7 @@ function AccordionTrigger({
       >
         {children}
         <IconChevronDown
-          className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden"
-          data-slot="accordion-trigger-icon"
-        />
-        <IconChevronUp
-          className="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline"
+          className="pointer-events-none shrink-0 transition-transform group-aria-expanded/accordion-trigger:rotate-180"
           data-slot="accordion-trigger-icon"
         />
       </AccordionPrimitive.Trigger>
@@ -77,4 +73,4 @@ function AccordionContent({
   )
 }
 
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
+export { Accordion, AccordionContent, AccordionItem, AccordionTrigger }
