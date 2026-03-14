@@ -5,7 +5,6 @@ import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/lib/api/client"
 import { DisableTwoFactorModal } from "@/modules/settings/ui/disable-two-factor-modal"
 import { EnableTwoFactorModal } from "@/modules/settings/ui/enable-two-factor-modal"
@@ -73,10 +72,7 @@ TwoFactorSection.Skeleton = () => (
         Two-factor authentication
       </h2>
     </div>
-    <div className="space-y-2">
-      <Skeleton className="h-4 w-64" />
-    </div>
-    <div className="@md:ml-auto">
+    <div className="@md:col-span-2 col-span-1 @md:ml-auto">
       <Button disabled variant="outline">
         <IconKey /> Enable 2FA
       </Button>
