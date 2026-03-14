@@ -62,10 +62,10 @@ export function SessionsList({ sessions, currentSession }: SessionsListProps) {
     .filter((session) => new Date(session.expiresAt) >= new Date())
 
   return (
-    <div className="relative mt-4">
+    <div className="flex flex-col gap-2">
       {sessions.length > 0 && (
         <Button
-          className="absolute top-0 right-0"
+          className="ml-auto"
           disabled={revokeOtherSessions.isPending}
           onClick={() => {
             revokeOtherSessions.mutate()
@@ -78,7 +78,7 @@ export function SessionsList({ sessions, currentSession }: SessionsListProps) {
       )}
 
       <div className="flex flex-col gap-2">
-        <SessionGroup count={activeSessions.length} defaultOpen label="Active">
+        <SessionGroup defaultOpen>
           {activeSessions.map((session) => (
             <SessionCard
               isCurrentSession={session.token === currentSessionToken}
@@ -93,21 +93,14 @@ export function SessionsList({ sessions, currentSession }: SessionsListProps) {
 }
 
 interface SessionGroupProps {
-  label: string
-  count: number
   defaultOpen?: boolean
   children: React.ReactNode
 }
 
-function SessionGroup({ label, count, children }: SessionGroupProps) {
+function SessionGroup({ children }: SessionGroupProps) {
   return (
     <div>
-      <p className="mt-4 inline-flex items-center gap-1.5 font-medium text-sm">
-        {label}
-        <span className="tabular-nums">({count})</span>
-      </p>
-
-      <ul className="mt-2 flex max-h-90 flex-col gap-2 overflow-y-auto py-2">
+      <ul className="flex max-h-90 flex-col gap-2 overflow-y-auto py-2">
         {Array.isArray(children) ? (
           (children as React.ReactNode[]).map((child, idx) => (
             <li key={idx}>{child}</li>
@@ -212,7 +205,7 @@ function SessionCard({ session, isCurrentSession = false }: SessionCardProps) {
             </span>
             {statusBadge}
           </div>
-          <p className="mt-0.5 text-muted-foreground text-xs">
+          <p className="mt-0.5 text-foreground/70 text-xs">
             Created{" "}
             {formatDistanceToNow(session.createdAt, { addSuffix: true })}
             <IconPointFilled className="mx-1 inline size-1.5" />
@@ -222,7 +215,7 @@ function SessionCard({ session, isCurrentSession = false }: SessionCardProps) {
 
         <span
           aria-hidden="true"
-          className="ml-2 shrink-0 text-muted-foreground transition-transform"
+          className="ml-2 shrink-0 text-foreground/70 transition-transform"
         >
           <IconChevronDown
             className={cn(
@@ -278,9 +271,9 @@ function SessionCard({ session, isCurrentSession = false }: SessionCardProps) {
             />
           </dl>
 
-          <div className="mt-4 rounded-md bg-muted px-3 pt-2 pb-4">
+          <div className="mt-4 rounded-md bg-green-500/10 px-3 pt-2 pb-4">
             <div className="mb-1 flex items-center justify-between">
-              <span className="font-medium text-muted-foreground text-xs">
+              <span className="font-medium text-foreground/70 text-xs">
                 Session Token
               </span>
               <Button
