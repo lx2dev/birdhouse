@@ -39,7 +39,7 @@ function SessionsSectionSuspense({ session }: SessionsSectionProps) {
           </h2>
         </div>
 
-        <div className="col-span-1 md:col-span-2">
+        <div className="@md:col-span-2 col-span-1">
           <SessionsList currentSession={session} sessions={sessions} />
         </div>
       </div>
