@@ -43,7 +43,7 @@ import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
 import { CreateTemplateDialog } from "@/modules/admin/ui/create-template-dialog"
-import { EditTemplateDialog } from "@/modules/admin/ui/edit-template.dialog"
+import { EditTemplateDialog } from "@/modules/admin/ui/edit-template-dialog"
 import type { VMTemplateStatus } from "@/server/db/schema"
 import { vmTemplateStatusEnum } from "@/server/db/schema"
 
