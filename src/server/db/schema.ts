@@ -1,5 +1,8 @@
 import { relations, sql } from "drizzle-orm"
 import { index, pgEnum, pgTableCreator } from "drizzle-orm/pg-core"
+import type z from "zod"
+
+import type { userPreferencesSchema } from "@/schemas/user-preferences"
 
 export const createTable = pgTableCreator((name) => `birdhouse_${name}`)
 
@@ -329,8 +332,34 @@ export const verification = createTable(
   (t) => [index("verification_identifier_idx").on(t.identifier)],
 )
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userPreferencesTable = createTable(
+  "user_preferences",
+  (d) => ({
+    preferences: d
+      .jsonb("preferences")
+      .notNull()
+      .$type<z.infer<typeof userPreferencesSchema>>()
+      .default(sql`'{}'::jsonb`),
+    updatedAt: d
+      .timestamp("updated_at", { withTimezone: true })
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
+    userId: d
+      .text("user_id")
+      .primaryKey()
+      .references(() => user.id, { onDelete: "cascade" }),
+  }),
+  (t) => [index("user_preferences_userId_idx").on(t.userId)],
+)
+
+export type UserPreferences = typeof userPreferencesTable.$inferSelect
+export type UserPreferencesInsert = typeof userPreferencesTable.$inferInsert
+
+export const userRelations = relations(user, ({ many, one }) => ({
   accounts: many(account),
+  preferences: one(userPreferencesTable, {
+    fields: [user.id],
+    references: [userPreferencesTable.userId],
+  }),
   twoFactors: many(twoFactor),
 }))
 
