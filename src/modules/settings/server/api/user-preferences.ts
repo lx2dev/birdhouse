@@ -14,6 +14,7 @@ export const userPreferencesRouter = createTRPCRouter({
     return userPreferencesSchema.parse(preferences?.preferences ?? {})
   }),
 
+  // TODO: Send notifications to user depending on what they have enabled in their preferences
   update: protectedProcedure
     .input(userPreferencesSchema.partial())
     .mutation(async ({ ctx, input }) => {

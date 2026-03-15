@@ -6,6 +6,7 @@ export function NotificationsView() {
     <div className="@container py-6">
       <EmailNotificationsSection />
       <Separator className="my-8" />
+      {/* TODO: In-app notifications */}
     </div>
   )
 }
