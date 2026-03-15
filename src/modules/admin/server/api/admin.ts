@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server"
 import { count, eq } from "drizzle-orm"
+import z from "zod"
 
 import { logAndNotify, logOnly } from "@/helpers/audit/log-and-notify"
 import {
@@ -151,6 +152,58 @@ export const adminRouter = createTRPCRouter({
         })
 
         return template
+      }),
+
+    delete: adminProcedure
+      .input(
+        z.object({
+          id: z.string(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { id: userId } = ctx.session.user
+
+        const [existingTemplate] = await ctx.db
+          .select()
+          .from(vmTemplateTable)
+          .where(eq(vmTemplateTable.id, input.id))
+
+        if (!existingTemplate) {
+          await logOnly({
+            action: "admin:delete_vm_template_failed",
+            db: ctx.db,
+            details: {
+              error: `VM Template with ID ${input.id} not found`,
+            },
+            resourceId: input.id,
+            resourceType: "vm_template",
+            userId,
+          })
+
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `VM Template with ID ${input.id} not found`,
+          })
+        }
+
+        await ctx.db
+          .delete(vmTemplateTable)
+          .where(eq(vmTemplateTable.id, input.id))
+
+        await logAndNotify({
+          action: "admin:delete_vm_template",
+          db: ctx.db,
+          details: {
+            displayName: existingTemplate.displayName,
+          },
+          notifyMessage: `VM Template "${existingTemplate.displayName}" deleted`,
+          notifyStatus: "alert",
+          resourceId: existingTemplate.id,
+          resourceType: "vm_template",
+          userId,
+        })
+
+        return { success: true }
       }),
 
     update: adminProcedure
