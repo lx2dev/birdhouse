@@ -10,6 +10,7 @@ import {
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
+import { toast } from "sonner"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -28,6 +29,7 @@ import { authClient } from "@/lib/auth/client"
 export function UserMenu() {
   const router = useRouter()
   const mobile = useIsMobile()
+  const utils = api.useUtils()
   const { resolvedTheme, setTheme } = useTheme()
 
   const [profile] = api.account.getProfile.useSuspenseQuery()
@@ -42,8 +44,24 @@ export function UserMenu() {
     })
   }
 
+  const updatePreferences = api.userPreferences.update.useMutation({
+    onError(error) {
+      toast.error("Something went wrong", {
+        description: error.message,
+      })
+    },
+    onSuccess({ preferences }) {
+      utils.userPreferences.getAll.setData(undefined, preferences)
+      void utils.userPreferences.getAll.invalidate()
+      setTheme(preferences.theme)
+    },
+  })
+
   function toggleTheme() {
     setTheme(resolvedTheme === "light" ? "dark" : "light")
+    updatePreferences.mutate({
+      theme: resolvedTheme === "light" ? "dark" : "light",
+    })
   }
 
   const shortUserName = profile.name
