@@ -2,9 +2,11 @@
 
 import {
   IconArrowUpRight,
+  IconChevronDown,
   IconFileSettings,
   IconLogout,
   IconSettings,
+  IconShield,
   IconSunMoon,
 } from "@tabler/icons-react"
 import Link from "next/link"
@@ -22,15 +24,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { SidebarMenuButton } from "@/components/ui/sidebar"
+import { isUserAdmin } from "@/helpers/is-user-admin"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { api } from "@/lib/api/client"
-import { authClient } from "@/lib/auth/client"
+import { authClient, useSession } from "@/lib/auth/client"
 
-export function UserMenu() {
+interface UserMenuProps {
+  children?: React.ReactElement
+  variant?: "default" | "sidebarMenuButton" | "avatar"
+}
+
+export function UserMenu({ children, variant = "default" }: UserMenuProps) {
   const router = useRouter()
   const mobile = useIsMobile()
   const utils = api.useUtils()
-  const { resolvedTheme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
+  const { data: session } = useSession()
+
+  const isAdmin = isUserAdmin(session)
 
   const [profile] = api.account.getProfile.useSuspenseQuery()
 
@@ -58,9 +70,9 @@ export function UserMenu() {
   })
 
   function toggleTheme() {
-    setTheme(resolvedTheme === "light" ? "dark" : "light")
+    setTheme(theme === "light" ? "dark" : "light")
     updatePreferences.mutate({
-      theme: resolvedTheme === "light" ? "dark" : "light",
+      theme: theme === "light" ? "dark" : "light",
     })
   }
 
@@ -76,14 +88,43 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        nativeButton={false}
+        nativeButton={variant !== "avatar" || !!children}
         render={
-          <Avatar className="size-8" suppressHydrationWarning>
-            <AvatarImage alt={profile.name} src={profile.image ?? ""} />
-            <AvatarFallback className="text-sm capitalize">
-              {shortUserName}
-            </AvatarFallback>
-          </Avatar>
+          variant === "avatar" ? (
+            <Avatar className="size-8" suppressHydrationWarning>
+              <AvatarImage
+                alt={profile.name}
+                src={profile.image ?? undefined}
+              />
+              <AvatarFallback className="text-sm capitalize">
+                {shortUserName}
+              </AvatarFallback>
+            </Avatar>
+          ) : variant === "sidebarMenuButton" ? (
+            <SidebarMenuButton
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              size="lg"
+            >
+              <Avatar className="size-8 rounded-lg">
+                <AvatarImage
+                  alt={profile.name}
+                  src={profile.image ?? undefined}
+                />
+                <AvatarFallback className="rounded-lg">
+                  {shortUserName}
+                </AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium">{profile.name}</span>
+                <span className="truncate text-muted-foreground text-xs">
+                  {profile.email}
+                </span>
+              </div>
+              <IconChevronDown className="ml-auto size-4" />
+            </SidebarMenuButton>
+          ) : (
+            children
+          )
         }
       />
       <DropdownMenuContent align="end" className="min-w-56 rounded-lg">
@@ -91,7 +132,10 @@ export function UserMenu() {
           <DropdownMenuLabel className="p-0 font-normal">
             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar className="size-8">
-                <AvatarImage alt={profile.name} src={profile.image ?? ""} />
+                <AvatarImage
+                  alt={profile.name}
+                  src={profile.image ?? undefined}
+                />
                 <AvatarFallback className="text-sm capitalize">
                   {shortUserName}
                 </AvatarFallback>
@@ -114,6 +158,15 @@ export function UserMenu() {
             <IconSettings />
             Settings
           </DropdownMenuItem>
+          {isAdmin && (
+            <DropdownMenuItem
+              nativeButton={false}
+              render={<Link href="/admin" />}
+            >
+              <IconShield />
+              Admin Panel
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             nativeButton={false}
             render={<Link href="/docs" target="_blank" />}

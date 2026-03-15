@@ -9,6 +9,7 @@ import { Icons } from "@/components/icons"
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -23,8 +24,10 @@ import {
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { Skeleton } from "@/components/ui/skeleton"
 import type { NavSection } from "@/constants"
 import { APP_NAME, isNavItemActive } from "@/constants"
+import { UserMenu } from "@/modules/dashboard/ui/user-menu"
 
 interface SectionSidebarProps {
   sections: NavSection[]
@@ -127,7 +130,37 @@ export function SectionSidebar({ homeHref, sections }: SectionSidebarProps) {
           )
         })}
       </SidebarContent>
+
+      <SidebarFooter>
+        <UserDropdownMenu />
+      </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   )
 }
+
+function UserDropdownMenu() {
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <UserMenu variant="sidebarMenuButton" />
+      </SidebarMenuItem>
+    </SidebarMenu>
+  )
+}
+
+UserDropdownMenu.Skeleton = () => (
+  <SidebarMenu>
+    <SidebarMenuItem>
+      <SidebarMenuButton size="lg">
+        <Skeleton className="size-8 rounded-lg" />
+        <div className="grid flex-1">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="mt-1 h-2 w-20" />
+        </div>
+        <Skeleton className="ml-auto size-4" />
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  </SidebarMenu>
+)

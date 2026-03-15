@@ -13,6 +13,7 @@ export default async function SettingsLayout({
   if (!session) return redirect("/auth/signin")
 
   void api.account.getProfile.prefetch()
+  void api.userPreferences.getAll.prefetch()
 
   return (
     <HydrateClient>

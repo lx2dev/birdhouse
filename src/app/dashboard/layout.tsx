@@ -16,6 +16,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     limit: DEFAULT_FETCH_LIMIT,
   })
   void api.account.getProfile.prefetch()
+  void api.userPreferences.getAll.prefetch()
 
   return (
     <HydrateClient>

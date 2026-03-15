@@ -64,7 +64,7 @@ export function AppHeader() {
 
         <div className="ml-auto flex items-center gap-2">
           <Notifications />
-          <UserMenu />
+          <UserMenu variant="avatar" />
 
           <div className="block md:hidden">
             <Button

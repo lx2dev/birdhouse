@@ -12,6 +12,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
   if (!session) return notFound()
 
   void api.account.getProfile.prefetch()
+  void api.userPreferences.getAll.prefetch()
 
   return (
     <HydrateClient>
