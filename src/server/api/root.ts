@@ -5,6 +5,7 @@ import { osRouter } from "@/modules/dashboard/server/api/os"
 import { sshKeyRouter } from "@/modules/dashboard/server/api/sshkey"
 import { templateRouter } from "@/modules/dashboard/server/api/template"
 import { accountRouter } from "@/modules/settings/server/api/account"
+import { userPreferencesRouter } from "@/modules/settings/server/api/user-preferences"
 import { createCallerFactory, createTRPCRouter } from "@/server/api/init"
 
 export const appRouter = createTRPCRouter({
@@ -15,6 +16,7 @@ export const appRouter = createTRPCRouter({
   os: osRouter,
   sshKey: sshKeyRouter,
   template: templateRouter,
+  userPreferences: userPreferencesRouter,
 })
 
 export type AppRouter = typeof appRouter
