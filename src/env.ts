@@ -3,11 +3,11 @@ import { z } from "zod"
 
 export const env = createEnv({
   client: {
+    NEXT_PUBLIC_ADMIN_EMAIL: z.email(),
     NEXT_PUBLIC_URL: z.url(),
   },
   emptyStringAsUndefined: true,
   runtimeEnv: {
-    ADMIN_EMAIL: process.env.ADMIN_EMAIL,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
     DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
@@ -16,6 +16,7 @@ export const env = createEnv({
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    NEXT_PUBLIC_ADMIN_EMAIL: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     NODE_ENV: process.env.NODE_ENV,
     PM_DEFAULT_NODE: process.env.PM_DEFAULT_NODE,
@@ -28,7 +29,6 @@ export const env = createEnv({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
   },
   server: {
-    ADMIN_EMAIL: z.email(),
     BETTER_AUTH_SECRET: z.string(),
     DATABASE_URL: z.url(),
     DISCORD_CLIENT_ID: z.string(),

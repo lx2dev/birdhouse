@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/sidebar"
 // import { Skeleton } from "@/components/ui/skeleton"
 import { APP_NAME, NAV_ITEMS } from "@/constants"
+import { isUserAdmin } from "@/helpers/is-user-admin"
 import type { Session } from "@/lib/auth/utils"
 
 interface AppSidebarProps {
@@ -31,7 +32,8 @@ interface AppSidebarProps {
 export function AppSidebar({ session }: AppSidebarProps) {
   const pathname = usePathname()
   const { setOpenMobile } = useSidebar()
-  const isAdmin = session?.user.role === "admin"
+
+  const isAdmin = isUserAdmin(session)
 
   function navigate() {
     setOpenMobile(false)
