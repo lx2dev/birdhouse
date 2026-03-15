@@ -254,7 +254,7 @@ export const user = createTable(
       .$defaultFn(() => false)
       .notNull(),
     id: d.text().primaryKey(),
-    image: d.text(),
+    image: d.text().default("https://gravatar.com/avatar/HASH"),
     name: d.text().notNull(),
     role: d.text("role"),
     twoFactorEnabled: d.boolean("two_factor_enabled").default(false),

@@ -29,6 +29,13 @@
       "when": 1773534643578,
       "tag": "0004_moaning_dreadnoughts",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773556605191,
+      "tag": "0005_round_cobalt_man",
+      "breakpoints": true
     }
   ]
 }

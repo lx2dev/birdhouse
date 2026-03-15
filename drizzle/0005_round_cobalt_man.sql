@@ -1,0 +1,1 @@
+ALTER TABLE "birdhouse_user" ALTER COLUMN "image" SET DEFAULT 'https://gravatar.com/avatar/HASH';
