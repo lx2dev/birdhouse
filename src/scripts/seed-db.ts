@@ -1,3 +1,4 @@
+import { hashPassword } from "@/lib/utils"
 import { db } from "@/server/db"
 import * as schema from "@/server/db/schema"
 
@@ -17,6 +18,26 @@ const SEED_USERS: readonly (typeof schema.user.$inferInsert)[] = [
     id: "00000000-0000-0000-0000-000000000002",
     name: "Admin User",
     role: "admin",
+  },
+]
+
+const demoPassword = "password123"
+const password = await hashPassword(demoPassword)
+
+const SEED_ACCOUNTS: readonly (typeof schema.account.$inferInsert)[] = [
+  {
+    accountId: "00000000-0000-0000-0000-000000000111",
+    id: "00000000-0000-0000-0000-000000000011",
+    password,
+    providerId: "credential",
+    userId: "00000000-0000-0000-0000-000000000001",
+  },
+  {
+    accountId: "00000000-0000-0000-0000-000000000222",
+    id: "00000000-0000-0000-0000-000000000022",
+    password,
+    providerId: "credential",
+    userId: "00000000-0000-0000-0000-000000000002",
   },
 ]
 
@@ -59,7 +80,7 @@ const SEED_TEMPLATES: readonly (typeof schema.vmTemplate.$inferInsert)[] = [
   },
 ] as const
 
-const OPERATING_SYSTEM: readonly (typeof schema.operatingSystem.$inferInsert)[] =
+const OPERATING_SYSTEMS: readonly (typeof schema.operatingSystem.$inferInsert)[] =
   [
     {
       displayName: "Ubuntu",
@@ -107,6 +128,22 @@ async function seedUsers() {
   }
 }
 
+async function seedAccounts() {
+  try {
+    console.log("Seeding accounts...")
+    for (const account of SEED_ACCOUNTS) {
+      await db
+        .insert(schema.account)
+        .values(account)
+        .onConflictDoNothing()
+        .execute()
+    }
+  } catch (error) {
+    console.error("Error seeding accounts:", error)
+    process.exit(1)
+  }
+}
+
 async function seedVMTemplates() {
   try {
     console.log("Seeding VM templates...")
@@ -126,7 +163,7 @@ async function seedVMTemplates() {
 async function seedOperatingSystems() {
   try {
     console.log("Seeding Operating Systems...")
-    for (const os of OPERATING_SYSTEM) {
+    for (const os of OPERATING_SYSTEMS) {
       await db
         .insert(schema.operatingSystem)
         .values(os)
@@ -141,6 +178,7 @@ async function seedOperatingSystems() {
 
 async function main() {
   await seedUsers()
+  await seedAccounts()
   await seedVMTemplates()
   await seedOperatingSystems()
 }
