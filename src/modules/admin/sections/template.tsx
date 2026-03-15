@@ -132,9 +132,9 @@ function TemplateSectionSuspense() {
     <>
       <div className="mb-4">
         <QueryControls
-          onApply={() => setAppliedControls(controls)}
-          onChange={setControls}
-          onReset={() => {
+          onApplyAction={() => setAppliedControls(controls)}
+          onChangeAction={setControls}
+          onResetAction={() => {
             const reset: QueryControlsValue = {
               sortBy: undefined,
               sortOrder: "desc",
