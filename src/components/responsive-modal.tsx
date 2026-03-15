@@ -98,7 +98,9 @@ export function ResponsiveModal({
         <DrawerHeader hidden>
           <DrawerTitle hidden />
         </DrawerHeader>
-        <div className="mx-auto w-full max-w-lg py-8">{children}</div>
+        <div className="mx-auto w-full max-w-[calc(var(--container-lg)+1rem)] overflow-y-auto px-2 py-8">
+          {children}
+        </div>
       </DrawerContent>
     </Drawer>
   )
