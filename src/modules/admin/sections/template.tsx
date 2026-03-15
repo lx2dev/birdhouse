@@ -19,6 +19,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -185,7 +186,7 @@ function TemplateSectionSuspense() {
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
                       <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
-                        <IconServerCog className="size-5 text-primary" />
+                        <IconServerCog className="size-5 text-chart-3" />
                       </div>
                       <div>
                         <CardTitle className="text-lg">
@@ -198,7 +199,7 @@ function TemplateSectionSuspense() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="h-full space-y-4">
                   <div className="line-clamp-2 text-muted-foreground text-sm">
                     {template.description || "No description provided"}
                   </div>
@@ -219,41 +220,40 @@ function TemplateSectionSuspense() {
                       <div className="font-medium">{template.diskGb} GB</div>
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-2 border-t pt-2">
-                    <EditTemplateDialog template={template} variant="outline" />
-                    <Select
-                      disabled={isUpdating}
-                      onValueChange={(v) => {
-                        if (v === template.status) return
-
-                        updateTemplate.mutate({
-                          id: template.id,
-                          status: v as VMTemplateStatus,
-                        })
-                      }}
-                      value={template.status}
-                    >
-                      <SelectTrigger className="h-7!">
-                        <SelectValue className="text-foreground capitalize">
-                          {isUpdating ? <Spinner /> : <IconPower />}
-                          {template.status}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {vmTemplateStatusEnum.enumValues.map((status) => (
-                          <SelectItem
-                            className="capitalize"
-                            key={status}
-                            value={status}
-                          >
-                            {status}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </CardContent>
+                <CardFooter className="flex items-center gap-2">
+                  <EditTemplateDialog template={template} variant="outline" />
+                  <Select
+                    disabled={isUpdating}
+                    onValueChange={(v) => {
+                      if (v === template.status) return
+
+                      updateTemplate.mutate({
+                        id: template.id,
+                        status: v as VMTemplateStatus,
+                      })
+                    }}
+                    value={template.status}
+                  >
+                    <SelectTrigger className="h-7!">
+                      <SelectValue className="text-foreground capitalize">
+                        {isUpdating ? <Spinner /> : <IconPower />}
+                        {template.status}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {vmTemplateStatusEnum.enumValues.map((status) => (
+                        <SelectItem
+                          className="capitalize"
+                          key={status}
+                          value={status}
+                        >
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </CardFooter>
               </Card>
             )
           })}
