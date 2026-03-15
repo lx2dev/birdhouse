@@ -100,6 +100,10 @@ const adminCreateVMTemplateDetails = z.object({
   status: z.string(),
 })
 
+const adminDeleteVMTemplateDetails = z.object({
+  displayName: z.string(),
+})
+
 const adminUpdateVMTemplateDetails = z.object({
   cpuCores: z.number().optional(),
   diskGb: z.number().optional(),
@@ -158,6 +162,8 @@ export const auditActionMap = {
   // Admin actions
   "admin:create_operating_system": adminCreateOperatingSystemDetails,
   "admin:create_vm_template": adminCreateVMTemplateDetails,
+  "admin:delete_vm_template": adminDeleteVMTemplateDetails,
+  "admin:delete_vm_template_failed": adminTemplateFailedDetails,
   "admin:reject_user": adminRejectUserDetails,
   "admin:unban_user": adminUnbanUserDetails,
   "admin:update_vm_template": adminUpdateVMTemplateDetails,
