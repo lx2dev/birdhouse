@@ -1,6 +1,11 @@
 "use client"
 
-import { IconArrowUpRight } from "@tabler/icons-react"
+import {
+  IconArrowLeft,
+  IconArrowUpRight,
+  IconSettings,
+  IconShieldCheck,
+} from "@tabler/icons-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
@@ -24,17 +29,23 @@ import {
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Skeleton } from "@/components/ui/skeleton"
-import type { NavSection } from "@/constants"
+import type { NAV_SECTIONS, NavSection } from "@/constants"
 import { APP_NAME, isNavItemActive } from "@/constants"
 import { UserMenu } from "@/modules/dashboard/ui/user-menu"
 
 interface SectionSidebarProps {
   sections: NavSection[]
   homeHref: string
+  sectionKey: (typeof NAV_SECTIONS)[number]["key"]
+  isAdmin?: boolean
 }
 
-export function SectionSidebar({ homeHref, sections }: SectionSidebarProps) {
+export function SectionSidebar({
+  isAdmin = false,
+  homeHref,
+  sectionKey,
+  sections,
+}: SectionSidebarProps) {
   const pathname = usePathname()
   const { setOpenMobile } = useSidebar()
 
@@ -44,16 +55,73 @@ export function SectionSidebar({ homeHref, sections }: SectionSidebarProps) {
 
   return (
     <Sidebar variant="inset">
-      <SidebarHeader className="mx-4 px-0 py-0">
+      <SidebarHeader className="py-0">
         <Link className="flex items-center gap-2" href={homeHref}>
           <Icons.logo className="size-12 text-primary md:size-16" />
           <span className="inline font-semibold text-lg md:text-2xl">
             {APP_NAME}
           </span>
         </Link>
+
+        {sectionKey !== "platform" && (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                className="font-semibold [&_svg]:size-5"
+                onClick={navigate}
+                render={<Link href="/dashboard" />}
+                size="lg"
+                variant="outline"
+              >
+                <IconArrowLeft />
+                <span className="font-semibold text-base">
+                  Back to Platform
+                </span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        )}
       </SidebarHeader>
 
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel className="capitalize">General</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className="group/target text-muted-foreground data-active:bg-sidebar-accent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
+                  isActive={false}
+                  onClick={navigate}
+                  render={<Link href="/settings" />}
+                  size="lg"
+                >
+                  <IconSettings className="size-5" />
+                  <span className="flex items-center gap-0.5 font-semibold text-lg">
+                    Settings
+                  </span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              {isAdmin ? (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    className="group/target text-muted-foreground data-active:bg-sidebar-accent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
+                    isActive={false}
+                    onClick={navigate}
+                    render={<Link href="/admin" />}
+                    size="lg"
+                  >
+                    <IconShieldCheck className="size-5" />
+                    <span className="flex items-center gap-0.5 font-semibold text-lg">
+                      Admin
+                    </span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ) : null}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         {sections.map(({ items, key, label }) => {
           if (!items?.length) return null
 
@@ -149,18 +217,3 @@ function UserDropdownMenu() {
     </SidebarMenu>
   )
 }
-
-UserDropdownMenu.Skeleton = () => (
-  <SidebarMenu>
-    <SidebarMenuItem>
-      <SidebarMenuButton size="lg">
-        <Skeleton className="size-8 rounded-lg" />
-        <div className="grid flex-1">
-          <Skeleton className="h-3 w-16" />
-          <Skeleton className="mt-1 h-2 w-20" />
-        </div>
-        <Skeleton className="ml-auto size-4" />
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-  </SidebarMenu>
-)

@@ -4,10 +4,16 @@ import { DASHBOARD_SIDEBAR_SECTIONS } from "@/constants"
 
 import { SectionSidebar } from "./section-sidebar"
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  isAdmin?: boolean
+}
+
+export function AppSidebar({ isAdmin = false }: AppSidebarProps) {
   return (
     <SectionSidebar
       homeHref="/dashboard"
+      isAdmin={isAdmin}
+      sectionKey="platform"
       sections={DASHBOARD_SIDEBAR_SECTIONS}
     />
   )

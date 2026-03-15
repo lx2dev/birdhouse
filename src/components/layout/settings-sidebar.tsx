@@ -4,8 +4,17 @@ import { SETTINGS_SIDEBAR_SECTIONS } from "@/constants"
 
 import { SectionSidebar } from "./section-sidebar"
 
-export function SettingsSidebar() {
+interface SettingsSidebarProps {
+  isAdmin?: boolean
+}
+
+export function SettingsSidebar({ isAdmin = false }: SettingsSidebarProps) {
   return (
-    <SectionSidebar homeHref="/settings" sections={SETTINGS_SIDEBAR_SECTIONS} />
+    <SectionSidebar
+      homeHref="/settings"
+      isAdmin={isAdmin}
+      sectionKey="settings"
+      sections={SETTINGS_SIDEBAR_SECTIONS}
+    />
   )
 }

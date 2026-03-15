@@ -5,12 +5,14 @@ import { AppSidebar } from "@/components/layout/app-sidebar"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
+import { isUserAdmin } from "@/helpers/is-user-admin"
 import { api, HydrateClient } from "@/lib/api/server"
 import { getSession } from "@/lib/auth/utils"
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const session = await getSession()
   if (!session) return redirect("/auth/signin")
+  const isAdmin = isUserAdmin(session)
 
   void api.notification.list.prefetchInfinite({
     limit: DEFAULT_FETCH_LIMIT,
@@ -29,7 +31,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
             } as React.CSSProperties
           }
         >
-          <AppSidebar />
+          <AppSidebar isAdmin={isAdmin} />
           <SidebarInset>
             <AppHeader />
             <main className="size-full p-4 lg:p-8">{children}</main>
