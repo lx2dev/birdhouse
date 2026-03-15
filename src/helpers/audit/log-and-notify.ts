@@ -1,7 +1,9 @@
+// TODO: Send email notifications depending on user preferences and action type
+
 import type { db } from "@/server/db"
 
 import type { AuditActionDetails, AuditActionType } from "./actions"
-import { auditLog } from "./index"
+import { auditLog } from "./audit-log"
 import { notification } from "./notification"
 
 interface LogAndNotifyParams<T extends AuditActionType> {
