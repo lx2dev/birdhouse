@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
 import type { RouterOutputs } from "@/lib/api/client"
@@ -236,13 +237,64 @@ function EmailNotificationsForm({ preferences }: EmailNotificationsFormProps) {
 }
 
 EmailNotificationsSection.Skeleton = function EmailNotificationsSkeleton() {
-  return <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
+  return (
+    <div className="grid @md:grid-cols-3 grid-cols-1 items-center gap-4">
+      <div className="self-start">
+        <h2 className="font-semibold text-xl tracking-tight">
+          Email Notifications
+        </h2>
+      </div>
+
+      <div className="@md:col-span-2 col-span-1">
+        <div className="flex flex-col gap-4">
+          <div className="ml-auto">
+            <Skeleton className="size-6 w-24 rounded-full" />
+          </div>
+
+          <div>
+            <Card className="p-0">
+              <CardContent className="p-0">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div className="flex items-center gap-4 p-5" key={i}>
+                    <Skeleton className="size-8 rounded-md" />
+                    <div className="min-w-0 flex-1">
+                      <Skeleton className="mb-2 h-4 w-32" />
+                      <Skeleton className="mb-2 h-3 w-full max-w-[40ch]" />
+                      <Skeleton className="h-2 w-full max-w-[60ch]" />
+                    </div>
+
+                    <Skeleton className="h-[18.4px] w-8 rounded-full" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <div className="mt-4 flex items-center gap-2 rounded-lg border bg-card px-2.5 py-2 text-card-foreground">
+              <Skeleton className="size-4" />
+              <Skeleton className="h-3 w-full max-w-[40ch]" />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <Button className="ml-auto" disabled>
+            <IconDeviceFloppy />
+            Save changes
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 EmailNotificationsSection.Error = function EmailNotificationsError() {
   return (
-    <div className="text-destructive">
-      Failed to load email notifications settings.
+    <div className="grid @md:grid-cols-3 grid-cols-1 items-center gap-4">
+      <div className="self-start">
+        <p className="text-destructive">
+          Failed to load email notifications settings. Please try again later.
+        </p>
+      </div>
     </div>
   )
 }
