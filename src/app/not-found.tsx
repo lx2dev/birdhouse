@@ -10,9 +10,9 @@ export default async function GlobalNotFound() {
   const primaryLabel = session ? "Dashboard" : "Home"
 
   return (
-    <main className="flex min-h-svh items-center justify-center p-6 md:p-10">
+    <main className="@container flex min-h-svh items-center justify-center p-6 md:p-10">
       <div className="text-center">
-        <h1 className="font-extrabold text-[40ch] leading-none tracking-tight">
+        <h1 className="font-extrabold @md:text-[40ch] text-[20ch] leading-none tracking-tight">
           404
         </h1>
         <h2 className="mt-6 text-5xl">Page not found</h2>
