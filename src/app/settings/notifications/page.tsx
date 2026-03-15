@@ -1,23 +1,18 @@
 import { redirect } from "next/navigation"
 
+import { api, HydrateClient } from "@/lib/api/server"
 import { getSession } from "@/lib/auth/utils"
+import { NotificationsView } from "@/modules/settings/views/notifications"
 
 export default async function NotificationSettingsPage() {
   const session = await getSession()
   if (!session) return redirect("/auth/signin")
 
+  void api.userPreferences.getAll.prefetch()
+
   return (
-    /**
-     * - Notifications
-     *  - Email
-     */
-    <div className="space-y-2">
-      <h1 className="font-bold text-2xl tracking-tight">
-        Notification Settings
-      </h1>
-      <p className="text-muted-foreground">
-        Notification preferences are coming soon.
-      </p>
-    </div>
+    <HydrateClient>
+      <NotificationsView />
+    </HydrateClient>
   )
 }
