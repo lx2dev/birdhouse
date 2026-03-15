@@ -1,6 +1,25 @@
 import { db } from "@/server/db"
 import * as schema from "@/server/db/schema"
 
+const SEED_USERS: readonly (typeof schema.user.$inferInsert)[] = [
+  {
+    approved: true,
+    email: "test@birdhouselabs.app",
+    emailVerified: true,
+    id: "00000000-0000-0000-0000-000000000001",
+    name: "Test User",
+    role: "user",
+  },
+  {
+    approved: true,
+    email: "admin@birdhouselabs.app",
+    emailVerified: true,
+    id: "00000000-0000-0000-0000-000000000002",
+    name: "Admin User",
+    role: "admin",
+  },
+]
+
 const SEED_TEMPLATES: readonly (typeof schema.vmTemplate.$inferInsert)[] = [
   {
     cpuCores: 1,
@@ -76,6 +95,18 @@ const OPERATING_SYSTEM: readonly (typeof schema.operatingSystem.$inferInsert)[] 
     },
   ]
 
+async function seedUsers() {
+  try {
+    console.log("Seeding users...")
+    for (const user of SEED_USERS) {
+      await db.insert(schema.user).values(user).onConflictDoNothing().execute()
+    }
+  } catch (error) {
+    console.error("Error seeding users:", error)
+    process.exit(1)
+  }
+}
+
 async function seedVMTemplates() {
   try {
     console.log("Seeding VM templates...")
@@ -109,6 +140,7 @@ async function seedOperatingSystems() {
 }
 
 async function main() {
+  await seedUsers()
   await seedVMTemplates()
   await seedOperatingSystems()
 }
