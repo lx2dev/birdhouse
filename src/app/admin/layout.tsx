@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation"
 
+import { AdminSidebar } from "@/components/layout/admin-sidebar"
 import { AppHeader } from "@/components/layout/app-header"
-import { AppSidebar } from "@/components/layout/app-sidebar"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { api, HydrateClient } from "@/lib/api/server"
@@ -24,7 +24,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
             } as React.CSSProperties
           }
         >
-          <AppSidebar session={session} />
+          <AdminSidebar />
           <SidebarInset>
             <AppHeader />
             <main className="size-full p-4 lg:p-8">{children}</main>

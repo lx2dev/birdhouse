@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
-import { NAV_ITEMS } from "@/constants"
+import { getNavItemTitle, NAV_ITEMS } from "@/constants"
 import { cn } from "@/lib/utils"
 import { Notifications } from "@/modules/dashboard/ui/notifications"
 import { UserMenu } from "@/modules/dashboard/ui/user-menu"
@@ -33,7 +33,7 @@ export function AppHeader() {
   const parentKey = pathname.split("/")[1]
   const parent = parentKey.charAt(0).toUpperCase() + parentKey.slice(1)
   const parentHref = `/${parentKey}`
-  const title = navSection.items.find((item) => item.href === pathname)?.title
+  const title = getNavItemTitle(pathname, navSection.items)
 
   return (
     <header className="@container flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
