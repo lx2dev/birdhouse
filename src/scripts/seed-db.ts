@@ -1,3 +1,4 @@
+import { DEMO_PASSWORD } from "@/constants"
 import { hashPassword } from "@/lib/password"
 import { db } from "@/server/db"
 import * as schema from "@/server/db/schema"
@@ -21,7 +22,6 @@ const SEED_USERS: readonly (typeof schema.user.$inferInsert)[] = [
   },
 ]
 
-export const DEMO_PASSWORD = "password123"
 const password = await hashPassword(DEMO_PASSWORD)
 
 const SEED_ACCOUNTS: readonly (typeof schema.account.$inferInsert)[] = [

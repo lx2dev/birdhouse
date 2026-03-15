@@ -1,5 +1,3 @@
-import "server-only"
-
 import type { Options } from "@node-rs/argon2"
 import { hash } from "@node-rs/argon2"
 

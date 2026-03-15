@@ -20,6 +20,8 @@ export const APP_NAME = "Birdhouse"
 
 export const DEFAULT_FETCH_LIMIT = 10
 
+export const DEMO_PASSWORD = "Password123!"
+
 type NavItem = {
   href: string
   icon: Icon
