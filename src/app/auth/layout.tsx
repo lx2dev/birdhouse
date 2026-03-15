@@ -29,7 +29,12 @@ export default function AuthLayout({ children }: LayoutProps<"/auth">) {
             </p>
             <p>
               You can find demo credentials{" "}
-              <a className="underline underline-offset-4" href="/docs/demo">
+              <a
+                className="underline underline-offset-4"
+                href="/docs/demo"
+                rel="noopener"
+                target="_blank"
+              >
                 here
               </a>
               .
