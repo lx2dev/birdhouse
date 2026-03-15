@@ -2,7 +2,6 @@ import { redirect } from "next/navigation"
 
 import { AppHeader } from "@/components/layout/app-header"
 import { AppSidebar } from "@/components/layout/app-sidebar"
-import { SiteFooter } from "@/components/layout/site-footer"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { isUserAdmin } from "@/helpers/is-user-admin"
@@ -37,7 +36,6 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
             <main className="size-full p-4 lg:p-8">{children}</main>
           </SidebarInset>
         </SidebarProvider>
-        <SiteFooter />
       </div>
     </HydrateClient>
   )
