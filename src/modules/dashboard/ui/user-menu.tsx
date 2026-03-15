@@ -4,8 +4,8 @@ import {
   IconArrowUpRight,
   IconFileSettings,
   IconLogout,
+  IconSettings,
   IconSunMoon,
-  IconUserFilled,
 } from "@tabler/icons-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -109,10 +109,10 @@ export function UserMenu() {
         <DropdownMenuGroup>
           <DropdownMenuItem
             nativeButton={false}
-            render={<Link href="/settings/account/profile" />}
+            render={<Link href="/settings" />}
           >
-            <IconUserFilled />
-            Account
+            <IconSettings />
+            Settings
           </DropdownMenuItem>
           <DropdownMenuItem
             nativeButton={false}
