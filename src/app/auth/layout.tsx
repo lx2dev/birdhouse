@@ -27,6 +27,13 @@ export default function AuthLayout({ children }: LayoutProps<"/auth">) {
             <p>
               All data is periodically deleted. Do not use real credentials.
             </p>
+            <p>
+              You can find demo credentials{" "}
+              <a className="underline underline-offset-4" href="/docs/demo">
+                here
+              </a>
+              .
+            </p>
           </AlertDescription>
         </Alert>
 
