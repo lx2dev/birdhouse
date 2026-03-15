@@ -16,6 +16,7 @@ import {
   FieldTitle,
 } from "@/components/ui/field"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { api } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
@@ -169,9 +170,53 @@ function AppearanceSectionSuspense() {
 }
 
 AppearanceSection.Skeleton = function AppearanceSectionSkeleton() {
-  return <div>Appearance skeleton</div>
+  return (
+    <div className="grid @md:grid-cols-3 grid-cols-1 items-center gap-4">
+      <div className="self-start">
+        <h2 className="font-semibold text-xl tracking-tight">Appearance</h2>
+      </div>
+
+      <div className="@md:col-span-2 col-span-1 space-y-8">
+        <div>
+          <div className="grid @md:grid-cols-3 grid-cols-1 @md:gap-4 gap-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div className="rounded-lg border border-border" key={i}>
+                <div className="px-2 pt-2">
+                  <Skeleton className="aspect-video w-full" />
+                </div>
+                <div className="p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Skeleton className="size-3" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Skeleton className="mt-3 h-3 w-full max-w-[40ch]" />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <Button className="ml-auto" disabled>
+            <Spinner />
+            Saving changes
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 AppearanceSection.Error = function AppearanceSectionError() {
-  return <div>Appearance error</div>
+  return (
+    <div className="grid @md:grid-cols-3 grid-cols-1 items-center gap-4">
+      <div className="self-start">
+        <p className="text-destructive">
+          Failed to load appearance settings. Please try again later.
+        </p>
+      </div>
+    </div>
+  )
 }
