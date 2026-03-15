@@ -152,7 +152,8 @@
   --card-foreground: oklch(1 0 0);
   --popover: oklch(0.16 0.0042 285.9176);
   --popover-foreground: oklch(1 0 0);
-  --primary: oklch(0.567 0.2488 284.3951);
+  /* --primary: oklch(0.567 0.2488 284.3951); */
+  --primary: oklch(0.7248 0.1498 285.937);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.3867 0.0168 285.5868);
   --secondary-foreground: oklch(1 0 0);
@@ -218,7 +219,7 @@
   --color-fd-card: var(--card);
   --color-fd-card-foreground: var(--card-foreground);
   --color-fd-border: var(--border);
-  --color-fd-primary: var(--primary);
+  --color-fd-primary: var(--chart-3);
   --color-fd-primary-foreground: var(--primary-foreground);
   --color-fd-secondary: var(--secondary);
   --color-fd-secondary-foreground: var(--secondary-foreground);
