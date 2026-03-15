@@ -84,44 +84,6 @@ export function SectionSidebar({
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="capitalize">General</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  className="group/target text-muted-foreground data-active:bg-sidebar-accent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
-                  isActive={false}
-                  onClick={navigate}
-                  render={<Link href="/settings" />}
-                  size="lg"
-                >
-                  <IconSettings className="size-5" />
-                  <span className="flex items-center gap-0.5 font-semibold text-lg">
-                    Settings
-                  </span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              {isAdmin ? (
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    className="group/target text-muted-foreground data-active:bg-sidebar-accent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
-                    isActive={false}
-                    onClick={navigate}
-                    render={<Link href="/admin" />}
-                    size="lg"
-                  >
-                    <IconShieldCheck className="size-5" />
-                    <span className="flex items-center gap-0.5 font-semibold text-lg">
-                      Admin
-                    </span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ) : null}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
         {sections.map(({ items, key, label }) => {
           if (!items?.length) return null
 
@@ -197,6 +159,44 @@ export function SectionSidebar({
             </React.Fragment>
           )
         })}
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="capitalize">General</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className="group/target text-muted-foreground data-active:bg-sidebar-accent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
+                  isActive={false}
+                  onClick={navigate}
+                  render={<Link href="/settings" />}
+                  size="lg"
+                >
+                  <IconSettings className="size-5" />
+                  <span className="flex items-center gap-0.5 font-semibold text-lg">
+                    Settings
+                  </span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              {isAdmin ? (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    className="group/target text-muted-foreground data-active:bg-sidebar-accent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
+                    isActive={false}
+                    onClick={navigate}
+                    render={<Link href="/admin" />}
+                    size="lg"
+                  >
+                    <IconShieldCheck className="size-5" />
+                    <span className="flex items-center gap-0.5 font-semibold text-lg">
+                      Admin
+                    </span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ) : null}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>
