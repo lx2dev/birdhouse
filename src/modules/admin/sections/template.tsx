@@ -222,7 +222,7 @@ function TemplateSectionSuspense() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex items-center gap-2">
-                  <EditTemplateDialog template={template} variant="outline" />
+                  <EditTemplateDialog template={template} />
                   <Select
                     disabled={isUpdating}
                     onValueChange={(v) => {
