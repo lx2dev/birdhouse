@@ -1,5 +1,5 @@
 import type { Options } from "@node-rs/argon2"
-import { hash } from "@node-rs/argon2"
+import { hash, verify } from "@node-rs/argon2"
 
 const opts: Options = {
   algorithm: 2,
@@ -11,5 +11,11 @@ const opts: Options = {
 
 export async function hashPassword(password: string) {
   const res = await hash(password, opts)
+  return res
+}
+
+export async function verifyPassword(data: { password: string; hash: string }) {
+  const { password, hash } = data
+  const res = await verify(hash, password, opts)
   return res
 }

@@ -5,6 +5,7 @@ import { admin, lastLoginMethod, twoFactor } from "better-auth/plugins"
 
 import { APP_NAME, TRUSTED_SOCIAL_PROVIDERS } from "@/constants"
 import { env } from "@/env"
+import { hashPassword, verifyPassword } from "@/lib/password"
 import { getRedisClient } from "@/lib/redis"
 import { resend } from "@/lib/resend"
 import { db } from "@/server/db"
@@ -70,6 +71,10 @@ export const auth = betterAuth({
         },
         to: user.email,
       })
+    },
+    password: {
+      hash: hashPassword,
+      verify: verifyPassword,
     },
     requireEmailVerification: true,
     resetPasswordTokenExpiresIn: 60 * 10,
@@ -229,7 +234,7 @@ export const auth = betterAuth({
         })
       },
       async beforeDelete(user) {
-        if (user.email === env.ADMIN_EMAIL) {
+        if (user.email === env.NEXT_PUBLIC_ADMIN_EMAIL) {
           throw new APIError("BAD_REQUEST", {
             message: "The admin account cannot be deleted",
           })
