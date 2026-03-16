@@ -108,8 +108,8 @@ interface AdminMetricsSuspenseProps {
 
 function AdminMetricsSuspense({ metrics, alerts }: AdminMetricsSuspenseProps) {
   return (
-    <Card className="@container">
-      <div className="flex flex-wrap items-start gap-8 px-6 py-4">
+    <Card className="@container py-6">
+      <div className="flex flex-wrap items-start gap-8 px-6">
         {metrics.map((metric, idx) => (
           <div className="flex items-start gap-8" key={metric.label}>
             <MetricItem {...metric} />
@@ -120,9 +120,9 @@ function AdminMetricsSuspense({ metrics, alerts }: AdminMetricsSuspenseProps) {
         ))}
       </div>
 
-      <Separator />
+      <Separator className="my-2" />
 
-      <div className="flex @md:flex-row flex-col flex-wrap @md:items-center gap-x-6 gap-y-2 px-6 py-2">
+      <div className="flex @md:flex-row flex-col flex-wrap @md:items-center gap-x-6 gap-y-2 px-6">
         <span className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
           Status
         </span>
