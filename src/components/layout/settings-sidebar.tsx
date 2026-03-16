@@ -13,7 +13,6 @@ export function SettingsSidebar({ isAdmin = false }: SettingsSidebarProps) {
     <SectionSidebar
       homeHref="/settings"
       isAdmin={isAdmin}
-      sectionKey="settings"
       sections={SETTINGS_SIDEBAR_SECTIONS}
     />
   )

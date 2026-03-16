@@ -9,7 +9,6 @@ export function AdminSidebar() {
     <SectionSidebar
       homeHref="/admin"
       isAdmin
-      sectionKey="admin"
       sections={ADMIN_SIDEBAR_SECTIONS}
     />
   )

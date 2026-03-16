@@ -13,7 +13,6 @@ export function AppSidebar({ isAdmin = false }: AppSidebarProps) {
     <SectionSidebar
       homeHref="/dashboard"
       isAdmin={isAdmin}
-      sectionKey="platform"
       sections={DASHBOARD_SIDEBAR_SECTIONS}
     />
   )
