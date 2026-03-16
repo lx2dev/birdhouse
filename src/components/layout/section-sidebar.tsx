@@ -1,16 +1,18 @@
 "use client"
 
 import {
-  IconArrowLeft,
   IconArrowUpRight,
+  IconChevronRight,
+  IconLayoutDashboard,
   IconSettings,
-  IconShieldCheck,
+  IconShield,
 } from "@tabler/icons-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
 
 import { Icons } from "@/components/icons"
+import { Separator } from "@/components/ui/separator"
 import {
   Sidebar,
   SidebarContent,
@@ -29,21 +31,19 @@ import {
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar"
-import type { NAV_SECTIONS, NavSection } from "@/constants"
+import type { NavSection } from "@/constants"
 import { APP_NAME, isNavItemActive } from "@/constants"
 import { UserMenu } from "@/modules/dashboard/ui/user-menu"
 
 interface SectionSidebarProps {
   sections: NavSection[]
   homeHref: string
-  sectionKey: (typeof NAV_SECTIONS)[number]["key"]
   isAdmin?: boolean
 }
 
 export function SectionSidebar({
   isAdmin = false,
   homeHref,
-  sectionKey,
   sections,
 }: SectionSidebarProps) {
   const pathname = usePathname()
@@ -62,28 +62,74 @@ export function SectionSidebar({
             {APP_NAME}
           </span>
         </Link>
-
-        {sectionKey !== "platform" && (
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                className="font-semibold [&_svg]:size-5"
-                onClick={navigate}
-                render={<Link href="/dashboard" />}
-                size="lg"
-                variant="outline"
-              >
-                <IconArrowLeft />
-                <span className="font-semibold text-base">
-                  Back to Platform
-                </span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        )}
       </SidebarHeader>
 
+      <Separator className="my-4" />
+
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className="group/target text-muted-foreground data-active:bg-sidebar-accent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
+                  isActive={isNavItemActive(pathname, {
+                    href: "/dashboard",
+                    label: "",
+                  })}
+                  onClick={navigate}
+                  render={<Link href="/dashboard" />}
+                  size="lg"
+                >
+                  <IconLayoutDashboard className="text-muted-foreground" />
+                  <span className="flex items-center gap-0.5 font-semibold text-lg">
+                    Dashboard
+                  </span>
+                  <IconChevronRight className="ml-auto size-5!" />
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className="group/target text-muted-foreground data-active:bg-sidebar-accent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
+                  isActive={isNavItemActive(pathname, {
+                    href: "/settings",
+                    label: "",
+                  })}
+                  onClick={navigate}
+                  render={<Link href="/settings" />}
+                  size="lg"
+                >
+                  <IconSettings className="text-muted-foreground" />
+                  <span className="flex items-center gap-0.5 font-semibold text-lg">
+                    Settings
+                  </span>
+                  <IconChevronRight className="ml-auto size-5!" />
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              {isAdmin && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    className="group/target text-muted-foreground data-active:bg-sidebar-accent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
+                    isActive={isNavItemActive(pathname, {
+                      href: "/admin",
+                      label: "",
+                    })}
+                    onClick={navigate}
+                    render={<Link href="/admin" />}
+                    size="lg"
+                  >
+                    <IconShield className="text-muted-foreground" />
+                    <span className="flex items-center gap-0.5 font-semibold text-lg">
+                      Admin
+                    </span>
+                    <IconChevronRight className="ml-auto size-5!" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         {sections.map(({ items, key, label }) => {
           if (!items?.length) return null
 
@@ -115,7 +161,7 @@ export function SectionSidebar({
                             }
                             size="lg"
                           >
-                            <Icon />
+                            <Icon className="text-muted-foreground" />
                             <span className="flex items-center gap-0.5 font-semibold text-lg">
                               {itemLabel}
                               {target === "_blank" && (
@@ -125,11 +171,11 @@ export function SectionSidebar({
                           </SidebarMenuButton>
 
                           {item.children?.length ? (
-                            <SidebarMenuSub className="mx-0 mt-1 border-l-0 pl-6">
+                            <SidebarMenuSub className="ml-3">
                               {item.children.map((child) => (
                                 <SidebarMenuSubItem key={child.href}>
                                   <SidebarMenuSubButton
-                                    className="h-8 rounded-md px-2 font-medium text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground data-active:bg-transparent data-active:font-semibold data-[size=md]:text-base data-active:text-foreground [&>svg]:size-5"
+                                    className="text-muted-foreground data-active:bg-transparent data-[size=md]:text-base data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-5"
                                     isActive={isNavItemActive(pathname, child)}
                                     onClick={navigate}
                                     render={
@@ -137,7 +183,9 @@ export function SectionSidebar({
                                         href={child.href}
                                         target={child.target}
                                       >
-                                        {child.icon && <child.icon />}
+                                        {child.icon && (
+                                          <child.icon className="text-muted-foreground!" />
+                                        )}
                                         <span>{child.label}</span>
                                       </Link>
                                     }
@@ -159,44 +207,6 @@ export function SectionSidebar({
             </React.Fragment>
           )
         })}
-
-        <SidebarGroup>
-          <SidebarGroupLabel className="capitalize">General</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  className="group/target text-muted-foreground data-active:bg-sidebar-accent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
-                  isActive={false}
-                  onClick={navigate}
-                  render={<Link href="/settings" />}
-                  size="lg"
-                >
-                  <IconSettings className="size-5" />
-                  <span className="flex items-center gap-0.5 font-semibold text-lg">
-                    Settings
-                  </span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              {isAdmin ? (
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    className="group/target text-muted-foreground data-active:bg-sidebar-accent data-active:text-foreground data-active:hover:bg-sidebar-accent [&_svg]:size-6"
-                    isActive={false}
-                    onClick={navigate}
-                    render={<Link href="/admin" />}
-                    size="lg"
-                  >
-                    <IconShieldCheck className="size-5" />
-                    <span className="flex items-center gap-0.5 font-semibold text-lg">
-                      Admin
-                    </span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ) : null}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>
