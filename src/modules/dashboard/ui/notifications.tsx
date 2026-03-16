@@ -145,7 +145,8 @@ function NotificationsSuspense({ setOpen }: NotificationsProps) {
       })
     },
     onSuccess() {
-      utils.notification.list.invalidate()
+      void utils.notification.list.invalidate()
+      void utils.admin.getRecentActivity.invalidate()
     },
   })
 
@@ -283,7 +284,8 @@ function NotificationItem({ notification, onClick }: NotificationItemProps) {
       })
     },
     onSuccess() {
-      utils.notification.list.invalidate()
+      void utils.notification.list.invalidate()
+      void utils.admin.getRecentActivity.invalidate()
     },
   })
 
