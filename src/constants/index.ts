@@ -2,11 +2,14 @@ import type { Icon } from "@tabler/icons-react"
 import {
   IconAdjustments,
   IconBell,
+  IconClipboardList,
+  IconCpu,
+  IconDeviceDesktopCog,
   IconKey,
-  IconLayoutDashboard,
   IconLogs,
   IconPlus,
   IconServer2,
+  IconTemplate,
   IconUser,
   IconUsers,
   IconWorld,
@@ -47,7 +50,7 @@ const PLATFORM_ITEMS: NavItem[] = [
   {
     href: "/dashboard",
     icon: IconServer2,
-    label: "Dashboard",
+    label: "Instances",
     title: "Your instances",
   },
   {
@@ -111,7 +114,7 @@ const SETTINGS_NAV_ITEMS: NavItem[] = [
 const ADMIN_NAV_ITEMS: NavItem[] = [
   {
     href: "/admin",
-    icon: IconLayoutDashboard,
+    icon: IconClipboardList,
     label: "Overview",
     title: "Overview",
   },
@@ -119,32 +122,28 @@ const ADMIN_NAV_ITEMS: NavItem[] = [
     children: [
       {
         href: "/admin/instances",
+        icon: IconServer2,
         label: "Instances",
         title: "Manage instances",
       },
       {
         href: "/admin/templates",
+        icon: IconTemplate,
         label: "Templates",
         title: "Manage templates",
       },
       {
         href: "/admin/os",
+        icon: IconDeviceDesktopCog,
         label: "Operating Systems",
         title: "Manage operating systems",
       },
     ],
     href: "/admin/instances",
-    icon: IconServer2,
+    icon: IconCpu,
     label: "Compute",
     matchPrefixes: ["/admin/instances", "/admin/os", "/admin/templates"],
     title: "Compute resources",
-  },
-  {
-    href: "/admin/logs",
-    icon: IconLogs,
-    label: "Logs",
-    matchSubpaths: true,
-    title: "System logs",
   },
   {
     href: "/admin/users",
@@ -152,6 +151,13 @@ const ADMIN_NAV_ITEMS: NavItem[] = [
     label: "Users",
     matchSubpaths: true,
     title: "Manage users",
+  },
+  {
+    href: "/admin/logs",
+    icon: IconLogs,
+    label: "Logs",
+    matchSubpaths: true,
+    title: "System logs",
   },
 ]
 
