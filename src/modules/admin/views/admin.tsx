@@ -1,5 +1,7 @@
 import { HydrateClient } from "@/lib/api/server"
 import { AdminMetricsSection } from "@/modules/admin/sections/admin-metrics"
+import { RecentActivitySection } from "@/modules/admin/sections/recent-activity"
+import { SystemHealthSection } from "@/modules/admin/sections/system-health"
 
 export function AdminView() {
   return (
@@ -16,12 +18,10 @@ export function AdminView() {
 
         <div className="grid @2xl:grid-cols-7 gap-6">
           <div className="@2xl:col-span-4">
-            {/* <RecentActivity /> */}
-            RecentActivity
+            <RecentActivitySection />
           </div>
           <div className="@2xl:col-span-3">
-            {/* <SystemHealth /> */}
-            SystemHealth
+            <SystemHealthSection />
           </div>
         </div>
       </div>
