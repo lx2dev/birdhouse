@@ -16,22 +16,6 @@ export const adminCatalogStatusCountsSchema = z.object({
   unavailable: z.number(),
 })
 
-export const adminRecentUserActivitySchema = z.object({
-  action: z.string(),
-  timestamp: z.string(),
-  userId: z.string(),
-  userImage: z.string().nullable(),
-  userName: z.string(),
-})
-
-export const adminRecentVmActivitySchema = z.object({
-  action: z.string(),
-  timestamp: z.string(),
-  userImage: z.string().nullable(),
-  userName: z.string(),
-  vmId: z.string(),
-})
-
 export const adminStatsResponseSchema = z.object({
   audit: z.object({
     last7dCount: z.number(),
@@ -54,8 +38,6 @@ export const adminStatsResponseSchema = z.object({
   }),
   osCount: z.number(),
   pendingApprovalCount: z.number(),
-  recentUserActivity: z.array(adminRecentUserActivitySchema),
-  recentVmActivity: z.array(adminRecentVmActivitySchema),
   templateCount: z.number(),
   templates: z.object({
     byStatus: adminCatalogStatusCountsSchema,

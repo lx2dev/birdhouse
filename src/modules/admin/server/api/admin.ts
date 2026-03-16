@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server"
-import { desc, eq, inArray, sql } from "drizzle-orm"
+import { and, desc, eq, inArray, lt, or, sql } from "drizzle-orm"
 import z from "zod"
 
 import { logAndNotify, logOnly } from "@/helpers/audit/log-and-notify"
@@ -27,6 +27,72 @@ const ADMIN_RECENT_ACTIVITY_LIMIT = 12
 type AdminStatsResponse = z.infer<typeof adminStatsResponseSchema>
 
 export const adminRouter = createTRPCRouter({
+  getRecentActivity: adminProcedure
+    .input(
+      z.object({
+        cursor: z
+          .object({
+            createdAt: z.date(),
+            id: z.string(),
+          })
+          .nullish(),
+        limit: z.number().min(1).max(50).default(10),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { cursor, limit } = input
+
+      const rows = await ctx.db
+        .select({
+          action: auditLog.action,
+          id: auditLog.id,
+          resourceId: auditLog.resourceId,
+          resourceType: auditLog.resourceType,
+          timestamp: auditLog.createdAt,
+          userImage: userTable.image,
+          userName: userTable.name,
+        })
+        .from(auditLog)
+        .innerJoin(userTable, eq(auditLog.userId, userTable.id))
+        .where(
+          cursor
+            ? or(
+                lt(auditLog.createdAt, cursor.createdAt),
+                and(
+                  eq(auditLog.createdAt, cursor.createdAt),
+                  lt(auditLog.id, cursor.id),
+                ),
+              )
+            : undefined,
+        )
+        .orderBy(desc(auditLog.createdAt), desc(auditLog.id))
+        .limit(limit + 1)
+
+      const hasMore = rows.length > limit
+      const items = hasMore ? rows.slice(0, -1) : rows
+      const lastItem = items[items.length - 1]
+      const nextCursor =
+        hasMore && lastItem
+          ? { createdAt: lastItem.timestamp, id: lastItem.id }
+          : null
+
+      return {
+        items: items.map((row) => ({
+          action: row.action,
+          id: row.id,
+          resourceId: row.resourceId,
+          resourceType: row.resourceType,
+          timestamp:
+            row.timestamp instanceof Date
+              ? row.timestamp.toISOString()
+              : new Date(row.timestamp).toISOString(),
+          userImage: row.userImage,
+          userName: row.userName,
+        })),
+        nextCursor,
+      }
+    }),
+
   getStats: adminProcedure
     .output(adminStatsResponseSchema)
     .query(async ({ ctx }) => {
@@ -56,8 +122,6 @@ export const adminRouter = createTRPCRouter({
         [osStats],
         [notificationStats],
         [auditStats],
-        recentUserActivityRows,
-        recentVmActivityRows,
       ] = await Promise.all([
         ctx.db
           .select({
@@ -155,39 +219,6 @@ export const adminRouter = createTRPCRouter({
           .limit(ADMIN_RECENT_ACTIVITY_LIMIT),
       ])
 
-      const recentUserActivity: AdminStatsResponse["recentUserActivity"] =
-        recentUserActivityRows
-          .filter(
-            (row): row is typeof row & { userId: string } =>
-              typeof row.userId === "string",
-          )
-          .map((row) => ({
-            action: row.action,
-            timestamp:
-              row.timestamp instanceof Date
-                ? row.timestamp.toISOString()
-                : new Date(row.timestamp).toISOString(),
-            userId: row.userId,
-            userImage: row.userImage,
-            userName: row.userName,
-          }))
-
-      const recentVmActivity: AdminStatsResponse["recentVmActivity"] =
-        recentVmActivityRows.map((row, idx) => {
-          const timestamp =
-            row.timestamp instanceof Date
-              ? row.timestamp.toISOString()
-              : new Date(row.timestamp).toISOString()
-
-          return {
-            action: row.action,
-            timestamp,
-            userImage: row.userImage,
-            userName: row.userName,
-            vmId: row.vmId ?? `activity-${idx}-${timestamp}`,
-          }
-        })
-
       const totalUsers = Number(userStats?.totalCount ?? 0)
       const pendingUsers = Number(userStats?.pendingApprovalCount ?? 0)
 
@@ -246,8 +277,6 @@ export const adminRouter = createTRPCRouter({
         },
         osCount: totalOs,
         pendingApprovalCount: pendingUsers,
-        recentUserActivity,
-        recentVmActivity,
         templateCount: totalTemplates,
         templates: {
           byStatus: templateByStatus,
