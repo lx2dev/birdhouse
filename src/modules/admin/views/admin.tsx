@@ -1,17 +1,30 @@
-import { AdminSection } from "@/modules/admin/sections/admin"
-import { QuickActionsSection } from "@/modules/admin/sections/quick-actions"
+import { HydrateClient } from "@/lib/api/server"
+import { AdminMetricsSection } from "@/modules/admin/sections/admin-metrics"
 
 export function AdminView() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-bold text-3xl tracking-tight">Admin Dashboard</h1>
-        <p className="mt-2 text-muted-foreground">
-          Manage users and virtual machines
-        </p>
+    <HydrateClient>
+      <div className="@container space-y-6">
+        <div>
+          <h1 className="font-bold text-3xl tracking-tight">Admin Dashboard</h1>
+          <p className="mt-2 text-muted-foreground">
+            Overview of the Birdhouse platform
+          </p>
+        </div>
+
+        <AdminMetricsSection />
+
+        <div className="grid @2xl:grid-cols-7 gap-6">
+          <div className="@2xl:col-span-4">
+            {/* <RecentActivity /> */}
+            RecentActivity
+          </div>
+          <div className="@2xl:col-span-3">
+            {/* <SystemHealth /> */}
+            SystemHealth
+          </div>
+        </div>
       </div>
-      <AdminSection />
-      <QuickActionsSection />
-    </div>
+    </HydrateClient>
   )
 }
