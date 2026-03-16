@@ -1,8 +1,9 @@
 import { TRPCError } from "@trpc/server"
-import { count, eq } from "drizzle-orm"
+import { eq, sql } from "drizzle-orm"
 import z from "zod"
 
 import { logAndNotify, logOnly } from "@/helpers/audit/log-and-notify"
+import { getRedisClient } from "@/lib/redis"
 import {
   insertOperatingSystemSchema,
   insertVMTemplateSchema,
@@ -10,28 +11,202 @@ import {
 } from "@/modules/admin/schemas"
 import { adminProcedure, createTRPCRouter } from "@/server/api/init"
 import {
+  auditLog,
+  notificationTable,
   operatingSystem as osTable,
   user as userTable,
   vm as vmTable,
   vmTemplate as vmTemplateTable,
 } from "@/server/db/schema"
 
+const ADMIN_STATS_CACHE_KEY = "admin:getStats:v1"
+const ADMIN_STATS_CACHE_TTL_SECONDS = 15
+
 export const adminRouter = createTRPCRouter({
   getStats: adminProcedure.query(async ({ ctx }) => {
-    const [[userCount], [pendingApprovalCount], [vmCount]] = await Promise.all([
-      ctx.db.select({ count: count() }).from(userTable),
+    const redis = getRedisClient()
+
+    try {
+      const cached = await redis.get(ADMIN_STATS_CACHE_KEY)
+      if (cached) return JSON.parse(cached)
+    } catch {
+      // Ignore cache errors and continue with database fallback.
+    }
+
+    const now = new Date()
+
+    const [
+      [userStats],
+      [vmStats],
+      [templateStats],
+      [osStats],
+      [notificationStats],
+      [auditStats],
+    ] = await Promise.all([
       ctx.db
-        .select({ count: count() })
-        .from(userTable)
-        .where(eq(userTable.approved, false)),
-      ctx.db.select({ count: count() }).from(vmTable),
+        .select({
+          approvedCount: sql<number>`count(*) filter (where ${userTable.approved} = true)`,
+          bannedCount: sql<number>`count(*) filter (where ${userTable.banned} = true)`,
+          emailVerifiedCount: sql<number>`count(*) filter (where ${userTable.emailVerified} = true)`,
+          newLast7dCount: sql<number>`count(*) filter (where ${userTable.createdAt} >= now() - interval '7 days')`,
+          newLast24hCount: sql<number>`count(*) filter (where ${userTable.createdAt} >= now() - interval '24 hours')`,
+          newPrev24hCount: sql<number>`count(*) filter (where ${userTable.createdAt} >= now() - interval '48 hours' and ${userTable.createdAt} < now() - interval '24 hours')`,
+          pendingApprovalCount: sql<number>`count(*) filter (where ${userTable.approved} = false)`,
+          totalCount: sql<number>`count(*)`,
+          twoFactorEnabledCount: sql<number>`count(*) filter (where ${userTable.twoFactorEnabled} = true)`,
+        })
+        .from(userTable),
+      ctx.db
+        .select({
+          deletingCount: sql<number>`count(*) filter (where ${vmTable.status} = 'deleting')`,
+          errorCount: sql<number>`count(*) filter (where ${vmTable.status} = 'error')`,
+          newLast24hCount: sql<number>`count(*) filter (where ${vmTable.createdAt} >= now() - interval '24 hours')`,
+          newPrev24hCount: sql<number>`count(*) filter (where ${vmTable.createdAt} >= now() - interval '48 hours' and ${vmTable.createdAt} < now() - interval '24 hours')`,
+          provisioningCount: sql<number>`count(*) filter (where ${vmTable.status} = 'provisioning')`,
+          rebootingCount: sql<number>`count(*) filter (where ${vmTable.status} = 'rebooting')`,
+          runningCount: sql<number>`count(*) filter (where ${vmTable.status} = 'running')`,
+          stoppedCount: sql<number>`count(*) filter (where ${vmTable.status} = 'stopped')`,
+          suspendedCount: sql<number>`count(*) filter (where ${vmTable.status} = 'suspended')`,
+          totalCount: sql<number>`count(*)`,
+        })
+        .from(vmTable),
+      ctx.db
+        .select({
+          availableCount: sql<number>`count(*) filter (where ${vmTemplateTable.status} = 'available')`,
+          newLast24hCount: sql<number>`count(*) filter (where ${vmTemplateTable.createdAt} >= now() - interval '24 hours')`,
+          newPrev24hCount: sql<number>`count(*) filter (where ${vmTemplateTable.createdAt} >= now() - interval '48 hours' and ${vmTemplateTable.createdAt} < now() - interval '24 hours')`,
+          testingCount: sql<number>`count(*) filter (where ${vmTemplateTable.status} = 'testing')`,
+          totalCount: sql<number>`count(*)`,
+          unavailableCount: sql<number>`count(*) filter (where ${vmTemplateTable.status} = 'unavailable')`,
+        })
+        .from(vmTemplateTable),
+      ctx.db
+        .select({
+          availableCount: sql<number>`count(*) filter (where ${osTable.status} = 'available')`,
+          newLast24hCount: sql<number>`count(*) filter (where ${osTable.createdAt} >= now() - interval '24 hours')`,
+          newPrev24hCount: sql<number>`count(*) filter (where ${osTable.createdAt} >= now() - interval '48 hours' and ${osTable.createdAt} < now() - interval '24 hours')`,
+          testingCount: sql<number>`count(*) filter (where ${osTable.status} = 'testing')`,
+          totalCount: sql<number>`count(*)`,
+          unavailableCount: sql<number>`count(*) filter (where ${osTable.status} = 'unavailable')`,
+        })
+        .from(osTable),
+      ctx.db
+        .select({
+          alertCount: sql<number>`count(*) filter (where ${notificationTable.status} = 'alert')`,
+          failureCount: sql<number>`count(*) filter (where ${notificationTable.status} = 'failure')`,
+          totalCount: sql<number>`count(*)`,
+          unreadAlertCount: sql<number>`count(*) filter (where ${notificationTable.read} = false and ${notificationTable.status} = 'alert')`,
+          unreadCount: sql<number>`count(*) filter (where ${notificationTable.read} = false)`,
+        })
+        .from(notificationTable),
+      ctx.db
+        .select({
+          last7dCount: sql<number>`count(*) filter (where ${auditLog.createdAt} >= now() - interval '7 days')`,
+          last24hCount: sql<number>`count(*) filter (where ${auditLog.createdAt} >= now() - interval '24 hours')`,
+          totalCount: sql<number>`count(*)`,
+        })
+        .from(auditLog),
     ])
 
-    return {
-      pendingApprovalCount: pendingApprovalCount.count || 0,
-      userCount: userCount.count || 0,
-      vmCount: vmCount.count || 0,
+    const totalUsers = Number(userStats?.totalCount ?? 0)
+    const pendingUsers = Number(userStats?.pendingApprovalCount ?? 0)
+
+    const vmByStatus = {
+      deleting: Number(vmStats?.deletingCount ?? 0),
+      error: Number(vmStats?.errorCount ?? 0),
+      provisioning: Number(vmStats?.provisioningCount ?? 0),
+      rebooting: Number(vmStats?.rebootingCount ?? 0),
+      running: Number(vmStats?.runningCount ?? 0),
+      stopped: Number(vmStats?.stoppedCount ?? 0),
+      suspended: Number(vmStats?.suspendedCount ?? 0),
     }
+
+    const templateByStatus = {
+      available: Number(templateStats?.availableCount ?? 0),
+      testing: Number(templateStats?.testingCount ?? 0),
+      unavailable: Number(templateStats?.unavailableCount ?? 0),
+    }
+
+    const osByStatus = {
+      available: Number(osStats?.availableCount ?? 0),
+      testing: Number(osStats?.testingCount ?? 0),
+      unavailable: Number(osStats?.unavailableCount ?? 0),
+    }
+
+    const totalVms = Number(vmStats?.totalCount ?? 0)
+    const totalTemplates = Number(templateStats?.totalCount ?? 0)
+    const totalOs = Number(osStats?.totalCount ?? 0)
+    const totalNotifications = Number(notificationStats?.totalCount ?? 0)
+    const unreadNotifications = Number(notificationStats?.unreadCount ?? 0)
+    const alertNotifications = Number(notificationStats?.alertCount ?? 0)
+    const failureNotifications = Number(notificationStats?.failureCount ?? 0)
+    const unreadAlertNotifications = Number(
+      notificationStats?.unreadAlertCount ?? 0,
+    )
+
+    const response = {
+      audit: {
+        last7dCount: Number(auditStats?.last7dCount ?? 0),
+        last24hCount: Number(auditStats?.last24hCount ?? 0),
+        totalCount: Number(auditStats?.totalCount ?? 0),
+      },
+      generatedAt: now.toISOString(),
+      notifications: {
+        alertCount: alertNotifications,
+        failureCount: failureNotifications,
+        totalCount: totalNotifications,
+        unreadAlertCount: unreadAlertNotifications,
+        unreadCount: unreadNotifications,
+      },
+      operatingSystems: {
+        byStatus: osByStatus,
+        newLast24hCount: Number(osStats?.newLast24hCount ?? 0),
+        newPrev24hCount: Number(osStats?.newPrev24hCount ?? 0),
+        totalCount: totalOs,
+      },
+      osCount: totalOs,
+      pendingApprovalCount: pendingUsers,
+      templateCount: totalTemplates,
+      templates: {
+        byStatus: templateByStatus,
+        newLast24hCount: Number(templateStats?.newLast24hCount ?? 0),
+        newPrev24hCount: Number(templateStats?.newPrev24hCount ?? 0),
+        totalCount: totalTemplates,
+      },
+      userCount: totalUsers,
+      users: {
+        approvedCount: Number(userStats?.approvedCount ?? 0),
+        bannedCount: Number(userStats?.bannedCount ?? 0),
+        emailVerifiedCount: Number(userStats?.emailVerifiedCount ?? 0),
+        newLast7dCount: Number(userStats?.newLast7dCount ?? 0),
+        newLast24hCount: Number(userStats?.newLast24hCount ?? 0),
+        newPrev24hCount: Number(userStats?.newPrev24hCount ?? 0),
+        pendingApprovalCount: pendingUsers,
+        totalCount: totalUsers,
+        twoFactorEnabledCount: Number(userStats?.twoFactorEnabledCount ?? 0),
+      },
+      vmCount: totalVms,
+      vms: {
+        byStatus: vmByStatus,
+        healthyCount:
+          vmByStatus.running + vmByStatus.stopped + vmByStatus.suspended,
+        issueCount: vmByStatus.error + vmByStatus.deleting,
+        newLast24hCount: Number(vmStats?.newLast24hCount ?? 0),
+        newPrev24hCount: Number(vmStats?.newPrev24hCount ?? 0),
+        runningCount: vmByStatus.running,
+        totalCount: totalVms,
+      },
+    }
+
+    void redis
+      .set(ADMIN_STATS_CACHE_KEY, JSON.stringify(response), {
+        EX: ADMIN_STATS_CACHE_TTL_SECONDS,
+      })
+      .catch(() => {
+        // Cache write failures should never fail this request.
+      })
+
+    return response
   }),
 
   os: createTRPCRouter({
