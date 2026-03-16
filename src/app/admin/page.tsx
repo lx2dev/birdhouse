@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 
+import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { isUserAdmin } from "@/helpers/is-user-admin"
 import { api, HydrateClient } from "@/lib/api/server"
 import { getSession } from "@/lib/auth/utils"
@@ -12,6 +13,9 @@ export default async function AdminPage() {
   if (!session || !isAdmin) return redirect("/auth/signin")
 
   void api.admin.getStats.prefetch()
+  void api.admin.getRecentActivity.prefetchInfinite({
+    limit: DEFAULT_FETCH_LIMIT,
+  })
 
   return (
     <HydrateClient>
