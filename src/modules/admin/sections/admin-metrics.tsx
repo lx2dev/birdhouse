@@ -211,7 +211,7 @@ function AlertItem({ label, value, status, href }: AlertItemProps) {
           {value}
         </span>
         <Link
-          className="text-muted-foreground text-xs underline underline-offset-2"
+          className="text-muted-foreground text-xs underline underline-offset-2 transition-colors hover:text-foreground/70"
           href={href}
         >
           {label}
