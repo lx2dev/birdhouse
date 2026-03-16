@@ -25,6 +25,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { Progress } from "@/components/ui/progress"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { StatusBadge } from "@/modules/admin/ui/status-badge"
 
@@ -71,90 +72,98 @@ const services = [
 
 function SystemHealthSuspense() {
   return (
-    <Card className="@container h-full">
-      <div className="px-4">
-        <Alert variant="warning">
-          <IconAlertTriangle />
-          <AlertTitle>Mock System Health Alert</AlertTitle>
-          <AlertDescription>
-            This data is mocked for demo purposes. Real metrics and WIP.
-          </AlertDescription>
-        </Alert>
-      </div>
-
+    <Card className="@container pb-0">
       <CardHeader>
         <CardTitle>System Health</CardTitle>
         <CardDescription>Infrastructure status and metrics</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-4">
-          {metrics.map((metric) => (
-            <div className="space-y-2" key={metric.name}>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">{metric.name}</span>
-                <span className="font-medium text-foreground">
-                  {metric.value}%
-                </span>
-              </div>
-              <Progress
-                aria-label={`${metric.name}: ${metric.value}%`}
-                className="h-2"
-                value={metric.value}
-              />
-            </div>
-          ))}
-        </div>
+      <CardContent>
+        <ScrollArea className="h-[calc(100svh-31rem)] pr-4">
+          <div className="pb-4">
+            <div className="space-y-4 pb-4">
+              <Alert variant="warning">
+                <IconAlertTriangle />
+                <AlertTitle>Mock System Health Alert</AlertTitle>
+                <AlertDescription>
+                  This data is mocked for demo purposes. Real metrics and WIP.
+                </AlertDescription>
+              </Alert>
 
-        <div className="space-y-3">
-          <h4 className="font-medium text-foreground text-sm">Services</h4>
-          <div className="space-y-2">
-            {services.map((service) => (
-              <div
-                className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2"
-                key={service.name}
-              >
-                <span className="text-foreground text-sm">{service.name}</span>
-                <StatusBadge status={service.status} />
+              {metrics.map((metric) => (
+                <div className="space-y-2" key={metric.name}>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">{metric.name}</span>
+                    <span className="font-medium text-foreground">
+                      {metric.value}%
+                    </span>
+                  </div>
+                  <Progress
+                    aria-label={`${metric.name}: ${metric.value}%`}
+                    className="h-2"
+                    value={metric.value}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-medium text-foreground text-sm">Services</h4>
+              <div className="space-y-2">
+                {services.map((service) => (
+                  <div
+                    className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2"
+                    key={service.name}
+                  >
+                    <span className="text-foreground text-sm">
+                      {service.name}
+                    </span>
+                    <StatusBadge status={service.status} />
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
+        </ScrollArea>
       </CardContent>
     </Card>
   )
 }
 
 SystemHealthSection.Skeleton = () => (
-  <Card className="@container h-full">
+  <Card className="@container pb-0">
     <CardHeader>
       <CardTitle>System Health</CardTitle>
       <CardDescription>Infrastructure status and metrics</CardDescription>
     </CardHeader>
-    <CardContent className="space-y-6">
-      <div className="space-y-4">
-        {[...Array(4)].map((_, idx) => (
-          <div className="space-y-2" key={idx}>
-            <div className="flex items-center justify-between text-sm">
-              <Skeleton className="h-4 w-1/3" />
-              <Skeleton className="h-4 w-1/6" />
-            </div>
-            <Skeleton className="h-2" />
+    <CardContent>
+      <div className="h-[calc(100svh-26rem)] pr-4">
+        <div className="pb-4">
+          <div className="space-y-4">
+            {[...Array(4)].map((_, idx) => (
+              <div className="space-y-2" key={idx}>
+                <div className="flex items-center justify-between text-sm">
+                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="h-4 w-1/6" />
+                </div>
+                <Skeleton className="h-2" />
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <div className="space-y-3">
-        <h4 className="font-medium text-foreground text-sm">Services</h4>
-        <div className="space-y-2">
-          {[...Array(4)].map((_, idx) => (
-            <div
-              className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2"
-              key={idx}
-            >
-              <Skeleton className="h-4 w-1/3" />
-              <Skeleton className="h-4 w-1/6" />
+          <div className="space-y-3">
+            <h4 className="font-medium text-foreground text-sm">Services</h4>
+            <div className="space-y-2">
+              {[...Array(4)].map((_, idx) => (
+                <div
+                  className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2"
+                  key={idx}
+                >
+                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="h-4 w-1/6" />
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </CardContent>
