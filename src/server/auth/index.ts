@@ -169,6 +169,14 @@ export const auth = betterAuth({
     ),
   },
   user: {
+    additionalFields: {
+      approved: {
+        defaultValue: false,
+        input: false,
+        required: true,
+        type: "boolean",
+      },
+    },
     changeEmail: {
       enabled: true,
       async sendChangeEmailConfirmation({ user, newEmail, url }) {
