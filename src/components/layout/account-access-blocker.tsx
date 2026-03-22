@@ -4,7 +4,7 @@ import { isUserApproved } from "@/helpers/is-user-approved"
 import type { Session } from "@/lib/auth/utils"
 
 interface AccountAccessBlockerProps {
-  session: Session
+  session: Session | null
 }
 
 export function AccountAccessBlocker({ session }: AccountAccessBlockerProps) {
