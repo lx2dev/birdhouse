@@ -15,3 +15,4 @@ export const getSession = cache(async (req?: Pick<NextRequest, "headers">) => {
 })
 
 export type Session = typeof auth.$Infer.Session
+export type User = typeof auth.$Infer.Session.user
