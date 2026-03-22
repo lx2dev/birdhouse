@@ -580,4 +580,63 @@ export const adminRouter = createTRPCRouter({
         return updatedTemplate
       }),
   }),
+
+  users: createTRPCRouter({
+    list: adminProcedure
+      .input(
+        z.object({
+          cursor: z
+            .object({
+              createdAt: z.date(),
+              id: z.string(),
+            })
+            .nullish(),
+          limit: z.number().min(1).max(50).default(10),
+        }),
+      )
+      .query(async ({ ctx, input }) => {
+        const { cursor, limit } = input
+
+        const rows = await ctx.db
+          .select()
+          .from(userTable)
+          .where(
+            cursor
+              ? or(
+                  lt(userTable.createdAt, cursor.createdAt),
+                  and(
+                    eq(userTable.createdAt, cursor.createdAt),
+                    lt(userTable.id, cursor.id),
+                  ),
+                )
+              : undefined,
+          )
+          .orderBy(desc(userTable.createdAt), desc(userTable.id))
+          .limit(limit + 1)
+
+        const hasMore = rows.length > limit
+        const items = hasMore ? rows.slice(0, -1) : rows
+        const lastItem = items[items.length - 1]
+        const nextCursor =
+          hasMore && lastItem
+            ? { createdAt: lastItem.createdAt, id: lastItem.id }
+            : null
+
+        return {
+          items: items.map((row) => ({
+            approved: row.approved,
+            createdAt:
+              row.createdAt instanceof Date
+                ? row.createdAt.toISOString()
+                : new Date(row.createdAt).toISOString(),
+            email: row.email,
+            emailVerified: row.emailVerified,
+            id: row.id,
+            name: row.name,
+            twoFactorEnabled: row.twoFactorEnabled,
+          })),
+          nextCursor,
+        }
+      }),
+  }),
 })
