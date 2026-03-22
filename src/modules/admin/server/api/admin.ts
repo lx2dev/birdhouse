@@ -1,5 +1,14 @@
 import { TRPCError } from "@trpc/server"
-import { and, desc, eq, inArray, lt, or, sql } from "drizzle-orm"
+import {
+  and,
+  desc,
+  eq,
+  getTableColumns,
+  inArray,
+  lt,
+  or,
+  sql,
+} from "drizzle-orm"
 import z from "zod"
 
 import { logAndNotify, logOnly } from "@/helpers/audit/log-and-notify"
@@ -598,7 +607,12 @@ export const adminRouter = createTRPCRouter({
         const { cursor, limit } = input
 
         const rows = await ctx.db
-          .select()
+          .select({
+            ...getTableColumns(userTable),
+            vmCount: ctx.db
+              .$count(vmTable, eq(vmTable.userId, userTable.id))
+              .as("vmCount"),
+          })
           .from(userTable)
           .where(
             cursor
@@ -623,18 +637,7 @@ export const adminRouter = createTRPCRouter({
             : null
 
         return {
-          items: items.map((row) => ({
-            approved: row.approved,
-            createdAt:
-              row.createdAt instanceof Date
-                ? row.createdAt.toISOString()
-                : new Date(row.createdAt).toISOString(),
-            email: row.email,
-            emailVerified: row.emailVerified,
-            id: row.id,
-            name: row.name,
-            twoFactorEnabled: row.twoFactorEnabled,
-          })),
+          items,
           nextCursor,
         }
       }),
