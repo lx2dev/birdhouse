@@ -128,6 +128,18 @@ const adminApproveUserFailedDetails = z.object({
   targetUserId: z.string().optional(),
 })
 
+const adminCreateUserDetails = z.object({
+  targetEmail: z.string(),
+  targetUserId: z.string(),
+})
+
+const adminCreateUserFailedDetails = z.object({
+  error: z.string().optional(),
+  reason: z.string().optional(),
+  targetEmail: z.string().optional(),
+  targetUserId: z.string().optional(),
+})
+
 const adminRejectUserDetails = z.object({
   reason: z.string().optional(),
   targetUserEmail: z.string(),
@@ -167,6 +179,8 @@ export const auditActionMap = {
   "admin:approve_user_failed": adminApproveUserFailedDetails,
   "admin:ban_user": adminBanUserDetails,
   "admin:create_operating_system": adminCreateOperatingSystemDetails,
+  "admin:create_user": adminCreateUserDetails,
+  "admin:create_user_failed": adminCreateUserFailedDetails,
   "admin:create_vm_template": adminCreateVMTemplateDetails,
   "admin:delete_vm_template": adminDeleteVMTemplateDetails,
   "admin:delete_vm_template_failed": adminTemplateFailedDetails,
