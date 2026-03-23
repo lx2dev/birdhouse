@@ -122,6 +122,12 @@ const adminApproveUserDetails = z.object({
   targetUserId: z.string(),
 })
 
+const adminApproveUserFailedDetails = z.object({
+  error: z.string().optional(),
+  reason: z.string().optional(),
+  targetUserId: z.string().optional(),
+})
+
 const adminRejectUserDetails = z.object({
   reason: z.string().optional(),
   targetUserEmail: z.string(),
@@ -156,10 +162,10 @@ const notificationMarkAllAsReadDetails = z.object({
 // Action type mapping
 
 export const auditActionMap = {
-  "admin:approve_user": adminApproveUserDetails,
-  "admin:ban_user": adminBanUserDetails,
-
   // Admin actions
+  "admin:approve_user": adminApproveUserDetails,
+  "admin:approve_user_failed": adminApproveUserFailedDetails,
+  "admin:ban_user": adminBanUserDetails,
   "admin:create_operating_system": adminCreateOperatingSystemDetails,
   "admin:create_vm_template": adminCreateVMTemplateDetails,
   "admin:delete_vm_template": adminDeleteVMTemplateDetails,

@@ -591,6 +591,57 @@ export const adminRouter = createTRPCRouter({
   }),
 
   users: createTRPCRouter({
+    approve: adminProcedure
+      .input(
+        z.object({
+          userId: z.string(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { id: adminUserId } = ctx.session.user
+
+        const [user] = await ctx.db
+          .update(userTable)
+          .set({ approved: true })
+          .where(eq(userTable.id, input.userId))
+          .returning()
+
+        if (!user) {
+          await logOnly({
+            action: "admin:approve_user_failed",
+            db: ctx.db,
+            details: {
+              error: `User with ID ${input.userId} not found`,
+              targetUserId: input.userId,
+            },
+            resourceId: input.userId,
+            resourceType: "user",
+            userId: adminUserId,
+          })
+
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `User with ID ${input.userId} not found`,
+          })
+        }
+
+        await logAndNotify({
+          action: "admin:approve_user",
+          db: ctx.db,
+          details: {
+            targetUserEmail: user.email,
+            targetUserId: user.id,
+          },
+          notifyMessage: `User "${user.name}" approved`,
+          notifyStatus: "success",
+          resourceId: user.id,
+          resourceType: "user",
+          userId: adminUserId,
+        })
+
+        return user
+      }),
+
     list: adminProcedure
       .input(
         z.object({
