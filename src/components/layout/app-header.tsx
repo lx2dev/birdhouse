@@ -16,8 +16,6 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
 import { getNavItemTitle, NAV_ITEMS } from "@/constants"
 import { cn } from "@/lib/utils"
-import { Notifications } from "@/modules/dashboard/ui/notifications"
-import { UserMenu } from "@/modules/dashboard/ui/user-menu"
 
 export function AppHeader() {
   const pathname = usePathname()
@@ -63,9 +61,6 @@ export function AppHeader() {
         </Breadcrumb>
 
         <div className="ml-auto flex items-center gap-2">
-          <Notifications />
-          <UserMenu variant="avatar" />
-
           <div className="block md:hidden">
             <Button
               className="relative"

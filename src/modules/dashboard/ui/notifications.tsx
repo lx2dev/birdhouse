@@ -80,7 +80,6 @@ export function Notifications() {
           )}
         </PopoverTrigger>
         <PopoverContent
-          align="end"
           alignOffset={-48}
           className="h-125 w-100 p-0"
           sideOffset={16}

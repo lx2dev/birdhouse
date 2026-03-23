@@ -34,6 +34,7 @@ import {
 import type { NavSection } from "@/constants"
 import { APP_NAME, isNavItemActive } from "@/constants"
 import { UserMenu } from "@/modules/dashboard/ui/user-menu"
+import { Notifications } from "@/modules/dashboard/ui/notifications"
 
 interface SectionSidebarProps {
   sections: NavSection[]
@@ -209,8 +210,9 @@ export function SectionSidebar({
         })}
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="flex flex-row items-center">
         <UserDropdownMenu />
+        <Notifications />
       </SidebarFooter>
 
       <SidebarRail />
