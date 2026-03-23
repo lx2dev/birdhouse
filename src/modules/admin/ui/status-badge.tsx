@@ -11,28 +11,15 @@ type Status =
   | "available"
   | "unavailable"
   | "testing"
-  | "approved"
   | "pending"
-  | "banned"
 
 const statusConfig: Record<Status, { label: string; className: string }> = {
-  approved: {
-    className: cn(
-      "border-green-600/30 bg-green-600/15 text-green-600",
-      "darkborder-green-400/30 darkbg-green-400/15 darktext-green-400",
-    ),
-    label: "Approved",
-  },
   available: {
     className: cn(
       "border-green-600/30 bg-green-600/15 text-green-600",
       "dark:border-green-400/30 dark:bg-green-400/15 dark:text-green-400",
     ),
     label: "Available",
-  },
-  banned: {
-    className: "bg-destructive/15 text-destructive border-destructive/30",
-    label: "Banned",
   },
   deleting: {
     className: "bg-destructive/15 text-destructive border-destructive/30",
@@ -114,11 +101,9 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
         aria-hidden="true"
         className={cn(
           "size-1.5 rounded-full",
-          status === "running" ||
-            status === "available" ||
-            status === "approved"
+          status === "running" || status === "available"
             ? "animate-pulse bg-green-600 dark:bg-green-400"
-            : status === "error" || status === "deleting" || status === "banned"
+            : status === "error" || status === "deleting"
               ? "bg-destructive"
               : status === "provisioning" || status === "rebooting"
                 ? "animate-pulse bg-blue-600 dark:bg-blue-400"
