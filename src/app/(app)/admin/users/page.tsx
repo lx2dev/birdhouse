@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation"
 
+import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { isUserAdmin } from "@/helpers/is-user-admin"
+import { api, HydrateClient } from "@/lib/api/server"
 import { getSession } from "@/lib/auth/utils"
+import { UsersView } from "@/modules/admin/views/users"
 
 export default async function AdminUsersPage() {
   const session = await getSession()
@@ -9,10 +12,13 @@ export default async function AdminUsersPage() {
 
   if (!session || !isAdmin) return redirect("/auth/signin")
 
+  void api.admin.users.list.prefetchInfinite({
+    limit: DEFAULT_FETCH_LIMIT,
+  })
+
   return (
-    <div className="space-y-2">
-      <h1 className="font-bold text-2xl tracking-tight">Users</h1>
-      <p className="text-muted-foreground">User management is coming soon.</p>
-    </div>
+    <HydrateClient>
+      <UsersView />
+    </HydrateClient>
   )
 }
