@@ -625,15 +625,13 @@ export const adminRouter = createTRPCRouter({
           })
         }
 
-        await logAndNotify({
+        await logOnly({
           action: "admin:approve_user",
           db: ctx.db,
           details: {
             targetUserEmail: user.email,
             targetUserId: user.id,
           },
-          notifyMessage: `User "${user.name}" approved`,
-          notifyStatus: "success",
           resourceId: user.id,
           resourceType: "user",
           userId: adminUserId,
