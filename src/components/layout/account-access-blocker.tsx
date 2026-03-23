@@ -2,14 +2,9 @@ import { IconAlertTriangle, IconMail, IconShield } from "@tabler/icons-react"
 import Link from "next/link"
 
 import { isUserApproved } from "@/helpers/is-user-approved"
-import type { Session } from "@/lib/auth/utils"
 
-interface AccountAccessBlockerProps {
-  session: Session | null
-}
-
-export function AccountAccessBlocker({ session }: AccountAccessBlockerProps) {
-  const { approved, emailVerified } = isUserApproved(session)
+export async function AccountAccessBlocker() {
+  const { approved, emailVerified } = await isUserApproved()
 
   if (approved) return null
 
@@ -34,7 +29,7 @@ export function AccountAccessBlocker({ session }: AccountAccessBlockerProps) {
                 Access restricted
               </h2>
               <p className="mt-2 max-w-xl text-muted-foreground text-sm md:text-base">
-                Your are signed in, but security checks are still pending.{" "}
+                You are signed in, but security checks are still pending.{" "}
                 <br className="hidden md:block" />
                 Access to the app stays locked until all required checks pass.
               </p>
