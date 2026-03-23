@@ -1,8 +1,6 @@
-import { IconPlus } from "@tabler/icons-react"
-
-import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/auth/utils"
 import { UsersTableSection } from "@/modules/admin/sections/users-table"
+import { CreateUserModal } from "@/modules/admin/ui/create-user-modal"
 
 export async function UsersView() {
   const session = await getSession()
@@ -17,9 +15,7 @@ export async function UsersView() {
           </p>
         </div>
 
-        <Button>
-          <IconPlus /> Add User
-        </Button>
+        <CreateUserModal />
       </div>
 
       <UsersTableSection currentUserId={session?.user.id} />
