@@ -5,6 +5,14 @@ import { account, user } from "@/server/db/schema"
 
 export const userInsertSchema = createInsertSchema(user)
 
+export const adminCreateUserSchema = userInsertSchema.pick({
+  approved: true,
+  email: true,
+  emailVerified: true,
+  name: true,
+  role: true,
+})
+
 export const accountInsertSchema = createInsertSchema(account)
 
 export const passwordFormBaseSchema = z.object({

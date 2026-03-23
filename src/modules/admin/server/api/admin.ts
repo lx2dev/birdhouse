@@ -28,6 +28,7 @@ import {
   vm as vmTable,
   vmTemplate as vmTemplateTable,
 } from "@/server/db/schema"
+import { adminCreateUserSchema } from "@/modules/settings/schemas/account"
 
 const ADMIN_STATS_CACHE_KEY = "admin:getStats:v2"
 const ADMIN_STATS_CACHE_TTL_SECONDS = 15
@@ -630,6 +631,60 @@ export const adminRouter = createTRPCRouter({
           db: ctx.db,
           details: {
             targetUserEmail: user.email,
+            targetUserId: user.id,
+          },
+          resourceId: user.id,
+          resourceType: "user",
+          userId: adminUserId,
+        })
+
+        return user
+      }),
+
+    insertOne: adminProcedure
+      .input(adminCreateUserSchema)
+      .mutation(async ({ ctx, input }) => {
+        const { id: adminUserId } = ctx.session.user
+
+        const name = input.name.trim()
+
+        const [user] = await ctx.db
+          .insert(userTable)
+          .values({
+            approved: input.approved,
+            banned: false,
+            email: input.email,
+            emailVerified: input.emailVerified,
+            id: crypto.randomUUID(),
+            name,
+            role: input.role,
+            twoFactorEnabled: false,
+          })
+          .returning()
+
+        if (!user) {
+          await logOnly({
+            action: "admin:create_user_failed",
+            db: ctx.db,
+            details: {
+              error: `Failed to create user with email ${input.email}`,
+              targetEmail: input.email,
+            },
+            resourceType: "user",
+            userId: adminUserId,
+          })
+
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create user",
+          })
+        }
+
+        await logOnly({
+          action: "admin:create_user",
+          db: ctx.db,
+          details: {
+            targetEmail: user.email,
             targetUserId: user.id,
           },
           resourceId: user.id,
