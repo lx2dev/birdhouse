@@ -1,9 +1,18 @@
 "use client"
 
+import { IconExclamationCircleFilled } from "@tabler/icons-react"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 
 import { DataTable } from "@/components/data-table"
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
+import { Skeleton } from "@/components/ui/skeleton"
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api } from "@/lib/api/client"
 import { getUserColumns } from "@/modules/admin/sections/users-table/columns"
@@ -41,19 +50,25 @@ function UsersTableSuspense({ currentUserId }: UsersTableSectionProps) {
 }
 
 UsersTableSection.Skeleton = () => (
-  <div className="w-full animate-pulse">
-    <div className="flex items-center space-x-4">
-      <div className="h-10 w-10 rounded-full bg-muted" />
-      <div className="flex-1 space-y-2 py-1">
-        <div className="h-4 w-3/4 rounded bg-muted" />
-        <div className="h-4 w-1/2 rounded bg-muted" />
-      </div>
+  <div className="w-full">
+    <div className="mb-4 flex justify-between">
+      <Skeleton className="h-8 w-1/3" />
+      <Skeleton className="h-8 w-24" />
     </div>
+    <Skeleton className="h-48" />
   </div>
 )
 
 UsersTableSection.Error = () => (
-  <div className="w-full">
-    <p className="text-center text-destructive">Failed to load users.</p>
-  </div>
+  <Empty>
+    <EmptyHeader>
+      <EmptyMedia>
+        <IconExclamationCircleFilled className="text-destructive" />
+      </EmptyMedia>
+      <EmptyTitle className="text-base">Failed to load users.</EmptyTitle>
+      <EmptyDescription>
+        An error occurred while fetching the users. Please try again later.
+      </EmptyDescription>
+    </EmptyHeader>
+  </Empty>
 )
