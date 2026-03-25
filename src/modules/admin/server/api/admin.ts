@@ -19,7 +19,10 @@ import {
   updateVMTemplateSchema,
 } from "@/modules/admin/schemas"
 import { adminStatsResponseSchema } from "@/modules/admin/schemas/stats"
-import { adminCreateUserSchema } from "@/modules/settings/schemas/account"
+import {
+  adminCreateUserSchema,
+  adminUpdateUserSchema,
+} from "@/modules/settings/schemas/account"
 import { adminProcedure, createTRPCRouter } from "@/server/api/init"
 import {
   auditLog,
@@ -744,6 +747,152 @@ export const adminRouter = createTRPCRouter({
           items,
           nextCursor,
         }
+      }),
+
+    reject: adminProcedure
+      .input(
+        z.object({
+          userId: z.string(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { id: adminUserId } = ctx.session.user
+
+        // TODO: Change approve to status to allow for more states like "rejected"
+
+        const [user] = await ctx.db
+          .update(userTable)
+          .set({ approved: false })
+          .where(eq(userTable.id, input.userId))
+          .returning()
+
+        if (!user) {
+          await logOnly({
+            action: "admin:reject_user_failed",
+            db: ctx.db,
+            details: {
+              error: `User with ID ${input.userId} not found`,
+              targetUserId: input.userId,
+            },
+            resourceId: input.userId,
+            resourceType: "user",
+            userId: adminUserId,
+          })
+
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `User with ID ${input.userId} not found`,
+          })
+        }
+
+        await logOnly({
+          action: "admin:reject_user",
+          db: ctx.db,
+          details: {
+            targetUserEmail: user.email,
+            targetUserId: user.id,
+          },
+          resourceId: user.id,
+          resourceType: "user",
+          userId: adminUserId,
+        })
+
+        return user
+      }),
+
+    update: adminProcedure
+      .input(adminUpdateUserSchema.partial())
+      .mutation(async ({ ctx, input }) => {
+        const { id: adminUserId } = ctx.session.user
+
+        if (!input.id) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "User ID is required",
+          })
+        }
+
+        const [existingUser] = await ctx.db
+          .select()
+          .from(userTable)
+          .where(eq(userTable.id, input.id))
+
+        if (!existingUser) {
+          await logOnly({
+            action: "admin:update_user_failed",
+            db: ctx.db,
+            details: {
+              error: `User with ID ${input.id} not found`,
+              targetUserId: input.id,
+            },
+            resourceId: input.id,
+            resourceType: "user",
+            userId: adminUserId,
+          })
+
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `User with ID ${input.id} not found`,
+          })
+        }
+
+        const updatedValues: Partial<typeof userTable.$inferInsert> = {
+          approved: input.approved,
+          banned: input.banned,
+          email: input.email,
+          emailVerified: input.emailVerified,
+          name: input.name,
+          role: input.role,
+          twoFactorEnabled: input.twoFactorEnabled,
+        }
+
+        const [updatedUser] = await ctx.db
+          .update(userTable)
+          .set(updatedValues)
+          .where(eq(userTable.id, input.id))
+          .returning()
+
+        if (!updatedUser) {
+          await logOnly({
+            action: "admin:update_user_failed",
+            db: ctx.db,
+            details: {
+              error: `Failed to update user with ID ${input.id}`,
+              targetUserId: input.id,
+            },
+            resourceId: input.id,
+            resourceType: "user",
+            userId: adminUserId,
+          })
+
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to update user",
+          })
+        }
+
+        await logOnly({
+          action: "admin:update_user",
+          db: ctx.db,
+          details: {
+            approved: updatedUser.approved,
+            banExpires: updatedUser.banExpires,
+            banned: updatedUser.banned,
+            banReason: updatedUser.banReason,
+            email: updatedUser.email,
+            emailVerified: updatedUser.emailVerified,
+            image: updatedUser.image,
+            name: updatedUser.name,
+            role: updatedUser.role,
+            targetUserId: updatedUser.id,
+            twoFactorEnabled: updatedUser.twoFactorEnabled,
+          },
+          resourceId: updatedUser.id,
+          resourceType: "user",
+          userId: adminUserId,
+        })
+
+        return updatedUser
       }),
   }),
 })
