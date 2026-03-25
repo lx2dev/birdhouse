@@ -75,7 +75,7 @@ function CreateUserForm({ setOpen }: CreateUserFormProps) {
     },
     onSuccess() {
       toast.success("User created successfully")
-      utils.admin.users.list.invalidate()
+      void utils.admin.users.list.invalidate()
       form.reset()
       setOpen(false)
     },
