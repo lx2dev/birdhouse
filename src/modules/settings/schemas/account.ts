@@ -13,6 +13,20 @@ export const adminCreateUserSchema = userInsertSchema.pick({
   role: true,
 })
 
+export const adminUpdateUserSchema = userInsertSchema.pick({
+  approved: true,
+  banExpires: true,
+  banned: true,
+  banReason: true,
+  email: true,
+  emailVerified: true,
+  id: true,
+  image: true,
+  name: true,
+  role: true,
+  twoFactorEnabled: true,
+})
+
 export const accountInsertSchema = createInsertSchema(account)
 
 export const passwordFormBaseSchema = z.object({
