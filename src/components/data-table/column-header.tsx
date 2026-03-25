@@ -1,3 +1,9 @@
+import {
+  IconArrowDown,
+  IconArrowsSort,
+  IconArrowUp,
+  IconEyeOff,
+} from "@tabler/icons-react"
 import type { Column } from "@tanstack/react-table"
 
 import { Button } from "@/components/ui/button"
@@ -9,12 +15,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
-import {
-  IconArrowDown,
-  IconArrowsSort,
-  IconArrowUp,
-  IconEyeOff,
-} from "@tabler/icons-react"
 
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {

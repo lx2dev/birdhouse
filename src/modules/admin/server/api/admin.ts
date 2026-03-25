@@ -19,6 +19,7 @@ import {
   updateVMTemplateSchema,
 } from "@/modules/admin/schemas"
 import { adminStatsResponseSchema } from "@/modules/admin/schemas/stats"
+import { adminCreateUserSchema } from "@/modules/settings/schemas/account"
 import { adminProcedure, createTRPCRouter } from "@/server/api/init"
 import {
   auditLog,
@@ -28,7 +29,6 @@ import {
   vm as vmTable,
   vmTemplate as vmTemplateTable,
 } from "@/server/db/schema"
-import { adminCreateUserSchema } from "@/modules/settings/schemas/account"
 
 const ADMIN_STATS_CACHE_KEY = "admin:getStats:v2"
 const ADMIN_STATS_CACHE_TTL_SECONDS = 15

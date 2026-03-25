@@ -33,8 +33,8 @@ import {
 } from "@/components/ui/sidebar"
 import type { NavSection } from "@/constants"
 import { APP_NAME, isNavItemActive } from "@/constants"
-import { UserMenu } from "@/modules/dashboard/ui/user-menu"
 import { Notifications } from "@/modules/dashboard/ui/notifications"
+import { UserMenu } from "@/modules/dashboard/ui/user-menu"
 
 interface SectionSidebarProps {
   sections: NavSection[]
