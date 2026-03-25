@@ -20,6 +20,7 @@ export function adminCanPerformRowAction({
   const protectedAdminEmail = env.NEXT_PUBLIC_ADMIN_EMAIL.trim().toLowerCase()
 
   if (normalizedTargetEmail === protectedAdminEmail) return false
+  if (normalizedTargetEmail !== protectedAdminEmail) return true
 
   const isTargetAdmin = targetUserRole === "admin"
   if (isTargetAdmin) return false
