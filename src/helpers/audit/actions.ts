@@ -128,6 +128,12 @@ const adminApproveUserFailedDetails = z.object({
   targetUserId: z.string().optional(),
 })
 
+const adminUpdateUserFailedDetails = z.object({
+  error: z.string().optional(),
+  reason: z.string().optional(),
+  targetUserId: z.string().optional(),
+})
+
 const adminCreateUserDetails = z.object({
   targetEmail: z.string(),
   targetUserId: z.string(),
@@ -146,6 +152,13 @@ const adminRejectUserDetails = z.object({
   targetUserId: z.string(),
 })
 
+const adminRejectUserFailedDetails = z.object({
+  error: z.string().optional(),
+  reason: z.string().optional(),
+  targetUserEmail: z.string().optional(),
+  targetUserId: z.string().optional(),
+})
+
 const adminBanUserDetails = z.object({
   banExpires: z.date().optional(),
   reason: z.string().optional(),
@@ -156,6 +169,27 @@ const adminBanUserDetails = z.object({
 const adminUnbanUserDetails = z.object({
   targetUserEmail: z.string(),
   targetUserId: z.string(),
+})
+
+const adminUpdateUserDetails = z.object({
+  approved: z.boolean().optional(),
+  banExpires: z.date().nullable().optional(),
+  banned: z.boolean().nullable().optional(),
+  banReason: z.string().nullable().optional(),
+  email: z.email().optional(),
+  emailVerified: z.boolean().optional(),
+  image: z.string().nullable().optional(),
+  name: z.string().optional(),
+  role: z
+    .string()
+    .nullable()
+    .optional()
+    .refine((val) => {
+      if (val === null || val === undefined) return true
+      return ["user", "admin"].includes(val)
+    }),
+  targetUserId: z.string(),
+  twoFactorEnabled: z.boolean().nullable().optional(),
 })
 
 const failureDetails = z.object({
@@ -185,7 +219,10 @@ export const auditActionMap = {
   "admin:delete_vm_template": adminDeleteVMTemplateDetails,
   "admin:delete_vm_template_failed": adminTemplateFailedDetails,
   "admin:reject_user": adminRejectUserDetails,
+  "admin:reject_user_failed": adminRejectUserFailedDetails,
   "admin:unban_user": adminUnbanUserDetails,
+  "admin:update_user": adminUpdateUserDetails,
+  "admin:update_user_failed": adminUpdateUserFailedDetails,
   "admin:update_vm_template": adminUpdateVMTemplateDetails,
   "admin:update_vm_template_failed": adminTemplateFailedDetails,
 
