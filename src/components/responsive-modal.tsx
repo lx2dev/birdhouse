@@ -1,6 +1,6 @@
 "use client"
 
-import type * as React from "react"
+import * as React from "react"
 
 import {
   AlertDialog,
@@ -23,7 +23,7 @@ interface ResponsiveModalProps {
   mediaQuery?: string
   open: boolean
   onOpenChange: (open: boolean) => void
-  trigger?: React.ComponentProps<typeof Button>
+  trigger?: React.ComponentProps<typeof Button> | React.ReactElement
   children: React.ReactNode
   className?: string
   alert?: boolean
@@ -32,6 +32,12 @@ interface ResponsiveModalProps {
 const defaultTrigger: React.ComponentProps<typeof Button> = {
   size: "default",
   variant: "outline",
+}
+
+function isTriggerElement(
+  trigger: ResponsiveModalProps["trigger"],
+): trigger is React.ReactElement {
+  return React.isValidElement(trigger)
 }
 
 export function ResponsiveModal({
@@ -44,40 +50,37 @@ export function ResponsiveModal({
   alert = false,
 }: ResponsiveModalProps) {
   const isDesktop = useMediaQuery(mediaQuery)
-
-  const triggerProps = { ...defaultTrigger, ...trigger }
+  const resolvedTrigger = isTriggerElement(trigger)
+    ? { children: undefined, element: trigger, nativeButton: false as const }
+    : {
+        children: trigger.children,
+        element: <Button {...trigger} className={cn(trigger.className)} />,
+        nativeButton: true as const,
+      }
 
   if (isDesktop) {
     if (!alert) {
       return (
         <Dialog onOpenChange={onOpenChange} open={open}>
           <DialogTrigger
-            render={
-              <Button
-                {...triggerProps}
-                className={cn(triggerProps.className)}
-              />
-            }
+            nativeButton={resolvedTrigger.nativeButton}
+            render={resolvedTrigger.element}
           >
-            {triggerProps.children}
+            {resolvedTrigger.children}
           </DialogTrigger>
           <DialogContent className={cn("md:max-w-lg", className)}>
             {children}
           </DialogContent>
         </Dialog>
       )
-    } else if (isDesktop && alert) {
+    } else {
       return (
         <AlertDialog onOpenChange={onOpenChange} open={open}>
           <AlertDialogTrigger
-            render={
-              <Button
-                {...triggerProps}
-                className={cn(triggerProps.className)}
-              />
-            }
+            nativeButton={resolvedTrigger.nativeButton}
+            render={resolvedTrigger.element}
           >
-            {triggerProps.children}
+            {resolvedTrigger.children}
           </AlertDialogTrigger>
           <AlertDialogContent className={cn("md:max-w-lg", className)}>
             {children}
@@ -89,11 +92,7 @@ export function ResponsiveModal({
 
   return (
     <Drawer dismissible={!alert} onOpenChange={onOpenChange} open={open}>
-      <DrawerTrigger asChild>
-        <Button {...triggerProps} className={cn(triggerProps.className)}>
-          {triggerProps.children}
-        </Button>
-      </DrawerTrigger>
+      <DrawerTrigger asChild>{resolvedTrigger.element}</DrawerTrigger>
       <DrawerContent className={cn("min-h-[50svh]", className)}>
         <DrawerHeader hidden>
           <DrawerTitle hidden />
