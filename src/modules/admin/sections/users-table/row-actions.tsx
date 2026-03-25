@@ -20,9 +20,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Spinner } from "@/components/ui/spinner"
 import { adminCanPerformRowAction } from "@/helpers/admin-can-perform-row-action"
 import { api } from "@/lib/api/client"
 import type { UserWithVMCount } from "@/modules/admin/sections/users-table/columns"
+import { EditUserModal } from "@/modules/admin/ui/edit-user-modal"
 
 interface RowActionsProps {
   user: UserWithVMCount
@@ -48,7 +50,20 @@ export function RowActions({ user, currentUserId }: RowActionsProps) {
     },
     onSuccess() {
       toast.success("User approved successfully")
-      utils.admin.users.list.invalidate()
+      void utils.admin.users.list.invalidate()
+    },
+  })
+
+  const rejectUser = api.admin.users.reject.useMutation({
+    onError(error) {
+      console.error("Failed to reject user:", error)
+      toast.error("Something went wrong", {
+        description: error.message,
+      })
+    },
+    onSuccess() {
+      toast.success("User rejected successfully")
+      void utils.admin.users.list.invalidate()
     },
   })
 
@@ -68,33 +83,47 @@ export function RowActions({ user, currentUserId }: RowActionsProps) {
         <IconDots />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        {!user.approved && (
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
+            <DropdownMenuItem
+              closeOnClick={false}
+              disabled={approveUser.isPending || rejectUser.isPending}
+              onClick={() => {
+                approveUser.mutate({
+                  userId: user.id,
+                })
+              }}
+            >
+              {approveUser.isPending ? (
+                <Spinner />
+              ) : (
+                <IconCheck className="text-primary" />
+              )}
+              Approve user
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              closeOnClick={false}
+              disabled={approveUser.isPending || rejectUser.isPending}
+              onClick={() => {
+                rejectUser.mutate({
+                  userId: user.id,
+                })
+              }}
+            >
+              {rejectUser.isPending ? (
+                <Spinner />
+              ) : (
+                <IconX className="text-destructive" />
+              )}
+              Reject user
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </DropdownMenuGroup>
+        )}
         <DropdownMenuGroup>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          {!user.approved && (
-            <>
-              <DropdownMenuItem
-                onClick={() => {
-                  approveUser.mutate({
-                    userId: user.id,
-                  })
-                }}
-              >
-                <IconCheck className="text-primary" />
-                Approve user
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  // rejectUser.mutate({
-                  //   userId: user.id,
-                  // })
-                }}
-              >
-                <IconX className="text-destructive" />
-                Reject user
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-            </>
-          )}
+          <EditUserModal user={user} />
           <DropdownMenuItem>
             <IconMail />
             Send email
