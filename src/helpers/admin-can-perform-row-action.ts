@@ -16,8 +16,9 @@ export function adminCanPerformRowAction({
   const isSelf = Boolean(currentUserId && currentUserId === targetUserId)
   if (isSelf) return false
 
-  const protectedAdminEmail = env.NEXT_PUBLIC_ADMIN_EMAIL.trim().toLowerCase()
   const normalizedTargetEmail = targetUserEmail.trim().toLowerCase()
+  const protectedAdminEmail = env.NEXT_PUBLIC_ADMIN_EMAIL.trim().toLowerCase()
+
   if (normalizedTargetEmail === protectedAdminEmail) return false
 
   const isTargetAdmin = targetUserRole === "admin"

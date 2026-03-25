@@ -1,3 +1,4 @@
+import { env } from "@/env"
 import { getSession } from "@/lib/auth/utils"
 import { db } from "@/server/db"
 
@@ -11,6 +12,16 @@ export async function isUserApproved(): Promise<{
     return {
       approved: false,
       emailVerified: false,
+    }
+  }
+
+  const normalizedUserEmail = session.user.email?.trim().toLowerCase()
+  const protectedAdminEmail = env.NEXT_PUBLIC_ADMIN_EMAIL.trim().toLowerCase()
+
+  if (normalizedUserEmail === protectedAdminEmail) {
+    return {
+      approved: true,
+      emailVerified: true,
     }
   }
 
