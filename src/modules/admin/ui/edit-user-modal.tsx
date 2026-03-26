@@ -404,6 +404,7 @@ function EditUserForm({ setOpen, user }: EditUserFormProps) {
                         render={
                           <InputGroupButton
                             aria-label="Open calendar"
+                            disabled={isLoading || !form.watch("banned")}
                             size="icon-xs"
                             variant="ghost"
                           />
