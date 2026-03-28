@@ -14,6 +14,7 @@ import z from "zod"
 import { logAndNotify, logOnly } from "@/helpers/audit/log-and-notify"
 import { getRedisClient } from "@/lib/redis"
 import {
+  AdminUserFilterSchema,
   insertOperatingSystemSchema,
   insertVMTemplateSchema,
   updateVMTemplateSchema,
@@ -707,11 +708,53 @@ export const adminRouter = createTRPCRouter({
               id: z.string(),
             })
             .nullish(),
+          filter: AdminUserFilterSchema.nullish(),
           limit: z.number().min(1).max(50).default(10),
         }),
       )
       .query(async ({ ctx, input }) => {
-        const { cursor, limit } = input
+        const { cursor, filter, limit } = input
+
+        const { success } = AdminUserFilterSchema.safeParse(filter)
+
+        if (filter && !success) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid filter value",
+          })
+        }
+
+        const conditions = []
+
+        switch (filter) {
+          case "approved":
+            conditions.push(eq(userTable.approved, true))
+            break
+          case "pending":
+            conditions.push(eq(userTable.approved, false))
+            break
+          case "banned":
+            conditions.push(eq(userTable.banned, true))
+            break
+          case "not_banned":
+            conditions.push(eq(userTable.banned, false))
+            break
+        }
+
+        if (cursor) {
+          conditions.push(
+            or(
+              lt(userTable.createdAt, cursor.createdAt),
+              and(
+                eq(userTable.createdAt, cursor.createdAt),
+                lt(userTable.id, cursor.id),
+              ),
+            ),
+          )
+        }
+
+        const whereClause =
+          conditions.length > 0 ? and(...conditions) : undefined
 
         const rows = await ctx.db
           .select({
@@ -721,17 +764,7 @@ export const adminRouter = createTRPCRouter({
               .as("vmCount"),
           })
           .from(userTable)
-          .where(
-            cursor
-              ? or(
-                  lt(userTable.createdAt, cursor.createdAt),
-                  and(
-                    eq(userTable.createdAt, cursor.createdAt),
-                    lt(userTable.id, cursor.id),
-                  ),
-                )
-              : undefined,
-          )
+          .where(whereClause)
           .orderBy(desc(userTable.createdAt), desc(userTable.id))
           .limit(limit + 1)
 

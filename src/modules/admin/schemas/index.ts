@@ -26,3 +26,11 @@ export const insertOperatingSystemSchema = z.object({
   proxmoxTemplateId: z.number(),
   status: z.enum(operatingSystemStatusEnum.enumValues).default("testing"),
 })
+
+export const AdminUserFilterSchema = z.enum([
+  "approved",
+  "pending",
+  "banned",
+  "not_banned",
+])
+export type AdminUserFilter = z.infer<typeof AdminUserFilterSchema>
