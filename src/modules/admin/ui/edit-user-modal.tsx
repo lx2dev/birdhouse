@@ -16,6 +16,7 @@ import type z from "zod"
 import { ResponsiveModal } from "@/components/responsive-modal"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import {
   Field,
@@ -94,6 +95,7 @@ function EditUserForm({ setOpen, user }: EditUserFormProps) {
       id: user.id,
       image: user.image,
       name: user.name,
+      resetPassword: false,
       role: user.role,
       twoFactorEnabled: user.twoFactorEnabled,
     },
@@ -434,6 +436,30 @@ function EditUserForm({ setOpen, user }: EditUserFormProps) {
           }}
         />
       </div>
+
+      <Controller
+        control={form.control}
+        name="resetPassword"
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid} orientation="horizontal">
+            <Checkbox
+              aria-invalid={fieldState.invalid}
+              checked={field.value ?? false}
+              disabled={isLoading}
+              id={field.name}
+              name={field.name}
+              onCheckedChange={field.onChange}
+            />
+            <FieldContent>
+              <FieldLabel htmlFor={field.name}>Reset Password</FieldLabel>
+              <FieldDescription>
+                The user will receive a password reset email.
+              </FieldDescription>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </FieldContent>
+          </Field>
+        )}
+      />
 
       <div className="flex items-center justify-end gap-2">
         <Button
