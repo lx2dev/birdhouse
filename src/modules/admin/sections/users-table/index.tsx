@@ -1,6 +1,8 @@
 "use client"
 
 import { IconExclamationCircleFilled } from "@tabler/icons-react"
+import { useSearchParams } from "next/navigation"
+import * as React from "react"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 
@@ -15,27 +17,49 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api } from "@/lib/api/client"
+import type { AdminUserFilter } from "@/modules/admin/schemas"
 import { getUserColumns } from "@/modules/admin/sections/users-table/columns"
 
 import type { UserWithVMCount } from "./columns"
 
 interface UsersTableSectionProps {
   currentUserId: string | undefined
+  initialFilter?: AdminUserFilter
 }
 
-export function UsersTableSection({ currentUserId }: UsersTableSectionProps) {
+export function UsersTableSection({
+  currentUserId,
+  initialFilter,
+}: UsersTableSectionProps) {
   return (
     <Suspense fallback={<UsersTableSection.Skeleton />}>
       <ErrorBoundary fallback={<UsersTableSection.Error />}>
-        <UsersTableSuspense currentUserId={currentUserId} />
+        <UsersTableSuspense
+          currentUserId={currentUserId}
+          initialFilter={initialFilter}
+        />
       </ErrorBoundary>
     </Suspense>
   )
 }
 
-function UsersTableSuspense({ currentUserId }: UsersTableSectionProps) {
+function UsersTableSuspense({
+  currentUserId,
+  initialFilter,
+}: UsersTableSectionProps) {
+  const searchParams = useSearchParams()
+
+  const [filter, setFilter] = React.useState<AdminUserFilter | undefined>(
+    initialFilter,
+  )
+
+  React.useEffect(() => {
+    const newFilter = searchParams.get("filter") as AdminUserFilter
+    setFilter(newFilter || undefined)
+  }, [searchParams])
+
   const [users] = api.admin.users.list.useSuspenseInfiniteQuery(
-    { limit: DEFAULT_FETCH_LIMIT },
+    { filter, limit: DEFAULT_FETCH_LIMIT },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
 
@@ -43,9 +67,7 @@ function UsersTableSuspense({ currentUserId }: UsersTableSectionProps) {
   const columns = getUserColumns(currentUserId)
 
   return (
-    <div>
-      <DataTable<UserWithVMCount, unknown> columns={columns} data={usersData} />
-    </div>
+    <DataTable<UserWithVMCount, unknown> columns={columns} data={usersData} />
   )
 }
 

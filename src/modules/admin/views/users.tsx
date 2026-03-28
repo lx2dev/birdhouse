@@ -1,8 +1,13 @@
 import { getSession } from "@/lib/auth/utils"
+import type { AdminUserFilter } from "@/modules/admin/schemas"
 import { UsersTableSection } from "@/modules/admin/sections/users-table"
 import { CreateUserModal } from "@/modules/admin/ui/create-user-modal"
 
-export async function UsersView() {
+interface UsersViewProps {
+  filter?: AdminUserFilter
+}
+
+export async function UsersView({ filter }: UsersViewProps) {
   const session = await getSession()
 
   return (
@@ -18,7 +23,10 @@ export async function UsersView() {
         <CreateUserModal />
       </div>
 
-      <UsersTableSection currentUserId={session?.user.id} />
+      <UsersTableSection
+        currentUserId={session?.user.id}
+        initialFilter={filter}
+      />
     </div>
   )
 }
