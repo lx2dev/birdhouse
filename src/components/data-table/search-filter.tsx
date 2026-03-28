@@ -9,7 +9,11 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group"
 
-export function SearchFilter<TData>({ table }: { table: Table<TData> }) {
+export function DataTableSearchFilter<TData>({
+  table,
+}: {
+  table: Table<TData>
+}) {
   return (
     <InputGroup className="max-w-sm">
       <InputGroupInput
