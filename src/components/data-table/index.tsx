@@ -84,9 +84,9 @@ export function DataTable<TData, TValue>({
         </div>
         <div className="flex items-center gap-x-2">
           <DataTableFilterOptions
-            filterOptions={filterOptions}
             currentFilter={currentFilter}
             filterLabel={filterLabel}
+            filterOptions={filterOptions}
           />
           <DataTableViewOptions table={table} />
         </div>
