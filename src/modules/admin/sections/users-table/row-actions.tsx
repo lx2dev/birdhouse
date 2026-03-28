@@ -5,6 +5,7 @@ import {
   IconCheck,
   IconDots,
   IconHandStop,
+  IconKey,
   IconMail,
   IconX,
 } from "@tabler/icons-react"
@@ -82,49 +83,54 @@ export function RowActions({ user, currentUserId }: RowActionsProps) {
       >
         <IconDots />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="min-w-48">
         {!user.approved && (
-          <DropdownMenuGroup>
-            <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              closeOnClick={false}
-              disabled={approveUser.isPending || rejectUser.isPending}
-              onClick={() => {
-                approveUser.mutate({
-                  userId: user.id,
-                })
-              }}
-            >
-              {approveUser.isPending ? (
-                <Spinner />
-              ) : (
-                <IconCheck className="text-primary" />
-              )}
-              Approve user
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              closeOnClick={false}
-              disabled={approveUser.isPending || rejectUser.isPending}
-              onClick={() => {
-                rejectUser.mutate({
-                  userId: user.id,
-                })
-              }}
-            >
-              {rejectUser.isPending ? (
-                <Spinner />
-              ) : (
-                <IconX className="text-destructive" />
-              )}
-              Reject user
-            </DropdownMenuItem>
+          <>
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                closeOnClick={false}
+                disabled={approveUser.isPending || rejectUser.isPending}
+                onClick={() => {
+                  approveUser.mutate({
+                    userId: user.id,
+                  })
+                }}
+              >
+                {approveUser.isPending ? (
+                  <Spinner />
+                ) : (
+                  <IconCheck className="text-primary" />
+                )}
+                Approve user
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                closeOnClick={false}
+                disabled={approveUser.isPending || rejectUser.isPending}
+                onClick={() => {
+                  rejectUser.mutate({
+                    userId: user.id,
+                  })
+                }}
+              >
+                {rejectUser.isPending ? (
+                  <Spinner />
+                ) : (
+                  <IconX className="text-destructive" />
+                )}
+                Reject user
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
-          </DropdownMenuGroup>
+          </>
         )}
         <DropdownMenuGroup>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <EditUserModal user={user} />
-          <DropdownMenuItem>
+          <DropdownMenuItem disabled>
+            <IconKey />
+            Reset Password
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled>
             <IconMail />
             Send email
           </DropdownMenuItem>
