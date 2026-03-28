@@ -220,6 +220,8 @@ export const auditActionMap = {
   "admin:delete_vm_template_failed": adminTemplateFailedDetails,
   "admin:reject_user": adminRejectUserDetails,
   "admin:reject_user_failed": adminRejectUserFailedDetails,
+  "admin:reset_password": adminUpdateUserDetails,
+  "admin:reset_password_failed": adminUpdateUserFailedDetails,
   "admin:unban_user": adminUnbanUserDetails,
   "admin:update_user": adminUpdateUserDetails,
   "admin:update_user_failed": adminUpdateUserFailedDetails,

@@ -25,6 +25,7 @@ import {
   adminUpdateUserSchema,
 } from "@/modules/settings/schemas/account"
 import { adminProcedure, createTRPCRouter } from "@/server/api/init"
+import { auth } from "@/server/auth"
 import {
   auditLog,
   notificationTable,
@@ -901,6 +902,43 @@ export const adminRouter = createTRPCRouter({
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Failed to update user",
+          })
+        }
+
+        if (input.resetPassword) {
+          const { status, message } = await auth.api.requestPasswordReset({
+            body: { email: updatedUser.email },
+          })
+
+          if (!status) {
+            await logOnly({
+              action: "admin:reset_password_failed",
+              db: ctx.db,
+              details: {
+                error: `Failed to reset password for user with ID ${input.id}: ${message}`,
+                targetUserId: input.id,
+              },
+              resourceId: input.id,
+              resourceType: "user",
+              userId: adminUserId,
+            })
+
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: `Failed to reset password: ${message}`,
+            })
+          }
+
+          await logOnly({
+            action: "admin:reset_password",
+            db: ctx.db,
+            details: {
+              email: updatedUser.email,
+              targetUserId: updatedUser.id,
+            },
+            resourceId: updatedUser.id,
+            resourceType: "user",
+            userId: adminUserId,
           })
         }
 
