@@ -60,6 +60,7 @@ export function EditUserModal({ user }: EditUserModalProps) {
 
   return (
     <ResponsiveModal
+      className="max-md:min-h-full"
       onOpenChange={setOpen}
       open={open}
       trigger={
