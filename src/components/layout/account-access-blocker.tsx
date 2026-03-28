@@ -1,10 +1,16 @@
 import { IconAlertTriangle, IconMail, IconShield } from "@tabler/icons-react"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 
 import { isUserApproved } from "@/helpers/is-user-approved"
+import { getSession } from "@/lib/auth/utils"
 
 export async function AccountAccessBlocker() {
-  const { approved, emailVerified } = await isUserApproved()
+  const session = await getSession()
+
+  if (!session) return redirect("/")
+
+  const { approved, emailVerified } = await isUserApproved(session)
 
   if (approved) return null
 

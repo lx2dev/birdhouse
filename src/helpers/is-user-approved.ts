@@ -1,13 +1,11 @@
 import { env } from "@/env"
-import { getSession } from "@/lib/auth/utils"
+import type { Session } from "@/lib/auth/utils"
 import { db } from "@/server/db"
 
-export async function isUserApproved(): Promise<{
+export async function isUserApproved(session: Session): Promise<{
   approved: boolean
   emailVerified: boolean
 }> {
-  const session = await getSession()
-
   if (!session?.user) {
     return {
       approved: false,
