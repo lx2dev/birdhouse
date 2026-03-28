@@ -18,9 +18,17 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api } from "@/lib/api/client"
 import type { AdminUserFilter } from "@/modules/admin/schemas"
+import { AdminUserFilterSchema } from "@/modules/admin/schemas"
 import { getUserColumns } from "@/modules/admin/sections/users-table/columns"
 
 import type { UserWithVMCount } from "./columns"
+
+const ADMIN_USER_FILTER_OPTIONS = AdminUserFilterSchema.options.map(
+  (value) => ({
+    label: value.charAt(0).toUpperCase() + value.slice(1),
+    value,
+  }),
+)
 
 interface UsersTableSectionProps {
   currentUserId: string | undefined
@@ -54,8 +62,10 @@ function UsersTableSuspense({
   )
 
   React.useEffect(() => {
-    const newFilter = searchParams.get("filter") as AdminUserFilter
-    setFilter(newFilter || undefined)
+    const parsedFilter = AdminUserFilterSchema.safeParse(
+      searchParams.get("filter"),
+    )
+    setFilter(parsedFilter.success ? parsedFilter.data : undefined)
   }, [searchParams])
 
   const [users] = api.admin.users.list.useSuspenseInfiniteQuery(
@@ -67,7 +77,13 @@ function UsersTableSuspense({
   const columns = getUserColumns(currentUserId)
 
   return (
-    <DataTable<UserWithVMCount, unknown> columns={columns} data={usersData} />
+    <DataTable<UserWithVMCount, unknown>
+      columns={columns}
+      currentFilter={filter || null}
+      data={usersData}
+      filterLabel="User Status"
+      filterOptions={ADMIN_USER_FILTER_OPTIONS}
+    />
   )
 }
 
