@@ -453,7 +453,9 @@ function EditUserForm({ setOpen, user }: EditUserFormProps) {
             <FieldContent>
               <FieldLabel htmlFor={field.name}>Reset Password</FieldLabel>
               <FieldDescription>
-                The user will receive a password reset email.
+                A password reset email will be sent to the user.{" "}
+                <br className="hidden sm:block" />
+                The user must have a credentials account for this to work.
               </FieldDescription>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </FieldContent>

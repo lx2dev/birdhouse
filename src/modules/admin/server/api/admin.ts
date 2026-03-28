@@ -11,6 +11,7 @@ import {
 } from "drizzle-orm"
 import z from "zod"
 
+import { env } from "@/env"
 import { logAndNotify, logOnly } from "@/helpers/audit/log-and-notify"
 import { getRedisClient } from "@/lib/redis"
 import {
@@ -27,6 +28,7 @@ import {
 import { adminProcedure, createTRPCRouter } from "@/server/api/init"
 import { auth } from "@/server/auth"
 import {
+  account as accountTable,
   auditLog,
   notificationTable,
   operatingSystem as osTable,
@@ -906,8 +908,30 @@ export const adminRouter = createTRPCRouter({
         }
 
         if (input.resetPassword) {
+          const hasCredentials = await ctx.db
+            .select({
+              id: accountTable.id,
+            })
+            .from(accountTable)
+            .where(
+              and(
+                eq(accountTable.userId, input.id),
+                eq(accountTable.providerId, "credentials"),
+              ),
+            )
+
+          if (!hasCredentials) {
+            throw new TRPCError({
+              code: "NOT_FOUND",
+              message: `User with ID ${input.id} not found`,
+            })
+          }
+
           const { status, message } = await auth.api.requestPasswordReset({
-            body: { email: updatedUser.email },
+            body: {
+              email: updatedUser.email,
+              redirectTo: `${env.NEXT_PUBLIC_URL}/auth/reset-password`,
+            },
           })
 
           if (!status) {
