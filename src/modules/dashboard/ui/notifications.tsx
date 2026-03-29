@@ -71,7 +71,7 @@ export function Notifications() {
           render={<Button size="icon-lg" variant="ghost" />}
         >
           <span className="sr-only">Notifications</span>
-          <IconBell className="size-5" />
+          <IconBell className="size-4" />
           {hasUnread && (
             <div className="absolute top-1.5 right-1.5 flex size-2.5 text-xs">
               <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75" />
@@ -99,7 +99,7 @@ export function Notifications() {
       <DrawerTrigger asChild className="relative">
         <Button size="icon-lg" variant="ghost">
           <span className="sr-only">Notifications</span>
-          <IconBell className="size-5" />
+          <IconBell className="size-4" />
           {hasUnread && (
             <div className="absolute top-1.5 right-1.5 flex size-2.5 text-xs">
               <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75" />
@@ -290,7 +290,7 @@ function NotificationItem({ notification, onClick }: NotificationItemProps) {
 
   return (
     <Item
-      className="rounded-none border-x-0 border-t-0 border-b-border last:border-b-0"
+      className="group rounded-none border-x-0 border-t-0 border-b-border last:border-b-0"
       key={id}
       onClick={onClick}
       render={<Link href={`/notifications/${id}`} />}
@@ -319,7 +319,11 @@ function NotificationItem({ notification, onClick }: NotificationItemProps) {
       {!read && (
         <ItemContent className="flex-none text-center">
           <Button
-            className="z-10"
+            className={cn(
+              "z-10",
+              !archive.isPending &&
+                "translate-x-1/2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100",
+            )}
             disabled={archive.isPending}
             onClick={(e) => {
               e.preventDefault()
