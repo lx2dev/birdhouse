@@ -15,6 +15,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
 
+import { InfiniteScroll } from "@/components/infinite-scroll"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -63,8 +64,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { api } from "@/lib/api/client"
-import { cn } from "@/lib/utils"
 import type {
   AdminLogDateRange,
   AdminLogOutcome,
@@ -251,6 +252,7 @@ export function LogsView({
   const router = useRouter()
   const utils = api.useUtils()
   const pathname = usePathname()
+  const isMobile = useIsMobile()
   const searchParams = useSearchParams()
 
   const [query, setQuery] = React.useState(initialQuery)
@@ -258,7 +260,7 @@ export function LogsView({
   const [range, setRange] = React.useState<AdminLogDateRange>(initialRange)
   const [resourceType, setResourceType] =
     React.useState<AdminLogResourceType>(initialResourceType)
-  const [isDetailsOpen, setIsDetailsOpen] = React.useState(true)
+  const [isDetailsOpen, setIsDetailsOpen] = React.useState(false)
   const [selectedLogId, setSelectedLogId] = React.useState<string | null>(null)
   const [isExporting, setIsExporting] = React.useState<"json" | "csv" | null>(
     null,
@@ -459,8 +461,8 @@ export function LogsView({
         </div>
       </header>
 
-      <Card className="overflow-hidden">
-        <CardHeader className="border-b bg-muted/20">
+      <Card className="gap-0 overflow-hidden pt-0">
+        <CardHeader className="border-b bg-muted/20 py-4">
           <div className="flex @lg:flex-row flex-col @lg:items-center gap-3">
             <div className="relative flex-1">
               <IconSearch className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -548,291 +550,39 @@ export function LogsView({
         </CardHeader>
 
         <CardContent className="max-h-[calc(100dvh-20.5rem)] p-0">
-          {isDetailsOpen ? (
-            <ResizablePanelGroup
-              className="max-h-[calc(100dvh-20.5rem)] min-h-[calc(100dvh-20.5rem)]"
-              orientation="horizontal"
+          <ResizablePanelGroup
+            className="max-h-[calc(100dvh-19.5rem)]"
+            orientation="horizontal"
+          >
+            <ResizablePanel
+              defaultSize="100%"
+              minSize={isMobile ? "0%" : "66%"}
             >
-              <ResizablePanel defaultSize="25%" minSize="66%">
-                <div className="border-r">
-                  <div className="max-h-[calc(100svh-18rem)] overflow-auto">
-                    {logsQuery.isLoading ? (
-                      <div className="space-y-2 p-4">
-                        {Array.from({ length: 10 }).map((_, index) => (
-                          <Skeleton className="h-10 w-full" key={index} />
-                        ))}
-                      </div>
-                    ) : rows.length === 0 ? (
-                      <div className="p-6">
-                        <Empty>
-                          <EmptyHeader>
-                            <EmptyMedia>
-                              <IconSearch />
-                            </EmptyMedia>
-                            <EmptyTitle>No logs found</EmptyTitle>
-                            <EmptyDescription>
-                              Try broadening your search or clearing filters.
-                            </EmptyDescription>
-                          </EmptyHeader>
-                        </Empty>
-                      </div>
-                    ) : (
-                      <Table className="min-w-190">
-                        <TableHeader className="sticky top-0 z-10 bg-card">
-                          <TableRow>
-                            <TableHead className="w-32">Time</TableHead>
-                            <TableHead className="w-28">Status</TableHead>
-                            <TableHead className="w-44">User</TableHead>
-                            <TableHead className="w-40">Resource</TableHead>
-                            <TableHead>Message</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {rows.map((log) => {
-                            const badge = getOutcomeBadgeProps(log.action)
-                            const isSelected = selectedLogId === log.id
-
-                            return (
-                              <TableRow
-                                aria-selected={isSelected}
-                                className={
-                                  isSelected ? "bg-muted/40" : "cursor-pointer"
-                                }
-                                key={log.id}
-                                onClick={() => {
-                                  setSelectedLogId(log.id)
-                                  setIsDetailsOpen(true)
-                                }}
-                                onKeyDown={(event) => {
-                                  if (
-                                    event.key === "Enter" ||
-                                    event.key === " "
-                                  ) {
-                                    event.preventDefault()
-                                    setSelectedLogId(log.id)
-                                    setIsDetailsOpen(true)
-                                  }
-                                }}
-                                role="button"
-                                tabIndex={0}
-                              >
-                                <TableCell className="font-mono text-muted-foreground text-xs">
-                                  {format(
-                                    new Date(log.timestamp),
-                                    "MMM dd HH:mm:ss",
-                                  )}
-                                </TableCell>
-                                <TableCell>
-                                  <Badge variant={badge.variant}>
-                                    {badge.label}
-                                  </Badge>
-                                </TableCell>
-                                <TableCell>
-                                  <div className="flex items-center gap-2">
-                                    <Avatar className="size-6">
-                                      <AvatarImage
-                                        alt={log.userName}
-                                        src={log.userImage ?? undefined}
-                                      />
-                                      <AvatarFallback className="text-[10px]">
-                                        {getUserInitials(log.userName)}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <span className="max-w-30 truncate text-sm">
-                                      {log.userName}
-                                    </span>
-                                  </div>
-                                </TableCell>
-                                <TableCell className="font-mono text-xs">
-                                  {log.resourceType}
-                                  {log.resourceId
-                                    ? `:${log.resourceId.slice(0, 8)}`
-                                    : ""}
-                                </TableCell>
-                                <TableCell className="max-w-104">
-                                  <div className="space-y-0.5">
-                                    <p className="truncate font-medium text-sm">
-                                      {formatAction(log.action)}
-                                    </p>
-                                    <p className="truncate text-muted-foreground text-xs">
-                                      {getDetailsSummary(log.details)}
-                                    </p>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            )
-                          })}
-                        </TableBody>
-                      </Table>
-                    )}
+              <div className="border-r">
+                {logsQuery.isLoading ? (
+                  <div className="space-y-2 p-4">
+                    {Array.from({ length: 14 }).map((_, index) => (
+                      <Skeleton className="h-10 w-full" key={index} />
+                    ))}
                   </div>
-
-                  <div className="flex items-center justify-between border-t p-3">
-                    <p className="text-muted-foreground text-xs">
-                      {logsQuery.hasNextPage
-                        ? "More logs are available"
-                        : "Reached the end of available logs"}
-                    </p>
-                    <Button
-                      disabled={
-                        !logsQuery.hasNextPage || logsQuery.isFetchingNextPage
-                      }
-                      onClick={() => logsQuery.fetchNextPage()}
-                      size="sm"
-                      variant="outline"
-                    >
-                      {logsQuery.isFetchingNextPage ? (
-                        <>
-                          <Spinner />
-                          Loading
-                        </>
-                      ) : (
-                        "Load more"
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </ResizablePanel>
-
-              <ResizableHandle withHandle />
-
-              <ResizablePanel defaultSize="25%" minSize="22%">
-                <aside className="h-full overflow-auto p-4">
-                  {!selectedLog ? (
+                ) : rows.length === 0 ? (
+                  <div className="p-6">
                     <Empty>
                       <EmptyHeader>
                         <EmptyMedia>
-                          <IconAlertCircle />
+                          <IconSearch />
                         </EmptyMedia>
-                        <EmptyTitle>Select a log</EmptyTitle>
+                        <EmptyTitle>No logs found</EmptyTitle>
                         <EmptyDescription>
-                          Choose a row to inspect full event details.
+                          Try broadening your search or clearing filters.
                         </EmptyDescription>
                       </EmptyHeader>
                     </Empty>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          {getLogOutcome(selectedLog.action) === "failed" ? (
-                            <IconAlertCircle className="size-4 text-destructive" />
-                          ) : getLogOutcome(selectedLog.action) ===
-                            "in_progress" ? (
-                            <IconClock className="size-4 text-muted-foreground" />
-                          ) : (
-                            <IconCircleCheck className="size-4 text-emerald-500" />
-                          )}
-                          <h2 className="font-medium text-base">
-                            Event details
-                          </h2>
-                          <div className="ml-auto flex items-center gap-1">
-                            <Separator
-                              className="mx-2 h-auto"
-                              orientation="vertical"
-                            />
-                            <Button
-                              aria-label="Collapse details panel"
-                              onClick={() => setIsDetailsOpen(false)}
-                              size="icon-lg"
-                              variant="ghost"
-                            >
-                              <IconX className="size-5" />
-                            </Button>
-                          </div>
-                        </div>
-                        <p className="text-muted-foreground text-sm">
-                          {formatAction(selectedLog.action)}
-                        </p>
-                        <p className="text-muted-foreground text-xs">
-                          {format(new Date(selectedLog.timestamp), "PPpp")} ({" "}
-                          {formatDistanceToNow(
-                            new Date(selectedLog.timestamp),
-                            {
-                              addSuffix: true,
-                            },
-                          )}
-                          )
-                        </p>
-                      </div>
-
-                      <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
-                        <p className="font-medium text-xs uppercase tracking-wide">
-                          Actor
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <Avatar className="size-7">
-                            <AvatarImage
-                              alt={selectedLog.userName}
-                              src={selectedLog.userImage ?? undefined}
-                            />
-                            <AvatarFallback className="text-[10px]">
-                              {getUserInitials(selectedLog.userName)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm">{selectedLog.userName}</p>
-                            <p className="text-muted-foreground text-xs">
-                              {selectedLog.userEmail}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
-                        <p className="font-medium text-xs uppercase tracking-wide">
-                          Resource
-                        </p>
-                        <p className="font-mono text-xs">
-                          {selectedLog.resourceType}
-                        </p>
-                        <p className="font-mono text-muted-foreground text-xs">
-                          {selectedLog.resourceId ?? "No resource id"}
-                        </p>
-                        <p className="font-mono text-muted-foreground text-xs">
-                          IP: {selectedLog.ipAddress ?? "Unknown"}
-                        </p>
-                      </div>
-
-                      <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
-                        <p className="font-medium text-xs uppercase tracking-wide">
-                          Payload
-                        </p>
-                        <pre className="max-h-64 overflow-auto rounded-md bg-background p-2 font-mono text-xs">
-                          {JSON.stringify(selectedLog.details, null, 2)}
-                        </pre>
-                      </div>
-                    </div>
-                  )}
-                </aside>
-              </ResizablePanel>
-            </ResizablePanelGroup>
-          ) : (
-            <div className={cn("grid", "grid-cols-1")}>
-              <div>
-                <div className="max-h-[calc(100svh-18rem)] overflow-auto">
-                  {logsQuery.isLoading ? (
-                    <div className="space-y-2 p-4">
-                      {Array.from({ length: 10 }).map((_, index) => (
-                        <Skeleton className="h-10 w-full" key={index} />
-                      ))}
-                    </div>
-                  ) : rows.length === 0 ? (
-                    <div className="p-6">
-                      <Empty>
-                        <EmptyHeader>
-                          <EmptyMedia>
-                            <IconSearch />
-                          </EmptyMedia>
-                          <EmptyTitle>No logs found</EmptyTitle>
-                          <EmptyDescription>
-                            Try broadening your search or clearing filters.
-                          </EmptyDescription>
-                        </EmptyHeader>
-                      </Empty>
-                    </div>
-                  ) : (
+                  </div>
+                ) : (
+                  <>
                     <Table className="min-w-190">
-                      <TableHeader className="sticky top-0 z-10 bg-card">
+                      <TableHeader className="z-10 bg-card">
                         <TableRow>
                           <TableHead className="w-32">Time</TableHead>
                           <TableHead className="w-28">Status</TableHead>
@@ -918,36 +668,135 @@ export function LogsView({
                         })}
                       </TableBody>
                     </Table>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between border-t p-3">
-                  <p className="text-muted-foreground text-xs">
-                    {logsQuery.hasNextPage
-                      ? "More logs are available"
-                      : "Reached the end of available logs"}
-                  </p>
-                  <Button
-                    disabled={
-                      !logsQuery.hasNextPage || logsQuery.isFetchingNextPage
-                    }
-                    onClick={() => logsQuery.fetchNextPage()}
-                    size="sm"
-                    variant="outline"
-                  >
-                    {logsQuery.isFetchingNextPage ? (
-                      <>
-                        <Spinner />
-                        Loading
-                      </>
-                    ) : (
-                      "Load more"
-                    )}
-                  </Button>
-                </div>
+                    <InfiniteScroll
+                      fetchNextPage={logsQuery.fetchNextPage}
+                      hasNextPage={logsQuery.hasNextPage}
+                      isFetchingNextPage={logsQuery.isFetchingNextPage}
+                      isManual
+                    />
+                  </>
+                )}
               </div>
-            </div>
-          )}
+            </ResizablePanel>
+
+            {isDetailsOpen && (
+              <>
+                <ResizableHandle withHandle />
+                <ResizablePanel
+                  defaultSize={isMobile ? "100%" : "50%"}
+                  minSize={isMobile ? "0%" : "22%"}
+                >
+                  <aside className="h-full overflow-auto p-4">
+                    {!selectedLog ? (
+                      <Empty>
+                        <EmptyHeader>
+                          <EmptyMedia>
+                            <IconAlertCircle />
+                          </EmptyMedia>
+                          <EmptyTitle>Select a log</EmptyTitle>
+                          <EmptyDescription>
+                            Choose a row to inspect full event details.
+                          </EmptyDescription>
+                        </EmptyHeader>
+                      </Empty>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            {getLogOutcome(selectedLog.action) === "failed" ? (
+                              <IconAlertCircle className="size-4 text-destructive" />
+                            ) : getLogOutcome(selectedLog.action) ===
+                              "in_progress" ? (
+                              <IconClock className="size-4 text-muted-foreground" />
+                            ) : (
+                              <IconCircleCheck className="size-4 text-emerald-500" />
+                            )}
+                            <h2 className="font-medium text-base">
+                              Event details
+                            </h2>
+                            <div className="ml-auto flex items-center gap-1">
+                              <Separator
+                                className="mx-2 h-auto"
+                                orientation="vertical"
+                              />
+                              <Button
+                                aria-label="Collapse details panel"
+                                onClick={() => setIsDetailsOpen(false)}
+                                size="icon-lg"
+                                variant="ghost"
+                              >
+                                <IconX className="size-5" />
+                              </Button>
+                            </div>
+                          </div>
+                          <p className="text-muted-foreground text-sm">
+                            {formatAction(selectedLog.action)}
+                          </p>
+                          <p className="text-muted-foreground text-xs">
+                            {format(new Date(selectedLog.timestamp), "PPpp")} ({" "}
+                            {formatDistanceToNow(
+                              new Date(selectedLog.timestamp),
+                              {
+                                addSuffix: true,
+                              },
+                            )}
+                            )
+                          </p>
+                        </div>
+
+                        <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
+                          <p className="font-medium text-xs uppercase tracking-wide">
+                            Actor
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <Avatar className="size-7">
+                              <AvatarImage
+                                alt={selectedLog.userName}
+                                src={selectedLog.userImage ?? undefined}
+                              />
+                              <AvatarFallback className="text-[10px]">
+                                {getUserInitials(selectedLog.userName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="text-sm">{selectedLog.userName}</p>
+                              <p className="text-muted-foreground text-xs">
+                                {selectedLog.userEmail}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
+                          <p className="font-medium text-xs uppercase tracking-wide">
+                            Resource
+                          </p>
+                          <p className="font-mono text-xs">
+                            {selectedLog.resourceType}
+                          </p>
+                          <p className="font-mono text-muted-foreground text-xs">
+                            {selectedLog.resourceId ?? "No resource id"}
+                          </p>
+                          <p className="font-mono text-muted-foreground text-xs">
+                            IP: {selectedLog.ipAddress ?? "Unknown"}
+                          </p>
+                        </div>
+
+                        <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
+                          <p className="font-medium text-xs uppercase tracking-wide">
+                            Payload
+                          </p>
+                          <pre className="max-h-64 overflow-auto rounded-md bg-background p-2 font-mono text-xs">
+                            {JSON.stringify(selectedLog.details, null, 2)}
+                          </pre>
+                        </div>
+                      </div>
+                    )}
+                  </aside>
+                </ResizablePanel>
+              </>
+            )}
+          </ResizablePanelGroup>
         </CardContent>
       </Card>
     </div>
