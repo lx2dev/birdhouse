@@ -100,6 +100,11 @@ const adminCreateVMTemplateDetails = z.object({
   status: z.string(),
 })
 
+const adminDeleteUserDetails = z.object({
+  targetUserEmail: z.string(),
+  targetUserId: z.string(),
+})
+
 const adminDeleteVMTemplateDetails = z.object({
   displayName: z.string(),
 })
@@ -216,6 +221,7 @@ export const auditActionMap = {
   "admin:create_user": adminCreateUserDetails,
   "admin:create_user_failed": adminCreateUserFailedDetails,
   "admin:create_vm_template": adminCreateVMTemplateDetails,
+  "admin:delete_user": adminDeleteUserDetails,
   "admin:delete_vm_template": adminDeleteVMTemplateDetails,
   "admin:delete_vm_template_failed": adminTemplateFailedDetails,
   "admin:reject_user": adminRejectUserDetails,

@@ -648,6 +648,52 @@ export const adminRouter = createTRPCRouter({
         return user
       }),
 
+    deleteMany: adminProcedure
+      .input(
+        z.object({
+          userIds: z.array(z.string()).min(1),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { id: adminUserId } = ctx.session.user
+
+        const usersToDelete = await ctx.db
+          .select()
+          .from(userTable)
+          .where(inArray(userTable.id, input.userIds))
+
+        if (usersToDelete.length === 0) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "No users found for the provided IDs",
+          })
+        }
+
+        await ctx.db
+          .delete(userTable)
+          .where(inArray(userTable.id, input.userIds))
+
+        await Promise.all(
+          usersToDelete.map((user) =>
+            logAndNotify({
+              action: "admin:delete_user",
+              db: ctx.db,
+              details: {
+                targetUserEmail: user.email,
+                targetUserId: user.id,
+              },
+              notifyMessage: `User "${user.email}" deleted`,
+              notifyStatus: "alert",
+              resourceId: user.id,
+              resourceType: "user",
+              userId: adminUserId,
+            }),
+          ),
+        )
+
+        return { success: true }
+      }),
+
     insertOne: adminProcedure
       .input(adminCreateUserSchema)
       .mutation(async ({ ctx, input }) => {
