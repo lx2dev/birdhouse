@@ -12,7 +12,7 @@ export async function UsersView({ filter }: UsersViewProps) {
 
   return (
     <div className="@container space-y-6">
-      <div className="flex @md:flex-row flex-col items-start @md:items-center @md:justify-between gap-4">
+      <header className="flex @md:flex-row flex-col items-start @md:items-center @md:justify-between gap-4">
         <div>
           <h1 className="font-semibold text-2xl tracking-tight">Users</h1>
           <p className="text-muted-foreground text-sm">
@@ -21,7 +21,7 @@ export async function UsersView({ filter }: UsersViewProps) {
         </div>
 
         <CreateUserModal />
-      </div>
+      </header>
 
       <UsersTableSection
         currentUserId={session?.user.id}
