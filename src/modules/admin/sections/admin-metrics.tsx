@@ -75,7 +75,7 @@ export function AdminMetricsSection() {
       value: stats.users.pendingApprovalCount,
     },
     {
-      href: "/admin/logs",
+      href: "/admin/logs?outcome=failed",
       label: "unread alerts",
       status: "destructive",
       value: stats.notifications.unreadAlertCount,
