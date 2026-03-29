@@ -53,3 +53,6 @@ export const AdminLogResourceTypeSchema = z.enum([
   "vm_template",
 ])
 export type AdminLogResourceType = z.infer<typeof AdminLogResourceTypeSchema>
+
+export const AdminLogDateRangeSchema = z.enum(["all", "30m", "24h", "7d"])
+export type AdminLogDateRange = z.infer<typeof AdminLogDateRangeSchema>

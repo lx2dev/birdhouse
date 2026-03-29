@@ -4,6 +4,7 @@ import {
   desc,
   eq,
   getTableColumns,
+  gte,
   ilike,
   inArray,
   lt,
@@ -16,6 +17,7 @@ import { env } from "@/env"
 import { logAndNotify, logOnly } from "@/helpers/audit/log-and-notify"
 import { getRedisClient } from "@/lib/redis"
 import {
+  AdminLogDateRangeSchema,
   AdminLogOutcomeSchema,
   AdminLogResourceTypeSchema,
   AdminUserFilterSchema,
@@ -43,6 +45,90 @@ import {
 const ADMIN_STATS_CACHE_KEY = "admin:getStats:v2"
 const ADMIN_STATS_CACHE_TTL_SECONDS = 15
 const ADMIN_RECENT_ACTIVITY_LIMIT = 12
+const ADMIN_LOGS_EXPORT_LIMIT = 5000
+
+interface LogFiltersInput {
+  cursor?: {
+    createdAt: Date
+    id: string
+  } | null
+  outcome: z.infer<typeof AdminLogOutcomeSchema>
+  query?: string | null
+  resourceType: z.infer<typeof AdminLogResourceTypeSchema>
+  timeRange: z.infer<typeof AdminLogDateRangeSchema>
+}
+
+function getDateRangeStart(timeRange: z.infer<typeof AdminLogDateRangeSchema>) {
+  const now = Date.now()
+
+  switch (timeRange) {
+    case "30m":
+      return new Date(now - 30 * 60 * 1000)
+    case "24h":
+      return new Date(now - 24 * 60 * 60 * 1000)
+    case "7d":
+      return new Date(now - 7 * 24 * 60 * 60 * 1000)
+    default:
+      return null
+  }
+}
+
+function buildAdminLogConditions({
+  cursor,
+  outcome,
+  query,
+  resourceType,
+  timeRange,
+}: LogFiltersInput) {
+  const normalizedQuery = query?.trim()
+  const dateRangeStart = getDateRangeStart(timeRange)
+  const failedCondition = or(
+    ilike(auditLog.action, "%failed%"),
+    eq(auditLog.action, "error"),
+  )
+  const inProgressCondition = or(
+    ilike(auditLog.action, "%requested%"),
+    ilike(auditLog.action, "%initiated%"),
+  )
+
+  return [
+    resourceType !== "all"
+      ? eq(auditLog.resourceType, resourceType)
+      : undefined,
+    outcome === "failed"
+      ? failedCondition
+      : outcome === "in_progress"
+        ? inProgressCondition
+        : outcome === "success"
+          ? sql<boolean>`not (
+              ${auditLog.action} ilike '%failed%'
+              or ${auditLog.action} = 'error'
+              or ${auditLog.action} ilike '%requested%'
+              or ${auditLog.action} ilike '%initiated%'
+            )`
+          : undefined,
+    normalizedQuery
+      ? or(
+          ilike(auditLog.action, `%${normalizedQuery}%`),
+          ilike(auditLog.resourceType, `%${normalizedQuery}%`),
+          ilike(auditLog.resourceId, `%${normalizedQuery}%`),
+          ilike(userTable.name, `%${normalizedQuery}%`),
+          ilike(userTable.email, `%${normalizedQuery}%`),
+          sql<boolean>`cast(${auditLog.details} as text) ilike ${`%${normalizedQuery}%`}`,
+        )
+      : undefined,
+    dateRangeStart ? gte(auditLog.createdAt, dateRangeStart) : undefined,
+    cursor
+      ? or(
+          lt(auditLog.createdAt, cursor.createdAt),
+          and(
+            eq(auditLog.createdAt, cursor.createdAt),
+            lt(auditLog.id, cursor.id),
+          ),
+        )
+      : undefined,
+  ]
+}
 
 type AdminStatsResponse = z.infer<typeof adminStatsResponseSchema>
 
@@ -341,6 +427,65 @@ export const adminRouter = createTRPCRouter({
     }),
 
   logs: createTRPCRouter({
+    export: adminProcedure
+      .input(
+        z.object({
+          limit: z.number().min(1).max(ADMIN_LOGS_EXPORT_LIMIT).default(1000),
+          outcome: AdminLogOutcomeSchema.default("all"),
+          query: z.string().min(1).max(200).nullish(),
+          resourceType: AdminLogResourceTypeSchema.default("all"),
+          timeRange: AdminLogDateRangeSchema.default("24h"),
+        }),
+      )
+      .query(async ({ ctx, input }) => {
+        const rows = await ctx.db
+          .select({
+            action: auditLog.action,
+            details: auditLog.details,
+            id: auditLog.id,
+            ipAddress: auditLog.ipAddress,
+            resourceId: auditLog.resourceId,
+            resourceType: auditLog.resourceType,
+            timestamp: auditLog.createdAt,
+            userEmail: userTable.email,
+            userId: userTable.id,
+            userImage: userTable.image,
+            userName: userTable.name,
+          })
+          .from(auditLog)
+          .innerJoin(userTable, eq(auditLog.userId, userTable.id))
+          .where(
+            and(
+              ...buildAdminLogConditions({
+                cursor: null,
+                outcome: input.outcome,
+                query: input.query,
+                resourceType: input.resourceType,
+                timeRange: input.timeRange,
+              }),
+            ),
+          )
+          .orderBy(desc(auditLog.createdAt), desc(auditLog.id))
+          .limit(input.limit)
+
+        return rows.map((row) => ({
+          action: row.action,
+          details: row.details,
+          id: row.id,
+          ipAddress: row.ipAddress,
+          resourceId: row.resourceId,
+          resourceType: row.resourceType,
+          timestamp:
+            row.timestamp instanceof Date
+              ? row.timestamp.toISOString()
+              : new Date(row.timestamp).toISOString(),
+          userEmail: row.userEmail,
+          userId: row.userId,
+          userImage: row.userImage,
+          userName: row.userName,
+        }))
+      }),
+
     list: adminProcedure
       .input(
         z.object({
@@ -354,59 +499,11 @@ export const adminRouter = createTRPCRouter({
           outcome: AdminLogOutcomeSchema.default("all"),
           query: z.string().min(1).max(200).nullish(),
           resourceType: AdminLogResourceTypeSchema.default("all"),
+          timeRange: AdminLogDateRangeSchema.default("24h"),
         }),
       )
       .query(async ({ ctx, input }) => {
-        const { cursor, limit, outcome, query, resourceType } = input
-
-        const normalizedQuery = query?.trim()
-        const failedCondition = or(
-          ilike(auditLog.action, "%failed%"),
-          eq(auditLog.action, "error"),
-        )
-        const inProgressCondition = or(
-          ilike(auditLog.action, "%requested%"),
-          ilike(auditLog.action, "%initiated%"),
-        )
-
-        const conditions = [
-          resourceType !== "all"
-            ? eq(auditLog.resourceType, resourceType)
-            : undefined,
-          outcome === "failed"
-            ? failedCondition
-            : outcome === "in_progress"
-              ? inProgressCondition
-              : outcome === "success"
-                ? sql<boolean>`not (
-                    ${auditLog.action} ilike '%failed%'
-                    or ${auditLog.action} = 'error'
-                    or ${auditLog.action} ilike '%requested%'
-                    or ${auditLog.action} ilike '%initiated%'
-                  )`
-                : undefined,
-          normalizedQuery
-            ? or(
-                ilike(auditLog.action, `%${normalizedQuery}%`),
-                ilike(auditLog.resourceType, `%${normalizedQuery}%`),
-                ilike(auditLog.resourceId, `%${normalizedQuery}%`),
-                ilike(userTable.name, `%${normalizedQuery}%`),
-                ilike(userTable.email, `%${normalizedQuery}%`),
-                sql<boolean>`cast(${auditLog.details} as text) ilike ${`%${normalizedQuery}%`}`,
-              )
-            : undefined,
-          cursor
-            ? or(
-                lt(auditLog.createdAt, cursor.createdAt),
-                and(
-                  eq(auditLog.createdAt, cursor.createdAt),
-                  lt(auditLog.id, cursor.id),
-                ),
-              )
-            : undefined,
-        ]
-
-        const whereClause = and(...conditions)
+        const { cursor, limit, outcome, query, resourceType, timeRange } = input
 
         const rows = await ctx.db
           .select({
@@ -424,7 +521,17 @@ export const adminRouter = createTRPCRouter({
           })
           .from(auditLog)
           .innerJoin(userTable, eq(auditLog.userId, userTable.id))
-          .where(whereClause)
+          .where(
+            and(
+              ...buildAdminLogConditions({
+                cursor,
+                outcome,
+                query,
+                resourceType,
+                timeRange,
+              }),
+            ),
+          )
           .orderBy(desc(auditLog.createdAt), desc(auditLog.id))
           .limit(limit + 1)
 
