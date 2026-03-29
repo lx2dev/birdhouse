@@ -192,6 +192,7 @@ export const auditLog = createTable(
     index("audit_log_userId_idx").on(t.userId),
     index("audit_log_action_idx").on(t.action),
     index("audit_log_resourceType_idx").on(t.resourceType),
+    index("audit_log_createdAt_id_idx").on(t.createdAt, t.id),
     index("audit_log_userId_createdAt_id_idx").on(t.userId, t.createdAt, t.id),
   ],
 )

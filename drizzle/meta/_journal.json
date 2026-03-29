@@ -36,6 +36,13 @@
       "when": 1773556605191,
       "tag": "0005_round_cobalt_man",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1774748126054,
+      "tag": "0006_yellow_gressill",
+      "breakpoints": true
     }
   ]
 }
