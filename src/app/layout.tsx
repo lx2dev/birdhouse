@@ -33,7 +33,13 @@ export default function RootLayout({
       <head>
         <meta content={APP_NAME} name="apple-mobile-web-app-title" />
       </head>
-      <body className={cn("antialiased", notoSans.variable, notoMono.variable)}>
+      <body
+        className={cn(
+          "overscroll-none antialiased",
+          notoSans.variable,
+          notoMono.variable,
+        )}
+      >
         <TRPCReactProvider>
           <ThemeProvider>
             {children}
