@@ -46,6 +46,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import {
@@ -58,6 +59,7 @@ import {
 } from "@/components/ui/table"
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api } from "@/lib/api/client"
+import { cn } from "@/lib/utils"
 import type {
   AdminLogDateRange,
   AdminLogOutcome,
@@ -251,6 +253,7 @@ export function LogsView({
   const [range, setRange] = React.useState<AdminLogDateRange>(initialRange)
   const [resourceType, setResourceType] =
     React.useState<AdminLogResourceType>(initialResourceType)
+  const [isDetailsOpen, setIsDetailsOpen] = React.useState(true)
   const [selectedLogId, setSelectedLogId] = React.useState<string | null>(null)
   const [isExporting, setIsExporting] = React.useState<"json" | "csv" | null>(
     null,
@@ -540,8 +543,15 @@ export function LogsView({
         </CardHeader>
 
         <CardContent className="max-h-[calc(100dvh-20.5rem)] p-0">
-          <div className="grid @5xl:grid-cols-[minmax(0,2fr)_minmax(20rem,1fr)]">
-            <div className="border-r">
+          <div
+            className={cn(
+              "grid",
+              isDetailsOpen
+                ? "@5xl:grid-cols-[minmax(0,2fr)_minmax(20rem,1fr)]"
+                : "grid-cols-1",
+            )}
+          >
+            <div className={cn(isDetailsOpen && "border-r")}>
               <div className="max-h-[calc(100svh-18rem)] overflow-auto">
                 {logsQuery.isLoading ? (
                   <div className="space-y-2 p-4">
@@ -586,11 +596,15 @@ export function LogsView({
                               isSelected ? "bg-muted/40" : "cursor-pointer"
                             }
                             key={log.id}
-                            onClick={() => setSelectedLogId(log.id)}
+                            onClick={() => {
+                              setSelectedLogId(log.id)
+                              setIsDetailsOpen(true)
+                            }}
                             onKeyDown={(event) => {
                               if (event.key === "Enter" || event.key === " ") {
                                 event.preventDefault()
                                 setSelectedLogId(log.id)
+                                setIsDetailsOpen(true)
                               }
                             }}
                             role="button"
@@ -673,94 +687,110 @@ export function LogsView({
               </div>
             </div>
 
-            <aside className="p-4">
-              {!selectedLog ? (
-                <Empty>
-                  <EmptyHeader>
-                    <EmptyMedia>
-                      <IconAlertCircle />
-                    </EmptyMedia>
-                    <EmptyTitle>Select a log</EmptyTitle>
-                    <EmptyDescription>
-                      Choose a row to inspect full event details.
-                    </EmptyDescription>
-                  </EmptyHeader>
-                </Empty>
-              ) : (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      {getLogOutcome(selectedLog.action) === "failed" ? (
-                        <IconAlertCircle className="size-4 text-destructive" />
-                      ) : getLogOutcome(selectedLog.action) ===
-                        "in_progress" ? (
-                        <IconClock className="size-4 text-muted-foreground" />
-                      ) : (
-                        <IconCircleCheck className="size-4 text-emerald-500" />
-                      )}
-                      <h2 className="font-medium text-base">Event details</h2>
+            {isDetailsOpen && (
+              <aside className="p-4">
+                {!selectedLog ? (
+                  <Empty>
+                    <EmptyHeader>
+                      <EmptyMedia>
+                        <IconAlertCircle />
+                      </EmptyMedia>
+                      <EmptyTitle>Select a log</EmptyTitle>
+                      <EmptyDescription>
+                        Choose a row to inspect full event details.
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        {getLogOutcome(selectedLog.action) === "failed" ? (
+                          <IconAlertCircle className="size-4 text-destructive" />
+                        ) : getLogOutcome(selectedLog.action) ===
+                          "in_progress" ? (
+                          <IconClock className="size-4 text-muted-foreground" />
+                        ) : (
+                          <IconCircleCheck className="size-4 text-emerald-500" />
+                        )}
+                        <h2 className="font-medium text-base">Event details</h2>
+                        <div className="ml-auto flex items-center gap-1">
+                          <Separator
+                            className="mx-2 h-auto"
+                            orientation="vertical"
+                          />
+                          <Button
+                            aria-label="Collapse details panel"
+                            onClick={() => setIsDetailsOpen(false)}
+                            size="icon-lg"
+                            variant="ghost"
+                          >
+                            <IconX className="size-5" />
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-muted-foreground text-sm">
+                        {formatAction(selectedLog.action)}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {format(new Date(selectedLog.timestamp), "PPpp")} ({" "}
+                        {formatDistanceToNow(new Date(selectedLog.timestamp), {
+                          addSuffix: true,
+                        })}
+                        )
+                      </p>
                     </div>
-                    <p className="text-muted-foreground text-sm">
-                      {formatAction(selectedLog.action)}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      {format(new Date(selectedLog.timestamp), "PPpp")} ({" "}
-                      {formatDistanceToNow(new Date(selectedLog.timestamp), {
-                        addSuffix: true,
-                      })}
-                      )
-                    </p>
-                  </div>
 
-                  <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
-                    <p className="font-medium text-xs uppercase tracking-wide">
-                      Actor
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <Avatar className="size-7">
-                        <AvatarImage
-                          alt={selectedLog.userName}
-                          src={selectedLog.userImage ?? undefined}
-                        />
-                        <AvatarFallback className="text-[10px]">
-                          {getUserInitials(selectedLog.userName)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-sm">{selectedLog.userName}</p>
-                        <p className="text-muted-foreground text-xs">
-                          {selectedLog.userEmail}
-                        </p>
+                    <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
+                      <p className="font-medium text-xs uppercase tracking-wide">
+                        Actor
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <Avatar className="size-7">
+                          <AvatarImage
+                            alt={selectedLog.userName}
+                            src={selectedLog.userImage ?? undefined}
+                          />
+                          <AvatarFallback className="text-[10px]">
+                            {getUserInitials(selectedLog.userName)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-sm">{selectedLog.userName}</p>
+                          <p className="text-muted-foreground text-xs">
+                            {selectedLog.userEmail}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
-                    <p className="font-medium text-xs uppercase tracking-wide">
-                      Resource
-                    </p>
-                    <p className="font-mono text-xs">
-                      {selectedLog.resourceType}
-                    </p>
-                    <p className="font-mono text-muted-foreground text-xs">
-                      {selectedLog.resourceId ?? "No resource id"}
-                    </p>
-                    <p className="font-mono text-muted-foreground text-xs">
-                      IP: {selectedLog.ipAddress ?? "Unknown"}
-                    </p>
-                  </div>
+                    <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
+                      <p className="font-medium text-xs uppercase tracking-wide">
+                        Resource
+                      </p>
+                      <p className="font-mono text-xs">
+                        {selectedLog.resourceType}
+                      </p>
+                      <p className="font-mono text-muted-foreground text-xs">
+                        {selectedLog.resourceId ?? "No resource id"}
+                      </p>
+                      <p className="font-mono text-muted-foreground text-xs">
+                        IP: {selectedLog.ipAddress ?? "Unknown"}
+                      </p>
+                    </div>
 
-                  <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
-                    <p className="font-medium text-xs uppercase tracking-wide">
-                      Payload
-                    </p>
-                    <pre className="max-h-64 overflow-auto rounded-md bg-background p-2 font-mono text-xs">
-                      {JSON.stringify(selectedLog.details, null, 2)}
-                    </pre>
+                    <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
+                      <p className="font-medium text-xs uppercase tracking-wide">
+                        Payload
+                      </p>
+                      <pre className="max-h-64 overflow-auto rounded-md bg-background p-2 font-mono text-xs">
+                        {JSON.stringify(selectedLog.details, null, 2)}
+                      </pre>
+                    </div>
                   </div>
-                </div>
-              )}
-            </aside>
+                )}
+              </aside>
+            )}
           </div>
         </CardContent>
       </Card>
