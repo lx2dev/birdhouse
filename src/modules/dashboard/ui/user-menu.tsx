@@ -22,6 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SidebarMenuButton } from "@/components/ui/sidebar"
@@ -182,6 +183,7 @@ export function UserMenu({ children, variant = "default" }: UserMenuProps) {
         <DropdownMenuItem onClick={toggleTheme}>
           <IconSunMoon />
           Toggle Theme
+          <DropdownMenuShortcut>D</DropdownMenuShortcut>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
