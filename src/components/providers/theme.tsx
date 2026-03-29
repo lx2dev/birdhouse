@@ -37,7 +37,12 @@ function ThemeShortcut() {
 
 export function ThemeProvider({ children }: React.PropsWithChildren) {
   return (
-    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="system"
+      disableTransitionOnChange
+      enableSystem
+    >
       <ThemeShortcut />
       {children}
     </NextThemesProvider>
