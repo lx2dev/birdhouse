@@ -34,3 +34,22 @@ export const AdminUserFilterSchema = z.enum([
   "not_banned",
 ])
 export type AdminUserFilter = z.infer<typeof AdminUserFilterSchema>
+
+export const AdminLogOutcomeSchema = z.enum([
+  "all",
+  "success",
+  "failed",
+  "in_progress",
+])
+export type AdminLogOutcome = z.infer<typeof AdminLogOutcomeSchema>
+
+export const AdminLogResourceTypeSchema = z.enum([
+  "all",
+  "notification",
+  "operating_system",
+  "ssh_key",
+  "user",
+  "virtual_machine",
+  "vm_template",
+])
+export type AdminLogResourceType = z.infer<typeof AdminLogResourceTypeSchema>

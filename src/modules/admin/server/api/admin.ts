@@ -4,6 +4,7 @@ import {
   desc,
   eq,
   getTableColumns,
+  ilike,
   inArray,
   lt,
   or,
@@ -15,6 +16,8 @@ import { env } from "@/env"
 import { logAndNotify, logOnly } from "@/helpers/audit/log-and-notify"
 import { getRedisClient } from "@/lib/redis"
 import {
+  AdminLogOutcomeSchema,
+  AdminLogResourceTypeSchema,
   AdminUserFilterSchema,
   insertOperatingSystemSchema,
   insertVMTemplateSchema,
@@ -336,6 +339,124 @@ export const adminRouter = createTRPCRouter({
 
       return response
     }),
+
+  logs: createTRPCRouter({
+    list: adminProcedure
+      .input(
+        z.object({
+          cursor: z
+            .object({
+              createdAt: z.date(),
+              id: z.string(),
+            })
+            .nullish(),
+          limit: z.number().min(1).max(100).default(30),
+          outcome: AdminLogOutcomeSchema.default("all"),
+          query: z.string().min(1).max(200).nullish(),
+          resourceType: AdminLogResourceTypeSchema.default("all"),
+        }),
+      )
+      .query(async ({ ctx, input }) => {
+        const { cursor, limit, outcome, query, resourceType } = input
+
+        const normalizedQuery = query?.trim()
+        const failedCondition = or(
+          ilike(auditLog.action, "%failed%"),
+          eq(auditLog.action, "error"),
+        )
+        const inProgressCondition = or(
+          ilike(auditLog.action, "%requested%"),
+          ilike(auditLog.action, "%initiated%"),
+        )
+
+        const conditions = [
+          resourceType !== "all"
+            ? eq(auditLog.resourceType, resourceType)
+            : undefined,
+          outcome === "failed"
+            ? failedCondition
+            : outcome === "in_progress"
+              ? inProgressCondition
+              : outcome === "success"
+                ? sql<boolean>`not (
+                    ${auditLog.action} ilike '%failed%'
+                    or ${auditLog.action} = 'error'
+                    or ${auditLog.action} ilike '%requested%'
+                    or ${auditLog.action} ilike '%initiated%'
+                  )`
+                : undefined,
+          normalizedQuery
+            ? or(
+                ilike(auditLog.action, `%${normalizedQuery}%`),
+                ilike(auditLog.resourceType, `%${normalizedQuery}%`),
+                ilike(auditLog.resourceId, `%${normalizedQuery}%`),
+                ilike(userTable.name, `%${normalizedQuery}%`),
+                ilike(userTable.email, `%${normalizedQuery}%`),
+                sql<boolean>`cast(${auditLog.details} as text) ilike ${`%${normalizedQuery}%`}`,
+              )
+            : undefined,
+          cursor
+            ? or(
+                lt(auditLog.createdAt, cursor.createdAt),
+                and(
+                  eq(auditLog.createdAt, cursor.createdAt),
+                  lt(auditLog.id, cursor.id),
+                ),
+              )
+            : undefined,
+        ]
+
+        const whereClause = and(...conditions)
+
+        const rows = await ctx.db
+          .select({
+            action: auditLog.action,
+            details: auditLog.details,
+            id: auditLog.id,
+            ipAddress: auditLog.ipAddress,
+            resourceId: auditLog.resourceId,
+            resourceType: auditLog.resourceType,
+            timestamp: auditLog.createdAt,
+            userEmail: userTable.email,
+            userId: userTable.id,
+            userImage: userTable.image,
+            userName: userTable.name,
+          })
+          .from(auditLog)
+          .innerJoin(userTable, eq(auditLog.userId, userTable.id))
+          .where(whereClause)
+          .orderBy(desc(auditLog.createdAt), desc(auditLog.id))
+          .limit(limit + 1)
+
+        const hasMore = rows.length > limit
+        const items = hasMore ? rows.slice(0, -1) : rows
+        const lastItem = items[items.length - 1]
+        const nextCursor =
+          hasMore && lastItem
+            ? { createdAt: lastItem.timestamp, id: lastItem.id }
+            : null
+
+        return {
+          items: items.map((row) => ({
+            action: row.action,
+            details: row.details,
+            id: row.id,
+            ipAddress: row.ipAddress,
+            resourceId: row.resourceId,
+            resourceType: row.resourceType,
+            timestamp:
+              row.timestamp instanceof Date
+                ? row.timestamp.toISOString()
+                : new Date(row.timestamp).toISOString(),
+            userEmail: row.userEmail,
+            userId: row.userId,
+            userImage: row.userImage,
+            userName: row.userName,
+          })),
+          nextCursor,
+        }
+      }),
+  }),
 
   os: createTRPCRouter({
     create: adminProcedure
