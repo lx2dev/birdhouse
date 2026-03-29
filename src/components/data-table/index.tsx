@@ -14,6 +14,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import type { ReactNode } from "react"
 import * as React from "react"
 
 import { DataTableFilterOptions } from "@/components/data-table/filter-options"
@@ -40,6 +41,7 @@ interface DataTableProps<TData, TValue> {
   filterOptions?: FilterOption[]
   currentFilter?: string | null
   filterLabel?: string
+  bulkActions?: (selectedRows: TData[], clearSelection: () => void) => ReactNode
 }
 
 export function DataTable<TData, TValue>({
@@ -48,6 +50,7 @@ export function DataTable<TData, TValue>({
   filterOptions,
   currentFilter,
   filterLabel,
+  bulkActions,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -76,11 +79,19 @@ export function DataTable<TData, TValue>({
     },
   })
 
+  const selectedRows = table
+    .getSelectedRowModel()
+    .rows.map((row) => row.original)
+  const selectedCount = Object.keys(rowSelection).length
+
   return (
     <div>
-      <div className="flex items-center py-4">
-        <div className="flex-1">
+      <div className="flex items-center gap-4 py-4">
+        <div className="flex flex-1 items-center gap-x-2">
           <DataTableSearchFilter table={table} />
+          {selectedCount > 0 &&
+            bulkActions &&
+            bulkActions(selectedRows, () => setRowSelection({}))}
         </div>
         <div className="flex items-center gap-x-2">
           <DataTableFilterOptions
