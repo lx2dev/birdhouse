@@ -1,1 +1,0 @@
-CREATE INDEX "audit_log_createdAt_id_idx" ON "birdhouse_audit_log" USING btree ("created_at","id");

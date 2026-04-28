@@ -1,1 +1,0 @@
-ALTER TABLE "birdhouse_vm" DROP CONSTRAINT "birdhouse_vm_operating_system_id_unique";
