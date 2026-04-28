@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/providers/theme"
 import { Toaster } from "@/components/ui/sonner"
 import { VersionChecker } from "@/components/version-checker"
 import { APP_NAME } from "@/constants"
+import { env } from "@/env"
 import { TRPCReactProvider } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
 
@@ -20,6 +21,7 @@ const notoMono = Noto_Sans_Mono({
 
 export const metadata: Metadata = {
   description: APP_NAME,
+  metadataBase: new URL(env.NEXT_PUBLIC_URL),
   title: "A Virtual Compute Platform By Lx2.dev",
 }
 
