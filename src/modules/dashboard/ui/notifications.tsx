@@ -96,18 +96,21 @@ export function Notifications() {
 
   return (
     <Drawer onOpenChange={setOpen} open={open}>
-      <DrawerTrigger asChild className="relative">
-        <Button size="icon-lg" variant="ghost">
-          <span className="sr-only">Notifications</span>
-          <IconBell className="size-4" />
-          {hasUnread && (
-            <div className="absolute top-1.5 right-1.5 flex size-2.5 text-xs">
-              <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75" />
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75" />
-            </div>
-          )}
-        </Button>
-      </DrawerTrigger>
+      <DrawerTrigger
+        className="relative"
+        render={
+          <Button size="icon-lg" variant="ghost">
+            <span className="sr-only">Notifications</span>
+            <IconBell className="size-4" />
+            {hasUnread && (
+              <div className="absolute top-1.5 right-1.5 flex size-2.5 text-xs">
+                <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75" />
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75" />
+              </div>
+            )}
+          </Button>
+        }
+      />
       <DrawerContent>
         <DrawerHeader hidden>
           <DrawerTitle hidden />

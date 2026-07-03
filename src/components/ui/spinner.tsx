@@ -2,14 +2,12 @@ import { IconLoader2 } from "@tabler/icons-react"
 
 import { cn } from "@/lib/utils"
 
-function Spinner({
-  className,
-  ...props
-}: Omit<React.ComponentProps<"svg">, "ref">) {
+function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
   return (
     <IconLoader2
       aria-label="Loading"
       className={cn("size-4 animate-spin", className)}
+      data-slot="spinner"
       role="status"
       {...props}
     />

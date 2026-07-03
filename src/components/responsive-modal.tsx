@@ -92,7 +92,7 @@ export function ResponsiveModal({
 
   return (
     <Drawer dismissible={!alert} onOpenChange={onOpenChange} open={open}>
-      <DrawerTrigger asChild>{resolvedTrigger.element}</DrawerTrigger>
+      <DrawerTrigger render={resolvedTrigger.element} />
       <DrawerContent className={cn("min-h-[50svh]", className)}>
         <DrawerHeader hidden>
           <DrawerTitle hidden />

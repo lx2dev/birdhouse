@@ -45,7 +45,7 @@ const itemVariants = cva(
       size: {
         default: "gap-2.5 px-3 py-2.5",
         sm: "gap-2.5 px-3 py-2.5",
-        xs: "gap-2 px-2.5 py-2 [[data-slot=dropdown-menu-content]_&]:p-0",
+        xs: "gap-2 in-data-[slot=dropdown-menu-content]:p-0 px-2.5 py-2",
       },
       variant: {
         default: "border-transparent",
@@ -81,7 +81,7 @@ function Item({
 }
 
 const itemMediaVariants = cva(
-  "flex shrink-0 items-center justify-center gap-2 group-has-[[data-slot=item-description]]/item:translate-y-0.5 group-has-[[data-slot=item-description]]/item:self-start [&_svg]:pointer-events-none",
+  "flex shrink-0 items-center justify-center gap-2 group-has-data-[slot=item-description]/item:translate-y-0.5 group-has-data-[slot=item-description]/item:self-start [&_svg]:pointer-events-none",
   {
     defaultVariants: {
       variant: "default",

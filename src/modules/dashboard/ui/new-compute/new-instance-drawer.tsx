@@ -51,12 +51,14 @@ export function NewInstanceDrawer(props: NewInstanceDrawerProps) {
                 <DrawerTitle>Provisioning Console</DrawerTitle>
                 <DrawerDescription>{drawerDescription}</DrawerDescription>
               </div>
-              <DrawerClose asChild>
-                <Button size="sm" variant="ghost">
-                  <IconX className="size-4" />
-                  Close
-                </Button>
-              </DrawerClose>
+              <DrawerClose
+                render={
+                  <Button size="sm" variant="ghost">
+                    <IconX className="size-4" />
+                    Close
+                  </Button>
+                }
+              />
             </div>
           </DrawerHeader>
 
