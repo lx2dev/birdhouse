@@ -29,6 +29,7 @@ export default function AuthLayout({ children }: LayoutProps<"/auth">) {
             </p>
             <p>
               You can find demo credentials{" "}
+              {/* biome-ignore-start lint/a11y/noAmbiguousAnchorText: sufficient context */}
               <a
                 className="underline underline-offset-4"
                 href="/docs/demo"
@@ -37,6 +38,7 @@ export default function AuthLayout({ children }: LayoutProps<"/auth">) {
               >
                 here
               </a>
+              {/* biome-ignore-end lint/a11y/noAmbiguousAnchorText: sufficient context */}
               .
             </p>
           </AlertDescription>

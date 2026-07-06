@@ -92,7 +92,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
   return (
     <style
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: dynamic CSS injection
+      // biome-ignore-start lint/security/noDangerouslySetInnerHtml: dynamic CSS injection
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
           .map(
@@ -111,6 +111,7 @@ ${colorConfig
           )
           .join("\n"),
       }}
+      // biome-ignore-end lint/security/noDangerouslySetInnerHtml: dynamic CSS injection
     />
   )
 }
