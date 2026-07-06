@@ -121,6 +121,9 @@ export const auth = betterAuth({
       })
     },
   },
+  onAPIError: {
+    errorURL: "/auth/error",
+  },
   plugins: [
     admin(),
     lastLoginMethod(),
